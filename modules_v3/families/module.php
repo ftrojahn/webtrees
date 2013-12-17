@@ -41,7 +41,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function modAction($modAction) {
 		switch ($modAction) {
 		case 'ajax':
-			Zend_Session::writeClose();
+			//$WT_SESSION_MANAGER->writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
 			echo $this->getSidebarAjaxContent();
 			break;

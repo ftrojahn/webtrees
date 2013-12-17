@@ -115,7 +115,7 @@ default:
 			header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . $url);
 			// Explicitly write the session data before we exit,
 			// as it doesn’t always happen when using APC.
-			Zend_Session::writeClose();
+			//$WT_SESSION_MANAGER->writeClose();
 			exit;
 		}
 	}
@@ -265,7 +265,7 @@ case 'register':
 				WT_I18N::translate('You are not allowed to send messages that contain external links.') . ' ' .
 				WT_I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1])
 			);
-			AddToLog('Possible spam registration from "'.$user_name.'"/"'.$user_email.'", IP="'.$WT_REQUEST->getClientIp().'", comments="'.$user_comments.'"', 'auth');
+			AddToLog('Possible spam registration from "'.$user_name.'"/"'.$user_email.'", IP="'.$WT_REMOTE_ADDRESS->getIpAddress().'", comments="'.$user_comments.'"', 'auth');
 		} else {
 			// Everything looks good - create the user
 			$controller->pageHeader();
@@ -362,7 +362,7 @@ case 'register':
 			$mail1_method = get_user_setting($webmaster_user_id, 'contact_method');
 			if ($mail1_method!='messaging3' && $mail1_method!='mailto' && $mail1_method!='none') {
 				WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
-					->execute(array($user_email, $WT_REQUEST->getClientIp(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
+					->execute(array($user_email, $WT_REMOTE_ADDRESS->getIpAddress(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
 			}
 
 			echo '<div class="confirm"><p>', WT_I18N::translate('Hello %s…<br>Thank you for your registration.', $user_realname), '</p><p>';
@@ -535,7 +535,7 @@ case 'verify_hash':
 			$mail1_method  = get_user_setting($webmaster_user_id, 'CONTACT_METHOD');
 			if ($mail1_method!='messaging3' && $mail1_method!='mailto' && $mail1_method!='none') {
 				WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
-					->execute(array($user_name, $WT_REQUEST->getClientIp(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
+					->execute(array($user_name, $WT_REMOTE_ADDRESS->getIpAddress(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
 			}
 
 			set_user_setting($user_id, 'verified', 1);

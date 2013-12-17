@@ -31,10 +31,10 @@ define('WT_DATA_DIR', realpath('data').DIRECTORY_SEPARATOR);
 define('WT_DEBUG_LANG', false); // The translation library needs this
 $WT_SESSION=new stdClass();
 $WT_SESSION->locale='';
-// Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
-set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
-require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace('WT_');
+
+// Autoload webtrees and third-party libraries
+require WT_ROOT . 'vendor/autoload.php';
+
 require 'includes/functions/functions.php';
 require WT_ROOT.'includes/functions/functions_utf-8.php';
 define('WT_LOCALE', WT_I18N::init());

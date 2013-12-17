@@ -29,7 +29,6 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.'includes/functions/functions_export.php';
-require_once WT_ROOT.'library/pclzip.lib.php';
 
 /**
 * Main controller class for the Clippings page.
@@ -291,7 +290,7 @@ class WT_Controller_Clippings {
 	// Brings up the download dialog box and allows the user to download the file
 	// based on the options he or she selected
 	function download_clipping() {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 
 		if ($this->IncludeMedia == "yes" || $this->Zip == "yes") {
 			header('Content-Type: application/zip');

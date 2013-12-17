@@ -26,8 +26,9 @@ if (!defined('WT_WEBTREES')) {
 class WT_Controller_Ajax extends WT_Controller_Base {
 
 	public function pageHeader() {
+		global $WT_SESSION_MANAGER;
 		// We have finished writing session data, so release the lock
-		Zend_Session::writeClose();
+		$WT_SESSION_MANAGER->writeClose();
 		// Ajax responses are always UTF8
 		header('Content-Type: text/html; charset=UTF-8');
 		$this->page_header=true;

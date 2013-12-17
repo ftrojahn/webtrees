@@ -21,7 +21,7 @@
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
 
-Zend_Session::writeClose();
+$WT_SESSION_MANAGER->writeClose();
 
 // The script must always end by calling one of these two functions.
 function ok() {

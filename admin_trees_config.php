@@ -191,7 +191,7 @@ case 'update':
 	}
 
 	// Reload the page, so that the settings take effect immediately.
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
 	exit;
 }

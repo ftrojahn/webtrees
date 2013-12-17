@@ -1410,7 +1410,7 @@ function format_surname_table($surnames, $script) {
 // @param $type string, indilist or famlist
 // @param $totals, boolean, show totals after each name
 function format_surname_tagcloud($surnames, $script, $totals) {
-	$cloud=new Zend_Tag_Cloud(
+	$cloud=new Zend\Tag\Cloud(
 		array(
 			'tagDecorator'=>array(
 				'decorator'=>'HtmlTag',

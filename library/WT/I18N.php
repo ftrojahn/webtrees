@@ -6,7 +6,7 @@
 // translate()
 // plural()
 //
-// We wrap the Zend_Translate gettext library, to allow us to add extra
+// We wrap the Zend\I18N library, to allow us to add extra
 // functionality, such as mixed RTL and LTR text.
 //
 // Copyright (C) 2013 Greg Roach
@@ -30,6 +30,8 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
+use Zend\Cache\Storage\Plugin\Serializer;
+
 class WT_I18N {
 	// All characters for a given script - for identifying text and text-direction.
 	const WT_UTF8_ARABIC_CHARACTERS = '؆؇؈؉؊؋؍؎؏ؘؙؚؐؑؒؓؔؕؖؗ؞ءآأؤإئابةتثجحخدذرزسشصضطظعغػؼؽؾؿفقكلمنهوىيٖٜٗ٘ٙٚٛٝٞ٪٫٬٭ٮٯٱٲٳٴٵٶٷٸٹٺٻټٽپٿڀځڂڃڄڅچڇڈډڊڋڌڍڎڏڐڑڒړڔڕږڗژڙښڛڜڝڞڟڠڡڢڣڤڥڦڧڨکڪګڬڭڮگڰڱڲڳڴڵڶڷڸڹںڻڼڽھڿۀہۂۃۄۅۆۇۈۉۊۋیۍێۏېۑےۓ۔ەۖۗۘۙۚۛۜ۞ۣ۟۠ۡۢۤۥۦۧۨ۩۪ۭ۫۬ۮۯ۰۱۲۳۴۵۶۷۸۹ۺۻۼ۽۾ۿݐݑݒݓݔݕݖݗݘݙݚݛݜݝݞݟݠݡݢݣݤݥݦݧݨݩݪݫݬݭݮݯݰݱݲݳݴݵݶݷݸݹݺݻݼݽݾݿﭐﭑﭒﭓﭔﭕﭖﭗﭘﭙﭚﭛﭜﭝﭞﭟﭠﭡﭢﭣﭤﭥﭦﭧﭨﭩﭪﭫﭬﭭﭮﭯﭰﭱﭲﭳﭴﭵﭶﭷﭸﭹﭺﭻﭼﭽﭾﭿﮀﮁﮂﮃﮄﮅﮆﮇﮈﮉﮊﮋﮌﮍﮎﮏﮐﮑﮒﮓﮔﮕﮖﮗﮘﮙﮚﮛﮜﮝﮞﮟﮠﮡﮢﮣﮤﮥﮦﮧﮨﮩﮪﮫﮬﮭﮮﮯﮰﮱﯓﯔﯕﯖﯗﯘﯙﯚﯛﯜﯝﯞﯟﯠﯡﯢﯣﯤﯥﯦﯧﯨﯩﯪﯫﯬﯭﯮﯯﯰﯱﯲﯳﯴﯵﯶﯷﯸﯹﯺﯻﯼﯽﯾﯿﰀﰁﰂﰃﰄﰅﰆﰇﰈﰉﰊﰋﰌﰍﰎﰏﰐﰑﰒﰓﰔﰕﰖﰗﰘﰙﰚﰛﰜﰝﰞﰟﰠﰡﰢﰣﰤﰥﰦﰧﰨﰩﰪﰫﰬﰭﰮﰯﰰﰱﰲﰳﰴﰵﰶﰷﰸﰹﰺﰻﰼﰽﰾﰿﱀﱁﱂﱃﱄﱅﱆﱇﱈﱉﱊﱋﱌﱍﱎﱏﱐﱑﱒﱓﱔﱕﱖﱗﱘﱙﱚﱛﱜﱝﱞﱟﱠﱡﱢﱣﱤﱥﱦﱧﱨﱩﱪﱫﱬﱭﱮﱯﱰﱱﱲﱳﱴﱵﱶﱷﱸﱹﱺﱻﱼﱽﱾﱿﲀﲁﲂﲃﲄﲅﲆﲇﲈﲉﲊﲋﲌﲍﲎﲏﲐﲑﲒﲓﲔﲕﲖﲗﲘﲙﲚﲛﲜﲝﲞﲟﲠﲡﲢﲣﲤﲥﲦﲧﲨﲩﲪﲫﲬﲭﲮﲯﲰﲱﲲﲳﲴﲵﲶﲷﲸﲹﲺﲻﲼﲽﲾﲿﳀﳁﳂﳃﳄﳅﳆﳇﳈﳉﳊﳋﳌﳍﳎﳏﳐﳑﳒﳓﳔﳕﳖﳗﳘﳙﳚﳛﳜﳝﳞﳟﳠﳡﳢﳣﳤﳥﳦﳧﳨﳩﳪﳫﳬﳭﳮﳯﳰﳱﳲﳳﳴﳵﳶﳷﳸﳹﳺﳻﳼﳽﳾﳿﴀﴁﴂﴃﴄﴅﴆﴇﴈﴉﴊﴋﴌﴍﴎﴏﴐﴑﴒﴓﴔﴕﴖﴗﴘﴙﴚﴛﴜﴝﴞﴟﴠﴡﴢﴣﴤﴥﴦﴧﴨﴩﴪﴫﴬﴭﴮﴯﴰﴱﴲﴳﴴﴵﴶﴷﴸﴹﴺﴻﴼﴽﵐﵑﵒﵓﵔﵕﵖﵗﵘﵙﵚﵛﵜﵝﵞﵟﵠﵡﵢﵣﵤﵥﵦﵧﵨﵩﵪﵫﵬﵭﵮﵯﵰﵱﵲﵳﵴﵵﵶﵷﵸﵹﵺﵻﵼﵽﵾﵿﶀﶁﶂﶃﶄﶅﶆﶇﶈﶉﶊﶋﶌﶍﶎﶏﶒﶓﶔﶕﶖﶗﶘﶙﶚﶛﶜﶝﶞﶟﶠﶡﶢﶣﶤﶥﶦﶧﶨﶩﶪﶫﶬﶭﶮﶯﶰﶱﶲﶳﶴﶵﶶﶷﶸﶹﶺﶻﶼﶽﶾﶿﷀﷁﷂﷃﷄﷅﷆﷇﷰﷱﷲﷳﷴﷵﷶﷷﷸﷹﷺﷻ﷼ﹰﹱﹲﹳﹴﹶﹷﹸﹹﹺﹻﹼﹽﹾﹿﺀﺁﺂﺃﺄﺅﺆﺇﺈﺉﺊﺋﺌﺍﺎﺏﺐﺑﺒﺓﺔﺕﺖﺗﺘﺙﺚﺛﺜﺝﺞﺟﺠﺡﺢﺣﺤﺥﺦﺧﺨﺩﺪﺫﺬﺭﺮﺯﺰﺱﺲﺳﺴﺵﺶﺷﺸﺹﺺﺻﺼﺽﺾﺿﻀﻁﻂﻃﻄﻅﻆﻇﻈﻉﻊﻋﻌﻍﻎﻏﻐﻑﻒﻓﻔﻕﻖﻗﻘﻙﻚﻛﻜﻝﻞﻟﻠﻡﻢﻣﻤﻥﻦﻧﻨﻩﻪﻫﻬﻭﻮﻯﻰﻱﻲﻳﻴﻵﻶﻷﻸﻹﻺﻻﻼ';
@@ -43,7 +45,6 @@ class WT_I18N {
 	public  static $list_separator;
 	private static $dir;
 	private static $cache;
-	private static $numbering_system;
 	private static $translation_adapter;
 
 	// Initialise the translation adapter with a locale setting.
@@ -52,10 +53,19 @@ class WT_I18N {
 		global $WT_SESSION;
 
 		// The translation libraries only work with a cache.
-		$cache_options=array('automatic_serialization'=>true);
 
 		if (ini_get('apc.enabled')) {
-			self::$cache=Zend_Cache::factory('Core', 'Apc', $cache_options, array());
+			self::$cache = Zend\Cache\StorageFactory::factory(array(
+				'adapter' => array(
+					'name'    => 'apc',
+					'options' => array(
+						'ttl' => 3600,
+					),
+				),
+				'plugins' => array(
+					'Serializer'
+				),
+			));
 		} else {
 			if (!is_dir(WT_DATA_DIR.'cache')) {
 				// We may not have permission - especially during setup, before we instruct
@@ -63,17 +73,18 @@ class WT_I18N {
 				@mkdir(WT_DATA_DIR.'cache');
 			}
 			if (is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
-				self::$cache=Zend_Cache::factory('Core', 'File', $cache_options, array('cache_dir'=>WT_DATA_DIR.'cache'));
-			} else {
-				// No cache available :-(
-				self::$cache=Zend_Cache::factory('Core', 'Zend_Cache_Backend_BlackHole', $cache_options, array(), false, true);
+				self::$cache = Zend\Cache\StorageFactory::factory(array(
+					'adapter' => array(
+						'name'    => 'filesystem',
+						'options' => array(
+							'ttl' => 3600,
+						),
+					),
+					'plugins' => array(
+						'Serializer'
+					),
+				));
 			}
-		}
-
-		// If we created a cache, use it.
-		if (self::$cache) {
-			Zend_Locale::setCache(self::$cache);
-			Zend_Translate::setCache(self::$cache);
 		}
 
 		$installed_languages=self::installed_languages();
@@ -130,27 +141,23 @@ class WT_I18N {
 		}
 		
 		// Load the translation file
-		self::$translation_adapter = new Zend_Translate('gettext', WT_ROOT.'language/'.$locale.'.mo', $locale);
-
-		// Deprecated - some custom modules use this to add translations
-		Zend_Registry::set('Zend_Translate', self::$translation_adapter);
+		self::$translation_adapter = new Zend\I18n\Translator\Translator();
+		self::$translation_adapter
+			->setCache(self::$cache)
+			->addTranslationFile('gettext', WT_ROOT.'language/'.$locale.'.mo', 'default', $locale)
+			->setFallbackLocale('en-US')
+			->setLocale($locale);
 
 		// Load any local user translations
 		if (is_dir(WT_DATA_DIR.'language')) {
 			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.mo')) {
-				self::$translation_adapter->addTranslation(
-					new Zend_Translate('gettext', WT_DATA_DIR.'language/'.$locale.'.mo', $locale)
-				);
+				self::$translation_adapter->addTranslationFile('gettext', WT_DATA_DIR.'language/'.$locale.'.mo', 'default', $locale);
 			}
 			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.php')) {
-				self::$translation_adapter->addTranslation(
-					new Zend_Translate('array', WT_DATA_DIR.'language/'.$locale.'.php', $locale)
-				);
+				self::$translation_adapter->addTranslationFile('array', WT_DATA_DIR.'language/'.$locale.'.php', 'default', $locale);
 			}
 			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.csv')) {
-				self::$translation_adapter->addTranslation(
-					new Zend_Translate('csv', WT_DATA_DIR.'language/'.$locale.'.csv', $locale)
-				);
+				self::$translation_adapter->addTranslationFile('csv', WT_DATA_DIR.'language/'.$locale.'.csv', 'default', $locale);
 			}
 		}
 
@@ -181,9 +188,6 @@ class WT_I18N {
 		// I18N: This is the name of the MySQL collation that applies to your language.  A list is available at http://dev.mysql.com/doc/refman/5.0/en/charset-unicode-sets.html
 		self::$collation=WT_I18N::translate('utf8_unicode_ci');
 
-		// Non-latin numbers may require non-latin digits
-		self::$numbering_system = Zend_Locale_Data::getContent($locale, 'defaultnumberingsystem');
-
 		return $locale;
 	}
 
@@ -192,7 +196,7 @@ class WT_I18N {
 		$mo_files=glob(WT_ROOT.'language'.DIRECTORY_SEPARATOR.'*.mo');
 		$cache_key=md5(serialize($mo_files));
 
-		if (!($installed_languages=self::$cache->load($cache_key))) {
+		if (true || !($installed_languages=self::$cache->getItem($cache_key))) {
 			$installed_languages=array();
 			foreach ($mo_files as $mo_file) {
 				if (preg_match('/^(([a-z][a-z][a-z]?)([-_][A-Z][A-Z])?([-_][A-Za-z]+)*)\.mo$/', basename($mo_file), $match)) {
@@ -222,17 +226,14 @@ class WT_I18N {
 					list(,$value)=explode('|', $value);
 				}
 			}
-			self::$cache->save($installed_languages, $cache_key);
+			//self::$cache->setItem($cache_key, $installed_languages);
 		}
 		return $installed_languages;
 	}
 
 	// Generate i18n markup for the <html> tag, e.g. lang="ar" dir="rtl"
 	public static function html_markup() {
-		$localeData=Zend_Locale_Data::getList(self::$locale, 'layout');
-		$dir=$localeData['characters']=='right-to-left' ? 'rtl' : 'ltr';
-		list($lang) = preg_split('/[-_@]/', self::$locale);
-		return 'lang="'.$lang.'" dir="'.$dir.'"';
+		return 'lang="' . WT_I18N::$locale . '" dir="' . WT_I18N::scriptDirection(WT_I18N::languageScript(WT_I18N::$locale)) . '"';
 	}
 
 	// Translate a number into the local representation.  e.g. 12345.67 becomes
@@ -240,20 +241,20 @@ class WT_I18N {
 	// fr: 12 345,67
 	// de: 12.345,67
 	public static function number($n, $precision=0) {
-		// Add "punctuation" and convert digits
-		$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
-		$n=self::digits($n);
-		return $n;
+		$number_format = new Zend\I18n\View\Helper\NumberFormat();
+		return $number_format
+			->setDecimals($precision)
+			->setFormatStyle(NumberFormatter::PATTERN_DECIMAL)
+			->__invoke($n);
 	}
 
 	// Convert the digits 0-9 into the local script
 	// Used for years, etc., where we do not want thousands-separators, decimals, etc.
 	public static function digits($n) {
-		if (self::$numbering_system != 'latn') {
-			return Zend_Locale_Format::convertNumerals($n, 'latn', self::$numbering_system);
-		} else {
-			return $n;
-		}
+		$number_format = new Zend\I18n\View\Helper\NumberFormat();
+		return $number_format
+			->setFormatStyle(NumberFormatter::DECIMAL)
+			->__invoke($n);
 	}
 
 	// Translate a fraction into a percentage.  e.g. 0.123 becomes
@@ -261,6 +262,12 @@ class WT_I18N {
 	// fr: 12,3 %
 	// de: 12,3%
 	public static function percentage($n, $precision=0) {
+		$number_format = new Zend\I18n\View\Helper\NumberFormat();
+		return $number_format
+			->setDecimals($precision)
+			->setFormatStyle(NumberFormatter::PERCENTAGE)
+			->__invoke($n);
+
 		return
 			/* I18N: This is a percentage, such as “32.5%”. “%s” is the number, “%%” is the percent symbol.  Some languages require a (non-breaking) space between the two, or a different symbol. */
 			WT_I18N::translate('%s%%', self::number($n*100.0, $precision));
@@ -273,7 +280,7 @@ class WT_I18N {
 		if (WT_DEBUG_LANG) {
 			$args[0]=WT_Debug::pseudoTranslate($args[0]);
 		} else {
-			$args[0]=self::$translation_adapter->_($args[0]);
+			$args[0]=self::$translation_adapter->translate($args[0]);
 		}
 		return call_user_func_array('sprintf', $args);
 	}
@@ -287,7 +294,7 @@ class WT_I18N {
 			$msgtxt=WT_Debug::pseudoTranslate($args[1]);
 		} else {
 			$msgid=$args[0]."\x04".$args[1];
-			$msgtxt=self::$translation_adapter->_($msgid);
+			$msgtxt=self::$translation_adapter->translate($msgid);
 			if ($msgtxt==$msgid) {
 				$msgtxt=$args[1];
 			}
@@ -301,7 +308,7 @@ class WT_I18N {
 	// This is necessary to fetch a format string (containing % characters) without
 	// performing sustitution of arguments.
 	public static function noop($string) {
-		return self::$translation_adapter->_($string);
+		return self::$translation_adapter->translate($string);
 	}
 
 	// echo self::plural('There is an error', 'There are errors', $num_errors);
@@ -316,7 +323,7 @@ class WT_I18N {
 				$string=WT_Debug::pseudoTranslate($args[1]);
 			}
 		} else {
-			$string=self::$translation_adapter->plural($args[0], $args[1], $args[2]);
+			$string=self::$translation_adapter->translatePlural($args[0], $args[1], $args[2]);
 		}
 		array_splice($args, 0, 3, array($string));
 		return call_user_func_array('sprintf', $args);
@@ -619,10 +626,8 @@ class WT_I18N {
 		$length_menu='<select>'.$length_menu.'</select>';
 		$length_menu=/* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', $length_menu);
 
-		// Which symbol is used for separating numbers into groups
-		$symbols = Zend_Locale_Data::getList(self::$locale, 'symbols');
 		// Which digits are used for numbers
-		$digits = Zend_Locale_Data::getContent(self::$locale, 'numberingsystem', self::$numbering_system);
+		$digits = '0123456789'; // TODO
 
 		if ($digits=='0123456789') {
 			$callback='';
@@ -670,7 +675,7 @@ class WT_I18N {
 			' "sInfoEmpty":      "'.WT_I18N::translate('Showing %1$s to %2$s of %3$s', 0, 0, 0).'",'.
 			' "sInfoFiltered":   "'./* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_').'",'.
 			' "sInfoPostfix":    "",'.
-			' "sInfoThousands":  "'.$symbols['group'].'",'.
+			' "sInfoThousands":  "'.','.'",'. // TODO
 			' "sLengthMenu":     "'.WT_Filter::escapeJs($length_menu).'",'.
 			' "sLoadingRecords": "'.WT_I18N::translate('Loading…').'",'.
 			' "sProcessing":     "'.WT_I18N::translate('Loading…').'",'.

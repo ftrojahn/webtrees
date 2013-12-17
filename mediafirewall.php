@@ -24,7 +24,7 @@
 define('WT_SCRIPT_NAME', 'mediafirewall.php');
 require './includes/session.php';
 
-Zend_Session::writeClose();
+//$WT_SESSION_MANAGER->writeClose();
 
 $mid   = WT_Filter::get('mid', WT_REGEX_XREF);
 $thumb = WT_Filter::getBool('thumb');

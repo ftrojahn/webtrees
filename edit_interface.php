@@ -127,7 +127,7 @@ case 'updateraw':
 	$fact_ids  = WT_Filter::postArray('fact_id');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=editraw&xref=' . $xref);
 		exit;
 	}
@@ -222,7 +222,7 @@ case 'updaterawfact':
 	$keep_chan = WT_Filter::postBool('keep_chan');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=editrawfact&xref=' . $xref . '&fact_id=' . $fact_id);
 		exit;
 	}
@@ -429,7 +429,7 @@ case 'update':
 	if (!WT_Filter::checkCsrf()) {
 		$prev_action = WT_Filter::post('prev_action', 'add|edit|addname|editname');
 		$fact_type   = WT_Filter::post('fact_type', WT_REGEX_TAG);
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=' . $prev_action . '&xref=' . $xref . '&fact_id=' . $fact_id . '&fact=' . $fact_type);
 		exit;
 	}
@@ -556,7 +556,7 @@ case 'add_child_to_family_action':
 
 	if (!WT_Filter::checkCsrf()) {
 		$gender = WT_Filter::get('gender', '[MFU]', 'U');
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_child_to_family&xref=' . $xref . '&gender=' . $gender);
 		exit;
 	}
@@ -633,7 +633,7 @@ case 'add_child_to_individual_action':
 	$islink  = WT_Filter::postArray('islink', '[01]');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_child_to_individual&xref=' . $xref);
 		exit;
 	}
@@ -716,7 +716,7 @@ case 'add_parent_to_individual_action':
 
 	if (!WT_Filter::checkCsrf()) {
 		$gender = WT_Filter::get('gender', '[MFU]', 'U');
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_parent_to_individual&xref=' . $xref . '&gender=' . $gender);
 		exit;
 	}
@@ -786,7 +786,7 @@ case 'add_unlinked_indi_action':
 	$islink  = WT_Filter::postArray('islink', '[01]');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_unlinked_indi');
 		exit;
 	}
@@ -851,7 +851,7 @@ case 'add_spouse_to_individual_action':
 
 	if (!WT_Filter::checkCsrf()) {
 		$gender = WT_Filter::get('famtag', 'HUSB|WIFE');
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_spouse_to_individual&xref=' . $xref . '&famtag=' . $famtag);
 		exit;
 	}
@@ -943,7 +943,7 @@ case 'add_spouse_to_family_action':
 
 	if (!WT_Filter::checkCsrf()) {
 		$gender = WT_Filter::get('famtag', 'HUSB|WIFE');
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=add_spouse_to_family&xref=' . $xref . '&famtag=' . $famtag);
 		exit;
 	}
@@ -1053,7 +1053,7 @@ case 'linkfamaction':
 	$PEDI   = WT_Filter::post('PEDI');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=addfamlink&xref=' . $xref);
 		exit;
 	}
@@ -1166,7 +1166,7 @@ case 'linkspouseaction':
 
 	if (!WT_Filter::checkCsrf()) {
 		$gender = WT_Filter::get('famtag', 'HUSB|WIFE');
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=linkspouse&xref=' . $xref . '&famtag=' . $famtag);
 		exit;
 	}
@@ -1304,7 +1304,7 @@ case 'addsourceaction':
 		->pageHeader();
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=addnewsource');
 		exit;
 	}
@@ -1409,7 +1409,7 @@ case 'addnoteaction':
 		->pageHeader();
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=addnewnote');
 		exit;
 	}
@@ -1432,7 +1432,7 @@ case 'addnoteaction_assisted':
 		->pageHeader();
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=addnewnote_assisted');
 		exit;
 	}
@@ -1517,7 +1517,7 @@ case 'editnoteaction':
 	$note      = WT_Filter::post('NOTE');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=editnote&xref=' . $xref);
 		exit;
 	}
@@ -1604,7 +1604,7 @@ case 'addnewrepository':
 case 'addrepoaction':
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=addnewrepository');
 		exit;
 	}
@@ -1793,7 +1793,7 @@ case 'reorder_media_update':
 	$keep_chan = WT_Filter::postBool('keep_chan');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=reorder_media_&xref=' . $xref);
 		exit;
 	}
@@ -1901,7 +1901,7 @@ case 'reorder_update':
 	$keep_chan = WT_Filter::postBool('keep_chan');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=reorder_children&xref=' . $xref);
 		exit;
 	}
@@ -2109,7 +2109,7 @@ case 'changefamily_update':
 	$keep_chan = WT_Filter::postBool('keep_chan');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=changefamily&xref=' . $xref);
 		exit;
 	}
@@ -2278,7 +2278,7 @@ case 'reorder_fams_update':
 	$keep_chan = WT_Filter::postBool('keep_chan');
 
 	if (!WT_Filter::checkCsrf()) {
-		Zend_Session::writeClose();
+		//$WT_SESSION_MANAGER->writeClose();
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME . '?action=reorder_fams&xref=' . $xref);
 		exit;
 	}

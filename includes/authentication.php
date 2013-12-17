@@ -52,7 +52,7 @@ function authenticateUser($user_name, $password) {
 			$approved=get_user_setting($user_id, 'verified_by_admin');
 			if ($verified && $approved || $is_admin) {
 				// Whenever we change our authorisation level change the session ID
-				Zend_Session::regenerateId();
+				//$WT_SESSION_MANAGER->regenerateId();
 				$WT_SESSION->wt_user = $user_id;
 				AddToLog('Login successful ->'.$user_name.'<-', 'auth');
 				return $user_id;
@@ -80,7 +80,7 @@ function userLogout($user_id) {
 	AddToLog('Logout '.getUserName($user_id), 'auth');
 	// If we are logging ourself out, then end our session too.
 	if (WT_USER_ID==$user_id) {
-		Zend_Session::destroy();
+		$WT_SESSION_MANAGER->destroy();
 	}
 }
 
@@ -188,13 +188,13 @@ function setUserEmail($user_id, $email) {
 // Note that while transfering data from PhpGedView to WT, we delete the WT users and
 // replace with PhpGedView users.  Hence the current user_id is not always available.
 function AddToLog($log_message, $log_type='error') {
-	global $WT_REQUEST;
+	global $WT_REMOTE_ADDRESS;
 	WT_DB::prepare(
 		"INSERT INTO `##log` (log_type, log_message, ip_address, user_id, gedcom_id) VALUES (?, ?, ?, ?, ?)"
 	)->execute(array(
 		$log_type,
 		$log_message,
-		$WT_REQUEST->getClientIp(),
+		$WT_REMOTE_ADDRESS->getIpAddress(),
 		defined('WT_USER_ID') && WT_USER_ID && WT_SCRIPT_NAME!='admin_pgv_to_wt.php' ? WT_USER_ID : null,
 		defined('WT_GED_ID') ? WT_GED_ID : null
 	));
@@ -203,13 +203,13 @@ function AddToLog($log_message, $log_type='error') {
 //----------------------------------- AddToSearchLog
 //-- requires a string to add into the searchlog-file
 function AddToSearchLog($log_message, $geds) {
-	global $WT_REQUEST;
+	global $WT_REMOTE_ADDRESS;
 	foreach (WT_Tree::getAll() as $tree) {
 		WT_DB::prepare(
 			"INSERT INTO `##log` (log_type, log_message, ip_address, user_id, gedcom_id) VALUES ('search', ?, ?, ?, ?)"
 		)->execute(array(
 			(count(WT_Tree::getAll())==count($geds) ? 'Global search: ' : 'Gedcom search: ').$log_message,
-			$WT_REQUEST->getClientIp(),
+			$WT_REMOTE_ADDRESS->getIpAddress(),
 			WT_USER_ID ? WT_USER_ID : null,
 			$tree->tree_id
 		));
@@ -218,7 +218,7 @@ function AddToSearchLog($log_message, $geds) {
 
 // Store a new message in the database
 function addMessage($message) {
-	global $WT_TREE, $WT_REQUEST;
+	global $WT_TREE, $WT_REMOTE_ADDRESS;
 
 	$user_id_from=get_user_id($message['from']);
 	$user_id_to  =get_user_id($message['to']);
@@ -300,7 +300,7 @@ function addMessage($message) {
 		WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
 			->execute(array(
 				$message['from'],
-				$WT_REQUEST->getClientIp(),
+				$WT_REMOTE_ADDRESS->getIpAddress(),
 				get_user_id($message['to']),
 				$message['subject'],
 				str_replace('<br>', '', $message['body']) // Remove the <br> that we added for the external email.  TODO: create different messages

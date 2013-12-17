@@ -34,7 +34,7 @@ if (
 	$obj instanceof WT_Note       ||
 	$obj instanceof WT_Media
 ) {
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$obj->getRawUrl());
 	exit;
 } elseif (!$obj || !$obj->canShow()) {

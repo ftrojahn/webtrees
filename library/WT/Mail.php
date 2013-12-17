@@ -28,12 +28,12 @@ class WT_Mail {
 
 	// Audit information to add to email footer
 	public static function auditFooter() {
-		global $WT_REQUEST;
+		global $WT_REMOTE_ADDRESS;
 
 		return
 			self::EOL .
 			'---------------------------------------' . self::EOL .
-			'IP ADDRESS: ' . $WT_REQUEST->getClientIp() . self::EOL .
+			'IP ADDRESS: ' . $WT_REMOTE_ADDRESS->getIpAddress() . self::EOL .
 			'LANGUAGE: '   . WT_LOCALE . self::EOL;
 	}
 
@@ -41,7 +41,7 @@ class WT_Mail {
 	// Caution! gmail may rewrite the "From" header unless you have added the address to your account.
 	public static function send(WT_Tree $tree, $to_email, $to_name, $replyto_email, $replyto_name, $subject, $message) {
 		try {
-			$mail = new Zend_Mail('UTF-8');
+			$mail = new Zend\Mail('UTF-8');
 			$mail
 				->setSubject ($subject)
 				->setBodyHtml($message)
@@ -73,7 +73,7 @@ class WT_Mail {
 	public static function transport() {
 		switch (WT_Site::preference('SMTP_ACTIVE')) {
 		case 'internal':
-			return new Zend_Mail_Transport_Sendmail();
+			return new Zend\Mail\Transport\Sendmail();
 		case 'external':
 			$config = array(
 				'name' => WT_Site::preference('SMTP_HELO'),
@@ -88,10 +88,10 @@ class WT_Mail {
 				$config['ssl'] = WT_Site::preference('SMTP_SSL');
 			}
 
-			return new Zend_Mail_Transport_Smtp(WT_Site::preference('SMTP_HOST'), $config);
+			return new Zend\Mail\Transport\Smtp(WT_Site::preference('SMTP_HOST'), $config);
 		default:
 			// For testing
-			return new Zend_Mail_Transport_File();
+			return new Zend\Mail\Transport\File();
 		}
 	}
 }

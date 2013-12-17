@@ -334,7 +334,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			if (count($this->myindilist)==1 && !$this->myfamlist && !$this->mysourcelist && !$this->mynotelist) {
 				$indi=$this->myindilist[0];
 				if ($indi->canShowName()) {
-					Zend_Session::writeClose();
+					//$WT_SESSION_MANAGER->writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$indi->getRawUrl());
 					exit;
 				}
@@ -342,7 +342,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			if (!$this->myindilist && count($this->myfamlist)==1 && !$this->mysourcelist && !$this->mynotelist) {
 				$fam=$this->myfamlist[0];
 				if ($fam->canShowName()) {
-					Zend_Session::writeClose();
+					//$WT_SESSION_MANAGER->writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$fam->getRawUrl());
 					exit;
 				}
@@ -350,7 +350,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			if (!$this->myindilist && !$this->myfamlist && count($this->mysourcelist)==1 && !$this->mynotelist) {
 				$sour=$this->mysourcelist[0];
 				if ($sour->canShowName()) {
-					Zend_Session::writeClose();
+					//$WT_SESSION_MANAGER->writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$sour->getRawUrl());
 					exit;
 				}
@@ -358,7 +358,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			if (!$this->myindilist && !$this->myfamlist && !$this->mysourcelist && count($this->mynotelist)==1) {
 				$note=$this->mynotelist[0];
 				if ($note->canShowName()) {
-					Zend_Session::writeClose();
+					//$WT_SESSION_MANAGER->writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$note->getRawUrl());
 					exit;
 				}

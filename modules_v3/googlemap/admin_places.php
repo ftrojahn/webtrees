@@ -141,7 +141,7 @@ $controller=new WT_Controller_Page();
 $controller->requireAdminLogin();
 
 if ($action=='ExportFile' && WT_USER_IS_ADMIN) {
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	$tmp = place_id_to_hierarchy($parent);
 	$maxLevel = getHighestLevel();
 	if ($maxLevel>8) $maxLevel=8;

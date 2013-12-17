@@ -43,7 +43,7 @@ header('Content-type: text/html; charset=UTF-8');
 
 
 if (!WT_Filter::checkCsrf()) {
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	header('HTTP/1.0 406 Not Acceptable');
 	exit;
 }
@@ -190,8 +190,8 @@ case 'masquerade':
 	if (WT_USER_IS_ADMIN && WT_USER_ID != $user_id && array_key_exists($user_id, $all_users)) {
 		AddToLog('masquerade as user ->' . get_user_name($user_id) . '<-', 'auth');
 		$WT_SESSION->wt_user = $user_id;
-		Zend_Session::regenerateId();
-		Zend_Session::writeClose();
+		$WT_SESSION_MANAGER->regenerateId();
+		$WT_SESSION_MANAGER->writeClose();
 	} else {
 		header('HTTP/1.0 406 Not Acceptable');
 	}
@@ -252,4 +252,4 @@ case 'theme':
 	}
 	break;
 }
-Zend_Session::writeClose();
+$WT_SESSION_MANAGER->writeClose();

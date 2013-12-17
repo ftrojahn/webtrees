@@ -144,10 +144,8 @@ if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 	unset($process);
 }
 
-// Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
-set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
-require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace('WT_');
+// Autoload webtrees and third-party libraries
+require WT_ROOT . 'vendor/autoload.php';
 
 // PHP requires a time zone to be set in php.ini
 if (!ini_get('date.timezone')) {
@@ -223,7 +221,7 @@ if (file_exists(WT_ROOT.'data/config.ini.php')) {
 	exit;
 }
 
-$WT_REQUEST=new Zend_Controller_Request_Http();
+$WT_REMOTE_ADDRESS = new Zend\Http\PhpEnvironment\RemoteAddress;
 
 require WT_ROOT.'includes/authentication.php';
 
@@ -273,7 +271,7 @@ $rule=WT_DB::prepare(
 	" WHERE IFNULL(INET_ATON(?), 0) BETWEEN ip_address_start AND ip_address_end" .
 	" AND ? LIKE user_agent_pattern" .
 	" ORDER BY ip_address_end-ip_address_start"
-)->execute(array($WT_REQUEST->getClientIp(), $_SERVER['HTTP_USER_AGENT']))->fetchOne();
+)->execute(array($WT_REMOTE_ADDRESS->getIpAddress(), $_SERVER['HTTP_USER_AGENT']))->fetchOne();
 
 switch ($rule) {
 case 'allow':
@@ -286,13 +284,13 @@ case 'robot':
 case 'unknown':
 	// Search engines don’t send cookies, and so create a new session with every visit.
 	// Make sure they always use the same one
-	Zend_Session::setId('search-engine-'.str_replace('.', '-', $WT_REQUEST->getClientIp()));
+	$WT_SESSION_MANAGER->setId('search-engine-'.str_replace('.', '-', $WT_REMOTE_ADDRESS->getIpAddress()));
 	$SEARCH_SPIDER=true;
 	break;
 case '':
 	WT_DB::prepare(
 		"INSERT INTO `##site_access_rule` (ip_address_start, ip_address_end, user_agent_pattern, comment) VALUES (IFNULL(INET_ATON(?), 0), IFNULL(INET_ATON(?), 4294967295), ?, '')"
-	)->execute(array($WT_REQUEST->getClientIp(), $WT_REQUEST->getClientIp(), $_SERVER['HTTP_USER_AGENT']));
+	)->execute(array($WT_REMOTE_ADDRESS->getIpAddress(), $WT_REMOTE_ADDRESS->getIpAddress(), $_SERVER['HTTP_USER_AGENT']));
 	$SEARCH_SPIDER=true;
 	break;
 }
@@ -312,7 +310,7 @@ session_set_save_handler(
 		return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();
 	},
 	// write
-	function ($id, $data) use ($WT_REQUEST) {
+	function ($id, $data) use ($WT_REMOTE_ADDRESS) {
 		// Only update the session table once per minute, unless the session data has actually changed.
 		WT_DB::prepare(
 			"INSERT INTO `##session` (session_id, user_id, ip_address, session_data, session_time)" .
@@ -322,7 +320,7 @@ session_set_save_handler(
 			" ip_address   = VALUES(ip_address)," .
 			" session_data = VALUES(session_data)," .
 			" session_time = CURRENT_TIMESTAMP - SECOND(CURRENT_TIMESTAMP)"
-		)->execute(array($id, WT_USER_ID, $WT_REQUEST->getClientIp(), $data));
+		)->execute(array($id, WT_USER_ID, $WT_REMOTE_ADDRESS->getIpAddress(), $data));
 		return true;
 	},
 	// destroy
@@ -337,10 +335,10 @@ session_set_save_handler(
 	}
 );
 
-// Use the Zend_Session object to start the session.
-// This allows all the other Zend Framework components to integrate with the session
 define('WT_SESSION_NAME', 'WT_SESSION');
-$cfg=array(
+
+$WT_SESSION_CONFIG = new Zend\Session\Config\SessionConfig();
+$WT_SESSION_CONFIG->setOptions(array(
 	'name'            => WT_SESSION_NAME,
 	'cookie_lifetime' => 0,
 	'gc_maxlifetime'  => WT_Site::preference('SESSION_TIME'),
@@ -348,24 +346,24 @@ $cfg=array(
 	'gc_divisor'      => 100,
 	'cookie_path'     => WT_SCRIPT_PATH,
 	'cookie_httponly' => true,
-);
+));
+$WT_SESSION_MANAGER = new Zend\Session\SessionManager($WT_SESSION_CONFIG);
 
 // Search engines don’t send cookies, and so create a new session with every visit.
 // Make sure they always use the same one
 if ($SEARCH_SPIDER) {
-	Zend_Session::setId('search-engine-'.str_replace('.', '-', $WT_REQUEST->getClientIp()));
+	$WT_SESSION_MANAGER->setId('search-engine-'.str_replace('.', '-', $WT_REMOTE_ADDRESS->getIpAddress()));
 }
 
-Zend_Session::start($cfg);
+$WT_SESSION_MANAGER->start();
 
 // Register a session “namespace” to store session data.  This is better than
-// using $_SESSION, as we can avoid clashes with other modules or applications,
-// and problems with servers that have enabled “register_globals”.
-$WT_SESSION=new Zend_Session_Namespace('WEBTREES');
+// using $_SESSION, as we can avoid clashes with other modules or applications.
+$WT_SESSION = new Zend\Session\Container('WEBTREES');
 
 if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
 	// A new session, so prevent session fixation attacks by choosing a new PHPSESSID.
-	Zend_Session::regenerateId();
+	$WT_SESSION_MANAGER->regenerateId();
 	$WT_SESSION->initiated=true;
 } else {
 	// An existing session

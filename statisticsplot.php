@@ -885,7 +885,7 @@ if ($action=='update') {
 	$surname = $savedInput['SURN'];
 	unset($savedInput);
 }
-Zend_Session::writeClose();
+$WT_SESSION_MANAGER->writeClose();
 
 echo '<div class="statistics_chart" title="', WT_I18N::translate('Statistics plot'), '">';
 

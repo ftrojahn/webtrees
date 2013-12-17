@@ -28,7 +28,7 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 $controller=new WT_Controller_Fanchart();
 
 if (WT_Filter::getBool('img')) {
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	$controller->generate_fan_chart('png');
 	exit;
 }

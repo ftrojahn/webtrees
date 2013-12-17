@@ -1,6 +1,7 @@
 # Exclude the following files when we build webtrees
 
 .git*                       export-ignore
+composer.*                  export-ignore
 Makefile                    export-ignore
 build/                      export-ignore
 library/Zend/Acl/           export-ignore

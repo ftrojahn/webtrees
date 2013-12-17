@@ -24,7 +24,7 @@ require './includes/session.php';
 header('Content-Type: text/plain; charset=UTF-8');
 
 // We have finished writing session data, so release the lock
-Zend_Session::writeClose();
+$WT_SESSION_MANAGER->writeClose();
 
 $term = WT_Filter::get('term'); // we can search on '"><& etc.
 $type = WT_Filter::get('field');

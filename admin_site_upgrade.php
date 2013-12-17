@@ -21,7 +21,6 @@
 define('WT_SCRIPT_NAME', 'admin_site_upgrade.php');
 
 require './includes/session.php';
-require WT_ROOT . 'library/pclzip.lib.php'; // TODO - rename and use autoloading
 
 // Check for updates
 $latest_version_txt = fetch_latest_version();

@@ -44,7 +44,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			$this->admin();
 			break;
 		case 'generate':
-			Zend_Session::writeClose();
+			//$WT_SESSION_MANAGER->writeClose();
 			$this->generate(WT_Filter::get('file'));
 			break;
 		default:

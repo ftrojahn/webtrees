@@ -1,0 +1,22 @@
+{
+	"name":        "webtrees",
+	"description": "Online genealogy",
+	"licence":     "GPL",
+	"keywords":    ["genealogy", "GEDCOM", "family tree"],
+	"authors":     [{"name":  "Greg Roach", "email": "fisharebest@gmail.com"}],
+	"config":      {},
+	"autoload":    {
+		"psr-0": {
+			"WT_": "library/WT/"
+		},
+		"classmap": [
+			"vendor/pclzip.lib.php"
+		]
+	},
+	"require":     {
+		"michelf/php-markdown":        "*",
+		"phpunit/phpunit":             "*",
+		"tecnick.com/tcpdf":           "*",
+		"zendframework/zendframework": "2.2.*"
+	}
+}

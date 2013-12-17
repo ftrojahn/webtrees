@@ -129,7 +129,7 @@ class WT_Controller_Base {
 	// Print the page header, using the theme
 	public function pageHeader() {
 		// Once we've displayed the header, we should no longer write session data.
-		Zend_Session::writeClose();
+		$WT_SESSION_MANAGER->writeClose();
 
 		// We've displayed the header - display the footer automatically
 		$this->page_header=true;

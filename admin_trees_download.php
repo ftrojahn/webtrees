@@ -46,8 +46,6 @@ if ($action == 'download') {
 
 $fileName = WT_GEDCOM;
 if ($action == "download" && $zip == "yes") {
-	require WT_ROOT.'library/pclzip.lib.php';
-
 	$temppath = WT_Site::preference('INDEX_DIRECTORY') . "tmp/";
 	$zipname = "dl" . date("YmdHis") . $fileName . ".zip";
 	$zipfile = WT_Site::preference('INDEX_DIRECTORY') . $zipname;
@@ -79,7 +77,7 @@ if ($action == "download" && $zip == "yes") {
 }
 
 if ($action == "download") {
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	header('Content-Type: text/plain; charset=UTF-8');
 	// We could open "php://compress.zlib" to create a .gz file or "php://compress.bzip2" to create a .bz2 file
 	$gedout = fopen('php://output', 'w');

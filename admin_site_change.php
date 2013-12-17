@@ -115,7 +115,7 @@ case 'delete':
 	WT_DB::prepare($DELETE)->execute($args);
 	break;
 case 'export':
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	header('Content-Type: text/csv');
 	header('Content-Disposition: attachment; filename="webtrees-changes.csv"');
 	$rows=WT_DB::prepare($SELECT1.$WHERE.' ORDER BY change_id')->execute($args)->fetchAll();
@@ -136,7 +136,7 @@ case 'export':
 	}
 	exit;
 case 'load_json':
-	Zend_Session::writeClose();
+	$WT_SESSION_MANAGER->writeClose();
 	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
 	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
 	set_user_setting(WT_USER_ID, 'admin_site_change_page_size', $iDisplayLength);

@@ -24,7 +24,7 @@
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
 
-Zend_Session::writeClose();
+$WT_SESSION_MANAGER->writeClose();
 
 header('Content-Type: text/html; charset=UTF-8');
 $person = WT_Individual::getInstance(WT_Filter::get('pid', WT_REGEX_XREF));

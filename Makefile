@@ -10,11 +10,12 @@ SHELL=bash
 WT_VERSION=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | awk -F - '{print $$1}')
 WT_RELEASE=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | awk -F - '{print $$2}')
 
-# Location of minification tools
+# Location of build tools
 CLOSURE_JS=$(BUILD_DIR)/compiler-20121212.jar
 CLOSURE_CSS=$(BUILD_DIR)/closure-stylesheets-20111230.jar
 YUI_COMPRESSOR=$(BUILD_DIR)/yuicompressor-2.4.7.jar
 HTML_COMPRESSION=$(BUILD_DIR)/htmlcompressor-1.5.3.jar
+COMPOSER=$(BUILD_DIR)/composer.phar
 
 # Files to minify
 CSS_FILES=$(shell find $(BUILD_DIR) -name "*.css")
@@ -25,21 +26,35 @@ CSS_RTL_FILES=$(patsubst %-ltr.css,%-rtl.css,$(CSS_LTR_FILES))
 PNG_LTR_FILES=$(shell find . -name "*-ltr.png")
 PNG_RTL_FILES=$(patsubst %-ltr.css,%-rtl.png,$(PNG_LTR_FILES))
 
+# Command line PHP scripts
+PHP_CLI=COMPOSER_PROCESS_TIMEOUT=1800 php -d allow_url_fopen=1 -d disable_functions=
+
 # Use maximum compression
 GZIP=gzip -9
 
-.PHONY: clean update check build/webtrees
+.PHONY: clean update check vendor build/webtrees
 
 ################################################################################
 # Update 
 ################################################################################
-update: $(MO_FILES) $(CSS_RTL_FILES) $(PNG_RTL_FILES)
+update: $(MO_FILES) $(CSS_RTL_FILES) $(PNG_RTL_FILES) vendor
 
 ################################################################################
 # Check for PHP syntax errors
 ################################################################################
 check:
 	if find . -name '*.php' -not -path './library/Zend/*' -exec php -l {} \; | grep -v "No syntax errors"; then false; else true; fi
+
+################################################################################
+# Third party (vendor) libraries
+################################################################################
+$(COMPOSER):
+	cd $(@D) && curl -sS https://getcomposer.org/installer | $(PHP_CLI)
+
+vendor: $(COMPOSER)
+	$(PHP_CLI) $(COMPOSER) self-update
+	$(PHP_CLI) $(COMPOSER) update
+	$(PHP_CLI) $(COMPOSER) dump-autoload --optimize
 
 ################################################################################
 # Create a release from this GIT branch

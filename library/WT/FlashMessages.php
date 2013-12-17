@@ -26,13 +26,13 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_FlashMessages {
 	public static function addMessage($message) {
-		$flash_messenger = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger');
+		$flash_messenger = new Zend\View\Helper\FlashMessenger();
 
 		$flash_messenger->addMessage($message);
 	}
 
 	public static function getMessages() {
-		$flash_messenger = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger');
+		$flash_messenger = new Zend\View\Helper\FlashMessenger();
 
 		$messages = array();
 

@@ -80,7 +80,7 @@ if ($delete_file) {
 
 switch($action) {
 case 'load_json':
-	Zend_Session::writeClose();
+	//$WT_SESSION_MANAGER->writeClose();
 	$sSearch        = WT_Filter::get('sSearch', null, ''); // MySQL needs an empty string, not NULL
 	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
 	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');

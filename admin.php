@@ -583,6 +583,10 @@ function old_paths() {
 		WT_ROOT.'themes/minimal/css-1.5.0',
 		WT_ROOT.'themes/webtrees/css-1.5.0',
 		WT_ROOT.'themes/xenea/css-1.5.0',
+		// Removed in x.y.z
+		WT_ROOT.'library/Zend',
+		WT_ROOT.'library/pclzip.lib.php',
+		WT_ROOT.'library/tcpdf',
 	);
 }
 

@@ -182,7 +182,8 @@ class WT_Controller_Page extends WT_Controller_Base {
 		flush();
 
 		// Once we've displayed the header, we should no longer write session data.
-		Zend_Session::writeClose();
+		global $WT_SESSION_MANAGER;
+		//$WT_SESSION_MANAGER->writeClose();
 
 		// We've displayed the header - display the footer automatically
 		$this->page_header=true;
