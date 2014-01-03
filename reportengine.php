@@ -65,24 +65,35 @@ function get_tag_values($tag) {
 $newvars = array();
 foreach ($vars as $name=>$var) {
 	$newvars[$name]['id'] = $var;
-	if (!empty($type[$name]) && (($type[$name]=='INDI') || ($type[$name]=='FAM') || ($type[$name]=='SOUR'))) {
-		$record = WT_GedcomRecord::getInstance($var);
-		if (!$record) {
-			$action='setup';
-		}
-		$gedcom = $record->getGedcom();
-		// If we wanted a FAM, and were given an INDI, look for a spouse
-		if ($type[$name]=='FAM' && $record instanceof WT_Individual) {
-			$tmp = false;
-			foreach ($record->getSpouseFamilies() as $family) {
-				$gedcom = $family->getGedcom();
-				$tmp = true;
+	if (!empty($type[$name])) {
+		switch ($type[$name]) {
+		case 'INDI':
+			$record = WT_Individual::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
 			}
-			if (!$tmp) {
-				$action='setup';
+			break;
+		case 'FAM':
+			$record = WT_Family::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
 			}
+			break;
+		case 'SOUR':
+			$record = WT_Source::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
+			}
+			break;
+		default:
+			break;
 		}
-		$newvars[$name]['gedcom'] = $gedcom;
 	}
 }
 $vars = $newvars;
