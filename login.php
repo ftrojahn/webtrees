@@ -39,6 +39,7 @@ $action          = WT_Filter::post('action');
 $user_realname   = WT_Filter::post('user_realname');
 $user_name       = WT_Filter::post('user_name',       WT_REGEX_USERNAME);
 $user_email      = WT_Filter::postEmail('user_email');
+$user_email2     = WT_Filter::postEmail('user_email2');
 $user_password01 = WT_Filter::post('user_password01', WT_REGEX_PASSWORD);
 $user_password02 = WT_Filter::post('user_password02', WT_REGEX_PASSWORD);
 $user_comments   = WT_Filter::post('user_comments');
@@ -253,13 +254,15 @@ case 'register':
 	$controller->setPageTitle(WT_I18N::translate('Request new user account'));
 
 	// The form parameters are mandatory, and the validation errors are shown in the client.
-	if ($WT_SESSION->good_to_send && $user_name && $user_password01 && $user_password01==$user_password02 && $user_realname && $user_email && $user_comments) {
+	if ($WT_SESSION->good_to_send && $user_name && $user_password01 && $user_password01==$user_password02 && $user_realname && $user_email && $user_email2 && $user_comments) {
 
 		// These validation errors cannot be shown in the client.
 		if (get_user_id($user_name)) {
 			WT_FlashMessages::addMessage(WT_I18N::translate('Duplicate user name.  A user with that user name already exists.  Please choose another user name.'));
 		} elseif (get_user_by_email($user_email)) {
 			WT_FlashMessages::addMessage(WT_I18N::translate('Duplicate email address.  A user with that email already exists.'));
+		} elseif ($user_email != $user_email2) {
+			WT_FlashMessages::addMessage(WT_I18N::translate('Emails do not match.'));
 		} elseif (preg_match('/(?!'.preg_quote(WT_SERVER_NAME, '/').')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $user_comments, $match)) {
 			WT_FlashMessages::addMessage(
 				WT_I18N::translate('You are not allowed to send messages that contain external links.') . ' ' .
@@ -402,6 +405,11 @@ case 'register':
 			<div>
 				<label for="user_email">', WT_I18N::translate('Email address'), help_link('email'),
 					'<input type="email" id="user_email" name="user_email" required maxlength="64" value="', WT_Filter::escapeHtml($user_email), '">
+				</label>
+			</div>
+			<div>
+				<label for="user_email">', WT_I18N::translate('Email address'), help_link('email'),
+					'<input type="email" id="user_email2" name="user_email2" required maxlength="64" value="', htmlspecialchars($user_email2), '">
 				</label>
 			</div>
 			<div>
