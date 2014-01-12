@@ -35,6 +35,8 @@ class WT_Tree {
 
 	// List of all trees
 	private static $trees   =null;
+	// List of all trees (ignoring access rules)
+	private static $trees_ignore_access   =null;
 
 	// Tree settings
 	private $preference     =null;    // wt_gedcom_setting table
@@ -154,10 +156,30 @@ class WT_Tree {
 		return self::$trees;
 	}
 
+	// Fetch all the trees (even those without access).
+	public static function getAllIgnoreAccess() {
+		if (self::$trees_ignore_access===null) {
+			self::$trees_ignore_access=array();
+			$rows=WT_DB::prepare(
+				"SELECT g.gedcom_id AS tree_id, g.gedcom_name AS tree_name, gs1.setting_value AS tree_title, gs2.setting_value AS imported".
+				" FROM `##gedcom` g".
+				" LEFT JOIN `##gedcom_setting`      gs1 ON (g.gedcom_id=gs1.gedcom_id AND gs1.setting_name='title')".
+				" LEFT JOIN `##gedcom_setting`      gs2 ON (g.gedcom_id=gs2.gedcom_id AND gs2.setting_name='imported')".
+				" WHERE ".
+				"  g.gedcom_id>0".          // exclude the "template" tree
+				" ORDER BY g.sort_order, 3"
+			)->execute()->fetchAll();
+			foreach ($rows as $row) {
+				self::$trees_ignore_access[$row->tree_id]=new WT_Tree($row->tree_id, $row->tree_name, $row->tree_title, $row->imported);
+			}
+		}
+		return self::$trees_ignore_access;
+	}
+
 	// Get the tree with a specific ID.  TODO - is this function needed long-term, or just while
 	// we integrate this class into the rest of the code?
 	public static function get($tree_id) {
-		$trees=self::getAll();
+		$trees=self::getAllIgnoreAccess();
 		return $trees[$tree_id];
 	}
 

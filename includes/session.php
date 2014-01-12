@@ -570,6 +570,14 @@ if (substr(PHP_SAPI, 0, 3) == 'cgi') {  // cgi-mode, should only be writable by 
 // Lightbox needs custom integration in many places.  Only check for the module once.
 define('WT_USE_LIGHTBOX', !$SEARCH_SPIDER && array_key_exists('lightbox', WT_Module::getActiveModules()));
 
+if (isset($_REQUEST['ged'])) {
+	//No access to gedcom -> show login page
+	if (WT_GEDCOM != $_REQUEST['ged']) {
+		$controller=new WT_Controller_Page();
+		$controller->requireMemberLogin();
+	}
+}
+
 // Search engines are only allowed to see certain pages.
 if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
 	'index.php', 'indilist.php', 'module.php', 'mediafirewall.php',

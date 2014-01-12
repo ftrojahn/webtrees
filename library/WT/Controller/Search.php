@@ -117,8 +117,8 @@ class WT_Controller_Search extends WT_Controller_Page {
 		}
 
 		// Retrieve the gedcoms to search in
-		if (count(WT_Tree::getAll())>1 && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
-			foreach (WT_Tree::getAll() as $tree) {
+		if (count(WT_Tree::getAllIgnoreAccess())>1 && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+			foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
 				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
 				if (isset ($_REQUEST["$str"]) || $topsearch) {
 					$this->sgeds[$tree->tree_id] = $tree->tree_name;
@@ -577,7 +577,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 				// individual results
 				echo '<div id="searchAccordion-indi">';
 				// Split individuals by tree
-				$trees=WT_Tree::getAll();
+				$trees=WT_Tree::getAllIgnoreAccess();
 				foreach ($this->sgeds as $ged_id=>$gedcom) {
 					$datalist = array();
 					foreach ($this->myindilist as $individual) {

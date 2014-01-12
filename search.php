@@ -204,9 +204,9 @@ echo '<div id="search-page">
 		// If the search is a general or soundex search then possibly display checkboxes for the gedcoms
 		if ($controller->action == "general" || $controller->action == "soundex") {
 			// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
-			if ((count(WT_Tree::getAll()) > 1) && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+			if ((count(WT_Tree::getAllIgnoreAccess()) > 1) && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
 				// More Than 3 Gedcom Filess enable elect all & select none buttons
-				if (count(WT_Tree::getAll())>3) {
+				if (count(WT_Tree::getAllIgnoreAccess())>3) {
 					echo '<div class="label">&nbsp;</div>
 						<div class="value">
 						<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', true);});return false;">
@@ -221,7 +221,7 @@ echo '<div id="search-page">
 				<div id="search_trees" class="value">';
 					//Create Groups
 					$groups = array();
-					foreach (WT_Tree::getAll() as $tree) {
+					foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
 						if (!in_array($tree->tree_name,$search_excluded_trees)){
 							if (strpos($tree->tree_title, ':') !== false){
 								$group = substr($tree->tree_title, 0, strpos($tree->tree_title, ':'));
@@ -244,6 +244,19 @@ echo '<div id="search-page">
 						echo '<input type="checkbox" name="grp_', $groupname,'" value="yes" onclick="jQuery(\'#search_group_', $groupindex ,' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])"';
 						if (isset ($_REQUEST['grp_'.$groupname])) {
 							echo 'checked="checked" ';
+						}
+						else {
+							$allchecked = true;
+							foreach ($groups[$groupname] as $tree) {
+								$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+								if (!isset ($_REQUEST["$str"])) {
+									$allchecked = false;
+									break;
+								}
+							}
+							if ($allchecked) {
+								echo 'checked="checked" ';
+							}
 						}
 						echo '>';
 						echo '<a href="javascript:void(0)" onclick="jQuery(\'#search_group_', $groupindex, '\').is(\':hidden\')?jQuery(\'#search_group_', $groupindex, '\').show():jQuery(\'#search_group_', $groupindex, '\').hide()">', $groupname, '</a><br/>', "\n";
