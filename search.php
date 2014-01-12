@@ -211,6 +211,10 @@ echo '<div id="search-page">
 						<div class="value">
 						<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', true);});return false;">
 						<input type="button" value="', /* I18N: select none (of the family trees) */ WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', false);});return false;">';
+						// More Than 10 Gedcom Files enable invert selection button
+						//if (count(WT_Tree::getAll())>10) {
+							echo '<input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', !jQuery(this).prop(\'checked\'));});return false;">';
+						//}
 						echo '</div>';
 				}
 				echo '<div class="label">' , WT_I18N::translate('Family trees'), '</div>

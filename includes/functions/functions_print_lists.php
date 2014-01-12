@@ -63,15 +63,13 @@ function format_indi_table($datalist, $option='') {
 					/*  8 birt plac */ {"sType": "unicode"},
 					/*  9 deat date */ {"iDataSort": 10},
 					/* 10 DEAT:DATE */ {"bVisible": false},
-					/* 11 age       */ {"iDataSort": 12, "sClass": "center"},
-					/* 12 AGE       */ {"sType": "numeric", "bVisible": false},
-					/* 13 deat plac */ {"sType": "unicode"},
-					/* 14 CHAN      */ {"iDataSort": 15, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-					/* 15 CHAN_sort */ {"bVisible": false},
-					/* 16 SEX       */ {"bVisible": false},
-					/* 17 BIRT      */ {"bVisible": false},
-					/* 18 DEAT      */ {"bVisible": false},
-					/* 19 TREE      */ {"bVisible": false}
+					/* 11 deat plac */ {"sType": "unicode"},
+					/* 12 CHAN      */ {"iDataSort": 13, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+					/* 13 CHAN_sort */ {"bVisible": false},
+					/* 14 SEX       */ {"bVisible": false},
+					/* 15 BIRT      */ {"bVisible": false},
+					/* 16 DEAT      */ {"bVisible": false},
+					/* 17 TREE      */ {"bVisible": false}
 				],
 				"aaSorting": [['.($option=='sosa'?'4, "asc"':'1, "asc"').']],
 				"iDisplayLength": 20,
@@ -92,25 +90,25 @@ function format_indi_table($datalist, $option='') {
 
 			/* Add event listeners for filtering inputs */
 			jQuery("#SEX_M_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("M", 16 );
+				oTable'.$table_id.'.fnFilter("M", 14 );
 				jQuery("#SEX_M_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#SEX_F_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("F", 16 );
+				oTable'.$table_id.'.fnFilter("F", 14 );
 				jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#SEX_U_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("U", 16 );
+				oTable'.$table_id.'.fnFilter("U", 14 );
 				jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#RESET_'.    $table_id.'").click( function() {
-				for (i=16; i<=19; i++){
+				for (i=14; i<=17; i++){
 					oTable'.$table_id.'.fnFilter("", i );
 				};
 				jQuery("div.filtersH_'.$table_id.' button").removeClass("ui-state-active");
@@ -145,8 +143,6 @@ function format_indi_table($datalist, $option='') {
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('PLAC'). '</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('DEAT'). '</th>';
 	$html .= '<th>SORT_DEAT</th>';
-	$html .= '<th>'. WT_Gedcom_Tag::getLabel('AGE'). '</th>';
-	$html .= '<th>AGE</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('PLAC'). '</th>';
 	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
 	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
@@ -288,13 +284,6 @@ function format_indi_table($datalist, $option='') {
 		$html .= '</td>';
 		//-- Event date (sortable)hidden by datatables code
 		$html .= '<td>'. $death_date->JD(). '</td>';
-		//-- Age at death
-		$age=WT_Date::getAge($birth_dates[0], $death_dates[0], 0);
-		if (!isset($unique_indis[$person->getXref()]) && $age>=0 && $age<=$max_age) {
-			$deat_by_age[$age].=$person->getSex();
-		}
-		// Need both display and sortable age
-		$html .= '<td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 2) . '</td><td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 1) . '</td>';
 		//-- Death place
 		$html .= '<td>';
 		foreach ($person->getAllDeathPlaces() as $n=>$death_place) {
