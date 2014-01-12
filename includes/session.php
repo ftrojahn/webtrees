@@ -2,7 +2,7 @@
 // Startup and session logic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -145,9 +145,12 @@ if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 }
 
 // Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
-set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
+set_include_path(WT_ROOT . 'library' . PATH_SEPARATOR . get_include_path());
 require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace('WT_');
+Zend_Loader_Autoloader::getInstance()
+	->registerNamespace('WT_')
+	->registerNamespace('HTMLPurifier_')
+	->registerNamespace('Michelf\\');
 
 // PHP requires a time zone to be set in php.ini
 if (!ini_get('date.timezone')) {
@@ -162,10 +165,11 @@ if (!ini_get('date.timezone')) {
 // TODO: we ought to generate this dynamically, but lots of code currently relies on this global
 $QUERY_STRING=isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 
+$https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
 define('WT_SERVER_NAME',
-	(empty($_SERVER['HTTPS']) || !in_array($_SERVER['HTTPS'], array('1', 'on', 'On', 'ON')) ?  'http://' : 'https://').
+	($https ?  'https://' : 'http://').
 	(empty($_SERVER['SERVER_NAME']) ? '' : $_SERVER['SERVER_NAME']).
-	(empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT']==80 ? '' : ':'.$_SERVER['SERVER_PORT'])
+	(empty($_SERVER['SERVER_PORT']) || (!$https && $_SERVER['SERVER_PORT']==80) || ($https && $_SERVER['SERVER_PORT']==443) ? '' : ':'.$_SERVER['SERVER_PORT'])
 );
 
 // SCRIPT_NAME should always be correct, but is not always present.

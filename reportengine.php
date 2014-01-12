@@ -4,7 +4,7 @@
 // Processes webtrees XML Reports and generates a report
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
@@ -65,24 +65,35 @@ function get_tag_values($tag) {
 $newvars = array();
 foreach ($vars as $name=>$var) {
 	$newvars[$name]['id'] = $var;
-	if (!empty($type[$name]) && (($type[$name]=='INDI') || ($type[$name]=='FAM') || ($type[$name]=='SOUR'))) {
-		$record = WT_GedcomRecord::getInstance($var);
-		if (!$record) {
-			$action='setup';
-		}
-		$gedcom = $record->getGedcom();
-		// If we wanted a FAM, and were given an INDI, look for a spouse
-		if ($type[$name]=='FAM' && $record instanceof WT_Individual) {
-			$tmp = false;
-			foreach ($record->getSpouseFamilies() as $family) {
-				$gedcom = $family->getGedcom();
-				$tmp = true;
+	if (!empty($type[$name])) {
+		switch ($type[$name]) {
+		case 'INDI':
+			$record = WT_Individual::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
 			}
-			if (!$tmp) {
-				$action='setup';
+			break;
+		case 'FAM':
+			$record = WT_Family::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
 			}
+			break;
+		case 'SOUR':
+			$record = WT_Source::getInstance($var);
+			if ($record && $record->canShowName()) {
+				$newvars[$name]['gedcom'] = $record->privatizeGedcom(WT_USER_ACCESS_LEVEL);
+			} else {
+				$action = 'setup';
+			}
+			break;
+		default:
+			break;
 		}
-		$newvars[$name]['gedcom'] = $gedcom;
 	}
 }
 $vars = $newvars;

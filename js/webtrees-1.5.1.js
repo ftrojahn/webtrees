@@ -1,7 +1,7 @@
 // Common javascript functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -18,7 +18,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // Specifications for various types of popup edit window.
 // Choose positions to center in the smallest (1000x800) target screen
@@ -239,10 +239,10 @@ var show = false;
 	function expand_layer(sid) {
 		if (jQuery("#"+sid+"_img").hasClass("icon-plus")) {
 			jQuery('#'+sid+"_img").removeClass("icon-plus").addClass("icon-minus");
-			jQuery('#'+sid).show("fast");
+			jQuery('#'+sid).slideDown("fast");
 		} else {
 			jQuery('#'+sid+"_img").removeClass("icon-minus").addClass("icon-plus");
-			jQuery('#'+sid).hide("fast");
+			jQuery('#'+sid).slideUp("fast");
 		}
 		return false;
 	}
@@ -260,6 +260,14 @@ function edit_record(xref, fact_id) {
 		"action":    "edit",
 		"xref":      xref,
 		"fact_id":   fact_id
+	});
+}
+
+function add_fact(xref, fact) {
+	return edit_interface({
+		"action": "add",
+		"xref":   xref,
+		"fact":   fact
 	});
 }
 
@@ -283,11 +291,7 @@ function add_record(xref, fact_field) {
 		if (fact == "OBJE") {
 			window.open('addmedia.php?action=showmediaform&linkid=' + encodeURIComponent(xref) + '&ged=' + encodeURIComponent(WT_GEDCOM), '_blank', edit_window_specs);
 		} else {
-			return edit_interface({
-				"action": "add",
-				"xref":   xref,
-				"fact":   fact
-			});
+			return add_fact(xref, fact);
 		}
 	}
 	return false;
@@ -1441,11 +1445,11 @@ function activate_colorbox(config) {
 		fixed:         true,
 		// Simple I18N - the text will need to come from PHP
 		current:        '',
-		previous:       textDirection=='ltr' ? '◀' : '▶',
-		next:           textDirection=='ltr' ? '▶' : '◀',
-		slideshowStart: '○',
-		slideshowStop:  '●',
-		close:          '×'
+		previous:       textDirection=='ltr' ? '\u25c0' : '\u25b6', // ◀ ▶
+		next:           textDirection=='ltr' ? '\u25b6' : '\u25c0', // ▶ ◀
+		slideshowStart: '\u25cb', // ○
+		slideshowStop:  '\u25cf', // ●
+		close:          '\u2715'  // ×
 	});
 	if (config) {
 		jQuery.extend(jQuery.colorbox.settings, config);
