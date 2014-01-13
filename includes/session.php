@@ -395,8 +395,9 @@ if (isset($_REQUEST['ged'])) {
 // Choose the selected tree (if it exists), or any valid tree otherwise
 $WT_TREE=null;
 foreach (WT_Tree::getAll() as $tree) {
-	$WT_TREE=$tree;
-	if ($WT_TREE->tree_name == $GEDCOM && ($WT_TREE->imported || WT_USER_IS_ADMIN)) {
+	if ($WT_TREE==null) { $WT_TREE=$tree; }
+	if ($tree->tree_name == $GEDCOM && ($tree->imported || WT_USER_IS_ADMIN)) {
+		$WT_TREE=$tree;
 		break;
 	}
 }

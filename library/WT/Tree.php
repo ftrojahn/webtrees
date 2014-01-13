@@ -231,6 +231,7 @@ class WT_Tree {
 
 		// Update the list of trees - to include this new one
 		self::$trees=null;
+		self::$trees_ignore_access=null;
 
 		// Module privacy
 		WT_Module::setDefaultAccess($tree_id);
@@ -367,6 +368,7 @@ class WT_Tree {
 
 		// Update the list of trees - to include the new configuration settings
 		self::$trees=null;
+		self::$trees_ignore_access=null;
 	}
 
 	// Delete everything relating to a tree
@@ -403,6 +405,7 @@ class WT_Tree {
 
 		// After updating the database, we need to fetch a new (sorted) copy
 		self::$trees=null;
+		self::$trees_ignore_access=null;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
