@@ -307,11 +307,14 @@ html[dir=rtl] .makeMenu li ul li {
 
 .makeMenu li:hover > ul {
 	display: block;
+	max-height:400px;
+	overflow-y:auto;
+	overflow-x:hidden;
 }
 
 .makeMenu ul li a {
 	background-color: #eee;
-	padding: 2px 5px;
+	padding: 2px 21px 2px 5px; /* add an extra 16px padding to the right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 	display: block;
 }
 
