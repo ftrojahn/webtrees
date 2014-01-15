@@ -437,22 +437,20 @@ if ($WT_TREE) {
 		if ($tree_temp2!=null) {
 			define('WT_GEDCOM',            $tree_temp2->tree_name);
 			define('WT_TREE_TITLE',        $tree_temp2->tree_title_html);
-			define('WT_GED_ID',            $tree_temp2->tree_id);
 			define('WT_GEDURL',            $tree_temp2->tree_name_url);
 		}
 		else {
 			define('WT_GEDCOM',            '');
 			define('WT_TREE_TITLE',        WT_WEBTREES);
-			define('WT_GED_ID',            null);
 			define('WT_GEDURL',            '');
 		}
 	}
 	else {
 		define('WT_GEDCOM',            $tree_temp->tree_name);
 		define('WT_TREE_TITLE',        $tree_temp->tree_title_html);
-		define('WT_GED_ID',            $tree_temp->tree_id);
 		define('WT_GEDURL',            $tree_temp->tree_name_url);
 	}
+	define('WT_GED_ID',            null);
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
 	define('WT_USER_CAN_ACCEPT',   false);
