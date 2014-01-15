@@ -395,7 +395,6 @@ if (isset($_REQUEST['ged'])) {
 // Choose the selected tree (if it exists), or any valid tree otherwise
 $WT_TREE=null;
 foreach (WT_Tree::getAll() as $tree) {
-	if ($WT_TREE==null) { $WT_TREE=$tree; }
 	if ($tree->tree_name == $GEDCOM && ($tree->imported || WT_USER_IS_ADMIN)) {
 		$WT_TREE=$tree;
 		break;
@@ -425,10 +424,31 @@ if ($WT_TREE) {
 	}
 	load_gedcom_settings(WT_GED_ID);
 } else {
-	define('WT_GEDCOM',            '');
+	$tree_temp=null;
+	$tree_temp2=null;
+	foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+		if ($tree_temp2==null) { $tree_temp2=$tree; }
+		if ($tree->tree_name == $GEDCOM) {
+			$tree_temp=$tree;
+			break;
+		}
+	}
+	if ($tree_temp==null) {
+		if ($tree_temp2!=null) {
+			define('WT_GEDCOM',            $tree_temp2->tree_name);
+			define('WT_TREE_TITLE',        $tree_temp2->tree_title_html);
+		}
+		else {
+			define('WT_GEDCOM',            '');
+			define('WT_TREE_TITLE',        WT_WEBTREES);
+		}
+	}
+	else {
+		define('WT_GEDCOM',            $tree_temp->tree_name);
+		define('WT_TREE_TITLE',        $tree_temp->tree_title_html);
+	}
 	define('WT_GED_ID',            null);
 	define('WT_GEDURL',            '');
-	define('WT_TREE_TITLE',        WT_WEBTREES);
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
 	define('WT_USER_CAN_ACCEPT',   false);
@@ -570,14 +590,6 @@ if (substr(PHP_SAPI, 0, 3) == 'cgi') {  // cgi-mode, should only be writable by 
 
 // Lightbox needs custom integration in many places.  Only check for the module once.
 define('WT_USE_LIGHTBOX', !$SEARCH_SPIDER && array_key_exists('lightbox', WT_Module::getActiveModules()));
-
-if (isset($_REQUEST['ged'])) {
-	//No access to gedcom -> show login page
-	if (WT_GEDCOM != $_REQUEST['ged']) {
-		$controller=new WT_Controller_Page();
-		$controller->requireMemberLogin();
-	}
-}
 
 // Search engines are only allowed to see certain pages.
 if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
