@@ -437,18 +437,22 @@ if ($WT_TREE) {
 		if ($tree_temp2!=null) {
 			define('WT_GEDCOM',            $tree_temp2->tree_name);
 			define('WT_TREE_TITLE',        $tree_temp2->tree_title_html);
+			define('WT_GED_ID',            $tree_temp2->tree_id);
+			define('WT_GEDURL',            $tree_temp2->tree_name_url);
 		}
 		else {
 			define('WT_GEDCOM',            '');
 			define('WT_TREE_TITLE',        WT_WEBTREES);
+			define('WT_GED_ID',            null);
+			define('WT_GEDURL',            '');
 		}
 	}
 	else {
 		define('WT_GEDCOM',            $tree_temp->tree_name);
 		define('WT_TREE_TITLE',        $tree_temp->tree_title_html);
+		define('WT_GED_ID',            $tree_temp->tree_id);
+		define('WT_GEDURL',            $tree_temp->tree_name_url);
 	}
-	define('WT_GED_ID',            null);
-	define('WT_GEDURL',            '');
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
 	define('WT_USER_CAN_ACCEPT',   false);
@@ -504,7 +508,7 @@ if (WT_Site::preference('LOGIN_URL')) {
 }
 
 // If there is no current tree and we need one, then redirect somewhere
-if (WT_SCRIPT_NAME!='admin_trees_manage.php' && WT_SCRIPT_NAME!='admin_pgv_to_wt.php' && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='import.php' && WT_SCRIPT_NAME!='help_text.php' && WT_SCRIPT_NAME!='message.php') {
+if (WT_SCRIPT_NAME!='admin_trees_manage.php' && WT_SCRIPT_NAME!='admin_pgv_to_wt.php' && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='import.php' && WT_SCRIPT_NAME!='help_text.php' && WT_SCRIPT_NAME!='message.php' && WT_SCRIPT_NAME!='search.php') {
 	if (!$WT_TREE || !WT_IMPORTED) {
 		if (WT_USER_IS_ADMIN) {
 			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
