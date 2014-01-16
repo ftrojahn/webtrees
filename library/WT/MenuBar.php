@@ -70,8 +70,14 @@ class WT_MenuBar {
 			);
 			$menu->addSubmenu($submenu);
 			foreach ($groups[$groupname] as $tree) {
+				if (strpos($tree->tree_title_html, ':') !== false) {
+					$new_tree_title = trim(substr($tree->tree_title_html, strpos($tree->tree_title_html, ':') + 1));
+				}
+				else {
+					$new_tree_title = $tree->tree_title_html;
+				}
 				$subsubmenu = new WT_Menu(
-					$tree->tree_title_html,
+					$new_tree_title,
 					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
 					'menu-tree-'.$tree->tree_id // Cannot use name - it must be a CSS identifier
 				);

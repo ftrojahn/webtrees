@@ -268,7 +268,6 @@ echo '<div id="search-page">
 							if (isset ($_REQUEST["$str"])) {
 								echo 'checked="checked" ';
 							}
-							$new_tree_title;
 							if (strpos($tree->tree_title, ':') !== false){
 								$new_tree_title = trim(substr($tree->tree_title, strpos($tree->tree_title, ':') + 1));
 								$new_tree_title = '<span dir="auto">' . WT_Filter::escapeHtml($new_tree_title) . '</span>';
