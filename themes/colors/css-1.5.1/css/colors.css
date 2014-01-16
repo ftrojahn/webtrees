@@ -92,12 +92,11 @@ html[dir=rtl] .makeMenu li ul li {text-align:right;}
 #main-menu > li > ul {left:0;right:auto;top:40px;}
 #main-menu a {display: block;text-decoration: none;padding: 0px 10px;margin: 0;white-space:nowrap;}
 #main-menu ul li:hover a, #main-menu li:hover li a {background: none;border: none;}
-#main-menu li:hover > ul {visibility:visible;opacity:1;-webkit-transition:visibility 0s linear 0s,opacity .2s linear 0s;-moz-transition:visibility 0s linear 0s,opacity .2s linear 0s;-o-transition:visibility 0s linear 0s,opacity .2s linear 0s;max-height:400px;padding-right:16px;overflow-y:auto;overflow-x:hidden;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+#main-menu li:hover > ul {visibility:visible;opacity:1;-webkit-transition:visibility 0s linear 0s,opacity .2s linear 0s;-moz-transition:visibility 0s linear 0s,opacity .2s linear 0s;-o-transition:visibility 0s linear 0s,opacity .2s linear 0s;}
 
 /* First row submenu style*/
 #main-menu > li > ul > li:first-child {text-indent:0px;min-width:100px;width:100%;
 background: none;font-weight:bold;white-space:nowrap;
-padding-right:16px; /* compensate the "padding-right:16px" from "#main-menu li:hover > ul" to draw the "border-bottom" all the way to the right edge */
 font-size:14px;text-align:center;height:22px;line-height: 1.5;border-bottom:solid #ddd 1px;}
 
 /* Menu icons */

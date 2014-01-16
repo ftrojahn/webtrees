@@ -148,10 +148,6 @@ display:none;
 /* Set up hover layout and style */
 #main-menu li:hover ul {
 display:block;
-padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
-max-height:400px;
-overflow-y:auto;
-overflow-x:hidden;
 }
 
 #main-menu li:hover li {
@@ -186,7 +182,7 @@ background-image:url(images/sprites-sub-menu.png);
 background-repeat:no-repeat;
 height:22px;
 line-height:15px;
-margin:2px 0px 3px 0px; /* increased padding-bottom by 1px to prevent useless scrollbar */
+margin:2px 0 2px 0px;
 text-indent:22px;
 }
 
@@ -208,7 +204,6 @@ font-weight: 700;
 text-align: center;
 text-indent: 0;
 padding: 5px;
-margin-right:-16px; /* compensate the "padding-right:16px" from "#main-menu li:hover ul" to draw the "border-bottom" all the way to the right edge */
 line-height: 1;
 border-bottom:1px solid #dddddd;
 height: auto;

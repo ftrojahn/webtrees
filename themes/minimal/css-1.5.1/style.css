@@ -86,7 +86,7 @@ html[dir=rtl] .makeMenu li ul li {text-align:right;}
 #topMenu ul ul li a {padding:5px;text-align:left;font-size:12px;}
 
 /* header hover */
-#topMenu ul li:hover > ul {position:absolute;margin:0;display:block;text-align:left;padding:0;max-height:400px;padding-right:16px;overflow-y:auto;overflow-x:hidden;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+#topMenu ul li:hover > ul {position:absolute;margin:0;display:block;text-align:left;padding:0;}
 #topMenu ul #menu-chart li:hover ul, #topMenu ul #menu-obje li:hover ul {position:absolute;display:block;margin-left:100%;left:0px;}
 
 /* --- RTL --- */
