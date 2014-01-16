@@ -550,6 +550,7 @@ html[dir=rtl] .faq_edit {float:left;}
 #main-menu ul {position:absolute;display:none;background:#ffffff;border:thin solid #aaaaaa;padding:5px 0;}
 #main-menu li a {margin:auto;padding-top:52px;width:100%;}
 #main-menu li li a {display:block;position:relative;float:left;font-size:11px;line-height:1.5;padding:1px 10px 1px 5px;}
+#menu-tree:hover > ul > li:hover > ul {max-height:400px;padding-right:16px;overflow-y:auto;overflow-x:hidden;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 
 /* Menu icons */
 #main-menu > li {background-image:url(images/large_menu_sprite.png);background-repeat:no-repeat;width:110px;height:64px;text-align:center;}

@@ -29,9 +29,29 @@ if (!defined('WT_WEBTREES')) {
 class WT_MenuBar {
 	public static function getGedcomMenu() {
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
-		$ALLOW_CHANGE_GEDCOM=WT_Site::preference('ALLOW_CHANGE_GEDCOM') && count(WT_Tree::getAllIgnoreAccess())>1;
+		require WT_ROOT.'data/search_config.ini.php';
+		//Create Groups
+		$groups = array();
 		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
-			if ($tree->tree_id==WT_GED_ID || $ALLOW_CHANGE_GEDCOM) {
+			if (!in_array($tree->tree_name,$search_excluded_trees)){
+				if (strpos($tree->tree_title, ':') !== false){
+					$group = substr($tree->tree_title, 0, strpos($tree->tree_title, ':'));
+					$groups[$group][] = $tree;
+				}
+				else{
+					$groups[WT_I18N::translate('Miscellaneous')][] = $tree;
+				}
+			}
+		}
+		//Sort Groups
+		$groups_sort = array();
+		foreach ($groups as $groupname => $group) {
+			$groups_sort[] = $groupname;
+		}
+		sort($groups_sort, SORT_STRING);
+		//Print Special Groups
+		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+			if (in_array($tree->tree_name,$search_excluded_trees)){
 				$submenu = new WT_Menu(
 					$tree->tree_title_html,
 					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
@@ -39,6 +59,25 @@ class WT_MenuBar {
 				);
 				$menu->addSubmenu($submenu);
 			}
+		}
+		//Print Groups
+		$groupindex = 1;
+		foreach ($groups_sort as $groupname) {
+			$submenu = new WT_Menu(
+				$groupname,
+				'#',
+				'menu-tree-group'.$groupindex // Cannot use name - it must be a CSS identifier
+			);
+			$menu->addSubmenu($submenu);
+			foreach ($groups[$groupname] as $tree) {
+				$subsubmenu = new WT_Menu(
+					$tree->tree_title_html,
+					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
+					'menu-tree-'.$tree->tree_id // Cannot use name - it must be a CSS identifier
+				);
+				$submenu->addSubmenu($subsubmenu);
+			}
+			$groupindex++;
 		}
 		return $menu;
 	}

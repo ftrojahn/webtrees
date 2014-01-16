@@ -321,6 +321,9 @@ html[dir=rtl] .makeMenu li ul li {
 	text-decoration: none;
 }
 
+#menu-tree:hover > ul > li:hover > ul li a {padding-right:21px;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+#menu-tree:hover > ul > li:hover > ul {max-height:400px;overflow-y:auto;overflow-x:hidden;}
+
 .lang-active,
 .theme-active {
 	font-weight: 900;
