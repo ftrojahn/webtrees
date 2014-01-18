@@ -123,7 +123,7 @@ echo '<div id="search-page">
 					<label for="srsour">' ,  WT_I18N::translate('Sources'), '</label>
 				</p><p>
 				<input type="checkbox"';
-				if (isset ($controller->srnote)) echo 'checked="checked"';
+				if (isset ($controller->srnote)) echo ' checked="checked"';
 				echo ' value="yes" id="srnote" name="srnote">
 					<label for="srnote">' ,  WT_I18N::translate('Shared notes'), '</label>
 			</p></div>
@@ -241,7 +241,7 @@ echo '<div id="search-page">
 					//Print Groups
 					$groupindex = 1;
 					foreach ($groups_sort as $groupname) {
-						echo '<input type="checkbox" name="grp_', $groupname,'" value="yes" onclick="jQuery(\'#search_group_', $groupindex ,' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])"';
+						echo '<input type="checkbox" name="grp_', $groupname,'" value="yes" onclick="jQuery(\'#search_group_', $groupindex ,' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])" ';
 						if (isset ($_REQUEST['grp_'.$groupname])) {
 							echo 'checked="checked" ';
 						}
