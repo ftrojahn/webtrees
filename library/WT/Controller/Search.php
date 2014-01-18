@@ -562,6 +562,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 		// ---- section to search and display results on a general keyword search
 		if ($this->action=="general" || $this->action=="soundex" || $this->action=="replace") {
 			if ($this->myindilist || $this->myfamlist || $this->mysourcelist || $this->mynotelist) {
+				$this->addInlineJavascript('jQuery("#search-page h2").first().append(jQuery(".loading-image").first());');
 				$this->addInlineJavascript('jQuery("#search-result-tabs").tabs();');
 				$this->addInlineJavascript('jQuery("#search-result-tabs").css("visibility", "visible");');
 				$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
