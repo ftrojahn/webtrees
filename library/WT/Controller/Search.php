@@ -681,6 +681,12 @@ class WT_Controller_Search extends WT_Controller_Page {
 				}
 				echo '</div>';
 			}
+			else {
+				$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
+			}
+		}
+		else {
+			$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
 		}
 		return $somethingPrinted; // whether anything printed
 	}
