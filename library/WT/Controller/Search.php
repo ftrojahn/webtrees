@@ -562,10 +562,12 @@ class WT_Controller_Search extends WT_Controller_Page {
 		// ---- section to search and display results on a general keyword search
 		if ($this->action=="general" || $this->action=="soundex" || $this->action=="replace") {
 			if ($this->myindilist || $this->myfamlist || $this->mysourcelist || $this->mynotelist) {
+				$this->addInlineJavascript('jQuery("#search-page h2").first().append(jQuery(".loading-image").first());');
 				$this->addInlineJavascript('jQuery("#search-result-tabs").tabs();');
 				$this->addInlineJavascript('jQuery("#search-result-tabs").css("visibility", "visible");');
 				$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
 				echo '<br>';
+				echo '<div class="loading-image">&nbsp;</div>';
 				echo '<div id="search-result-tabs"><ul>';
 				if ($this->myindilist) {echo '<li><a href="#searchAccordion-indi"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';}
 				if ($this->myfamlist) {echo '<li><a href="#searchAccordion-fam"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';}
@@ -674,7 +676,6 @@ class WT_Controller_Search extends WT_Controller_Page {
 				load_gedcom_settings(WT_GED_ID);
 				echo '</div>'; //#search-result-tabs
 			} elseif (isset ($this->query)) {
-				$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
 				echo '<br><div class="warning center"><em>'.WT_I18N::translate('No results found.').'</em><br>';
 				if (!isset ($this->srindi) && !isset ($this->srfams) && !isset ($this->srsour) && !isset ($this->srnote)) {
 					echo '<em>'.WT_I18N::translate('Be sure to select an option to search for.').'</em><br>';
