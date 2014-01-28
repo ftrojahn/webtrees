@@ -1925,6 +1925,7 @@ html[dir=rtl] #sb_content_extra_info .editfacts {float:left;}
 #search-page-table p {margin:0;}
 html[dir=rtl] #search-page-table .label {float:right;}
 html[dir=rtl] #search-page-table .value {margin:0 170px 0 0;}
+#search-notice {text-align:center;}
 
 /* ============== edituser.php ======================= */
 #edituser-page h2, #edituser_submit {margin:20px;text-align:center;}

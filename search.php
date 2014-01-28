@@ -89,6 +89,7 @@ $controller
 <?php
 echo '<div id="search-page">
 	<h2>' , $controller->getPageTitle(), '</h2>';
+	echo '<div id="search-notice">',WT_I18N::translate('The search result is displayed at the end of the page.'),'</div>';
 	//========== Search Form Outer Table //==========
 	echo '<form method="post" name="searchform" onsubmit="return checknames(this);" action="search.php"><input type="hidden" name="action" value="', $controller->action, '"><input type="hidden" name="isPostBack" value="true">
 	<div id="search-page-table">';
@@ -318,4 +319,7 @@ echo '<div id="search-page">
 		echo '</div>';  // close div id="search_submit"
 	echo '</form>';
 	$somethingPrinted = $controller->printResults();
+	if (!$somethingPrinted){
+		$controller->addInlineJavascript('jQuery("#search-notice").hide();');
+	}
 echo '</div>'; // close div id "search-page"
