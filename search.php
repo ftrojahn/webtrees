@@ -24,6 +24,7 @@
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'data/search_config.ini.php';
 
 $controller=new WT_Controller_Search();
 $controller
@@ -88,6 +89,7 @@ $controller
 <?php
 echo '<div id="search-page">
 	<h2>' , $controller->getPageTitle(), '</h2>';
+	echo '<div id="search-notice">',WT_I18N::translate('The search result is displayed at the end of the page.'),'</div>';
 	//========== Search Form Outer Table //==========
 	echo '<form method="post" name="searchform" onsubmit="return checknames(this);" action="search.php"><input type="hidden" name="action" value="', $controller->action, '"><input type="hidden" name="isPostBack" value="true">
 	<div id="search-page-table">';
@@ -122,7 +124,7 @@ echo '<div id="search-page">
 					<label for="srsour">' ,  WT_I18N::translate('Sources'), '</label>
 				</p><p>
 				<input type="checkbox"';
-				if (isset ($controller->srnote)) echo 'checked="checked"';
+				if (isset ($controller->srnote)) echo ' checked="checked"';
 				echo ' value="yes" id="srnote" name="srnote">
 					<label for="srnote">' ,  WT_I18N::translate('Shared notes'), '</label>
 			</p></div>
@@ -203,30 +205,81 @@ echo '<div id="search-page">
 		// If the search is a general or soundex search then possibly display checkboxes for the gedcoms
 		if ($controller->action == "general" || $controller->action == "soundex") {
 			// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
-			if ((count(WT_Tree::getAll()) > 1) && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+			if ((count(WT_Tree::getAllIgnoreAccess()) > 1) && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
 				// More Than 3 Gedcom Filess enable elect all & select none buttons
-				if (count(WT_Tree::getAll())>3) {
+				if (count(WT_Tree::getAllIgnoreAccess())>3) {
 					echo '<div class="label">&nbsp;</div>
 						<div class="value">
-						<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', true);});return false;">
-							<input type="button" value="', /* I18N: select none (of the family trees) */ WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', false);});return false;">';
-							// More Than 10 Gedcom Files enable invert selection button
-							if (count(WT_Tree::getAll())>10) {
-								echo '<input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', !jQuery(this).attr(\'checked\'));});return false;">';
-							}
+						<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', true);});return false;">
+						<input type="button" value="', /* I18N: select none (of the family trees) */ WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', false);});return false;">';
+						// More Than 10 Gedcom Files enable invert selection button
+						//if (count(WT_Tree::getAll())>10) {
+							echo '<input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', !jQuery(this).prop(\'checked\'));});return false;">';
+						//}
 						echo '</div>';
 				}
 				echo '<div class="label">' , WT_I18N::translate('Family trees'), '</div>
 				<div id="search_trees" class="value">';
-					//-- sorting menu by gedcom filename
-					foreach (WT_Tree::getAll() as $tree) {
-						$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
-						$controller->inputFieldNames[] = "$str";
-						echo '<p><input type="checkbox" ';
-						if (isset ($_REQUEST["$str"])) {
+					//Create Groups
+					$groups = array();
+					foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+						if (!in_array($tree->tree_name,$search_excluded_trees)){
+							if (strpos($tree->tree_title, ':') !== false){
+								$group = substr($tree->tree_title, 0, strpos($tree->tree_title, ':'));
+								$groups[$group][] = $tree;
+							}
+							else{
+								$groups[WT_I18N::translate('Miscellaneous')][] = $tree;
+							}
+						}
+					}
+					//Sort Groups
+					$groups_sort = array();
+					foreach ($groups as $groupname => $group) {
+						$groups_sort[] = $groupname;
+					}
+					sort($groups_sort, SORT_STRING);
+					//Print Groups
+					$groupindex = 1;
+					foreach ($groups_sort as $groupname) {
+						echo '<input type="checkbox" name="grp_', $groupname,'" value="yes" onclick="jQuery(\'#search_group_', $groupindex ,' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])" ';
+						if (isset ($_REQUEST['grp_'.$groupname])) {
 							echo 'checked="checked" ';
 						}
-						echo 'value="yes" id="checkbox_', $tree->tree_id , '" name="', $str, '"><label for="checkbox_', $tree->tree_id , '">', $tree->tree_title_html, '</label></p>', "\n";
+						else {
+							$allchecked = true;
+							foreach ($groups[$groupname] as $tree) {
+								$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+								if (!isset ($_REQUEST["$str"])) {
+									$allchecked = false;
+									break;
+								}
+							}
+							if ($allchecked) {
+								echo 'checked="checked" ';
+							}
+						}
+						echo '>';
+						echo '<a href="javascript:void(0)" onclick="jQuery(\'#search_group_', $groupindex, '\').is(\':hidden\')?jQuery(\'#search_group_', $groupindex, '\').show():jQuery(\'#search_group_', $groupindex, '\').hide()">', $groupname, '</a><br/>', "\n";
+						echo '<div id="search_group_', $groupindex,'" style="margin-left:18px;display:none">';
+						foreach ($groups[$groupname] as $tree) {
+							$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+							$controller->inputFieldNames[] = "$str";
+							echo '<p><input type="checkbox" ';
+							if (isset ($_REQUEST["$str"])) {
+								echo 'checked="checked" ';
+							}
+							if (strpos($tree->tree_title, ':') !== false){
+								$new_tree_title = trim(substr($tree->tree_title, strpos($tree->tree_title, ':') + 1));
+								$new_tree_title = '<span dir="auto">' . WT_Filter::escapeHtml($new_tree_title) . '</span>';
+							}
+							else{
+								$new_tree_title = $tree->tree_title;
+							}
+							echo 'value="yes" id="checkbox_', $tree->tree_id , '" name="', $str, '"><label for="checkbox_', $tree->tree_id , '">', $new_tree_title, '</label></p>', "\n";
+						}
+						echo '</div>', "\n";
+						$groupindex++;
 					}
 				echo '</div>';
 			}
@@ -266,4 +319,7 @@ echo '<div id="search-page">
 		echo '</div>';  // close div id="search_submit"
 	echo '</form>';
 	$somethingPrinted = $controller->printResults();
+	if (!$somethingPrinted){
+		$controller->addInlineJavascript('jQuery("#search-notice").hide();');
+	}
 echo '</div>'; // close div id "search-page"

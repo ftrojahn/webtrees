@@ -119,12 +119,13 @@ html[dir=rtl] #extra-menu.makeMenu li ul {left:0;right:auto;}
 #main-menu ul              {padding:0;list-style-type:none;}
 #main-menu li              {float:left;position:relative;left:50%;}
 #main-menu li li           {clear:both;}
-#main-menu li:hover > ul   {display:block;position:absolute;top:0;left:100%;right:auto;margin-top:0;}
+#main-menu li:hover > ul   {display:block;position:absolute;top:0;left:100%;right:auto;margin-top:0;margin-left:0;}
 #main-menu > li:hover > ul {left:0;right:auto;top:42px;}
 #main-menu a               {display:block;white-space:nowrap;overflow:hidden;}
 #main-menu ul              {position:absolute;display:none;background:#ffffff;border:thin solid #aaaaaa;padding:0;}
 #main-menu li a            {margin:auto;padding-top:22px;width:100%;}
 #main-menu li li a         {display:block;position:relative;float:left;font-size:11px;line-height:1.5;padding:0 10px 1px 5px;}
+#menu-tree:hover > ul > li:hover > ul {max-height:400px;padding-right:16px;overflow-y:auto;overflow-x:hidden;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 
 /* Menu icons */
 #main-menu > li {
@@ -1924,6 +1925,7 @@ html[dir=rtl] #sb_content_extra_info .editfacts {float:left;}
 #search-page-table p {margin:0;}
 html[dir=rtl] #search-page-table .label {float:right;}
 html[dir=rtl] #search-page-table .value {margin:0 170px 0 0;}
+#search-notice {text-align:center;}
 
 /* ============== edituser.php ======================= */
 #edituser-page h2, #edituser_submit {margin:20px;text-align:center;}

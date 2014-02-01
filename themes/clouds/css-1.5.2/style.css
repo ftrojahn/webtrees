@@ -158,9 +158,12 @@ float:none;
 #main-menu #menu-chart li:hover ul, #main-menu #menu-obje li:hover ul {
 display:block;
 margin-left:100%;
-margin-top:-35px;
+top:0;
 position:absolute;
 }
+
+#main-menu #menu-tree li ul {display:none;}
+#main-menu #menu-tree:hover > ul > li:hover > ul {display:block;left:100%;top:0;max-height:400px;padding-right:16px;overflow-y:auto;overflow-x:hidden;} /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 
 html[dir=rtl] #main-menu ul li:hover ul {margin-left:auto;margin-right:100%;}
 
@@ -182,7 +185,7 @@ background-image:url(images/sprites-sub-menu.png);
 background-repeat:no-repeat;
 height:22px;
 line-height:15px;
-margin:2px 0 2px 0px;
+margin:2px 0px 3px 0px; /* increased padding-bottom by 1px to prevent useless scrollbar */
 text-indent:22px;
 }
 
