@@ -182,6 +182,7 @@ default:
 			</div>';
 			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
 				echo '<div><a href="'.WT_LOGIN_URL.'?action=register">', WT_I18N::translate('Request new user account'), '</a></div>';
+				echo '<div><a href="'.WT_LOGIN_URL.'?action=delete">', WT_I18N::translate('Delete user account'), '</a></div>';
 			}
 		}
 	echo '</form>';
@@ -412,7 +413,7 @@ case 'register':
 				</label>
 			</div>
 			<div>
-				<label for="user_email">', WT_I18N::translate('Email address'), help_link('email'),
+				<label for="user_email2">', WT_I18N::translate('Email address'), help_link('email'),
 					'<input type="email" id="user_email2" name="user_email2" required maxlength="64" value="', htmlspecialchars($user_email2), '">
 				</label>
 			</div>
@@ -580,6 +581,78 @@ case 'verify_hash':
 		echo '</span>';
 	}
 	echo '</div>';
+	echo '</div>';
+	break;
+case 'delete':
+	if (!WT_Site::preference('USE_REGISTRATION_MODULE')) {
+		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
+		exit;
+	}
+	if ((isset($username)) && (isset($password))) {
+		$user_id=get_user_id($username);
+		if (!check_user_password($user_id, $password)) {
+			$message = WT_I18N::translate('The username or password is incorrect.');
+		}
+		else if (getUserFullName($user_id)<>$user_realname) {
+			$message = WT_I18N::translate('The real name does not match the one for this account.');
+		}
+		else if (getUserEmail($user_id)<>$user_email) {
+			$message = WT_I18N::translate('The email address does not match the one for this account.');
+		}
+		else {
+			AddToLog('deleted user ->' . get_user_name($user_id) . '<-', 'auth');
+			delete_user($user_id);
+
+			$controller
+				->setPageTitle(WT_I18N::translate('Delete user account'))
+				->pageHeader();
+			echo '<div id="deletion-text">';
+			echo WT_I18N::translate('<center><h2>Delete user account</h2></center><br>You were successfully signed-out as a user. We wish you continued success with your genealogical research.');
+			echo '</div>';
+			exit;
+		}
+	}
+
+	$controller
+		->setPageTitle(WT_I18N::translate('Delete user account'))
+		->pageHeader();
+
+	echo '<div id="deletion-page">';
+	echo '<div id="deletion-text">';
+	echo WT_I18N::translate('<center><h2>Delete user account</h2></center><br><div class="largeError">Notice:</div><div class="error">By filling in and submitting this form you will be removed permanently from the database.<br>You have always the possibility to register as a user again.<br>For changes to your user data (password, email address) login normally and edit them under My page -> My account</div>');
+	echo '</div>';
+
+	echo '<div id="deletion-box">';
+	if (!empty($message)) echo '<span class="error"><br><b>', $message, '</b><br><br></span>';
+	echo '<form id="deletion-form" name="deletion-form" method="post" action="'.WT_LOGIN_URL.'" autocomplete="off" onsubmit="return confirm(\'Dauerhaft abmelden?\')">
+			<input type="hidden" name="action" value="delete">
+			<h4>', WT_I18N::translate('All fields must be completed.'), '</h4><hr>
+			<div>
+				<label for="user_realname">', WT_I18N::translate('Real name'),
+					'<input type="text" id="user_realname" name="user_realname" required maxlength="64" value="', WT_Filter::escapeHtml($user_realname), '" autofocus>
+				</label>
+			</div>
+			<div>
+				<label for="user_email">', WT_I18N::translate('Email address'),
+					'<input type="email" id="user_email" name="user_email" required maxlength="64" value="', WT_Filter::escapeHtml($user_email), '">
+				</label>
+			</div>
+			<div>
+				<label for="username">', WT_I18N::translate('Username'),
+					'<input type="text" id="username" name="username" required maxlength="32" value="', WT_Filter::escapeHtml($username), '">
+				</label>
+			</div>
+			<div>
+				<label for="password">', WT_I18N::translate('Password'),
+					'<input type="password" id="password" name="password" value="', WT_Filter::escapeHtml($password), '" required pattern="'. WT_REGEX_PASSWORD .'">
+				</label>
+			</div>
+			<hr>
+			<div id="deletion-submit">
+				<input type="submit" value="', WT_I18N::translate('Sign-Out'), '">
+			</div>
+		</form>
+	</div>';
 	echo '</div>';
 	break;
 }
