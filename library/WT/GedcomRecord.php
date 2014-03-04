@@ -334,7 +334,11 @@ class WT_GedcomRecord {
 	}
 
 	// Can the details of this record be shown?
-	public function canShow($access_level=WT_USER_ACCESS_LEVEL) {
+	public function canShow($access_level=null) {
+		global $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 		// CACHING: this function can take three different parameters,
 		// and therefore needs three different caches for the result.
 		switch ($access_level) {
@@ -785,7 +789,11 @@ class WT_GedcomRecord {
 	}
 
 	// The facts and events for this record
-	public function getFacts($filter=null, $sort=false, $access_level=WT_USER_ACCESS_LEVEL) {
+	public function getFacts($filter=null, $sort=false, $access_level=null) {
+		global $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 		$facts=array();
 		if ($this->canShow($access_level)) {
 			foreach ($this->facts as $fact) {

@@ -38,8 +38,11 @@ class WT_Individual extends WT_GedcomRecord {
 	private $_getEstimatedDeathDate=null;
 
 	// Can the name of this record be shown?
-	public function canShowName($access_level=WT_USER_ACCESS_LEVEL) {
-		global $SHOW_LIVING_NAMES;
+	public function canShowName($access_level=null) {
+		global $SHOW_LIVING_NAMES, $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 
 		return $SHOW_LIVING_NAMES>=$access_level || $this->canShow($access_level);
 	}
@@ -79,8 +82,9 @@ class WT_Individual extends WT_GedcomRecord {
 		if (WT_USER_GEDCOM_ID && WT_USER_PATH_LENGTH && $this->getGedcomId()==WT_GED_ID && $access_level=WT_USER_ACCESS_LEVEL) {
 			return self::isRelated($this, WT_USER_PATH_LENGTH);
 		}
-		// No restriction found - show living people to members only:
-		return WT_PRIV_USER>=$access_level;
+		// No restriction found - use gedcom setting:
+		global $SHOW_LIVING_NAMES;
+		return $SHOW_LIVING_NAMES>=$access_level;
 	}
 
 	// For relationship privacy calculations - is this individual a close relative?

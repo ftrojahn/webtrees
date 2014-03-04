@@ -167,6 +167,14 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $WEBMASTER_USER_ID;            $WEBMASTER_USER_ID            =get_gedcom_setting($ged_id, 'WEBMASTER_USER_ID');
 	global $WEBTREES_EMAIL;               $WEBTREES_EMAIL               =get_gedcom_setting($ged_id, 'WEBTREES_EMAIL');
 	global $WORD_WRAPPED_NOTES;           $WORD_WRAPPED_NOTES           =get_gedcom_setting($ged_id, 'WORD_WRAPPED_NOTES');
+	global $USER_ACCESS_LEVEL;
+	if (WT_USER_IS_ADMIN || userGedcomAdmin(WT_USER_ID, $ged_id)) {
+		$USER_ACCESS_LEVEL = WT_PRIV_NONE;
+	} elseif (WT_Tree::get($ged_id)->canAcceptChanges(WT_USER_ID) || userCanEdit(WT_USER_ID, $ged_id) || userCanAccess(WT_USER_ID, $ged_id)) {
+		$USER_ACCESS_LEVEL = WT_PRIV_USER;
+	} else {
+		$USER_ACCESS_LEVEL = WT_PRIV_PUBLIC;
+	}
 
 	global $person_privacy; $person_privacy=array();
 	global $person_facts;   $person_facts  =array();

@@ -101,9 +101,14 @@ class WT_Fact {
 	}
 
 	// Do the privacy rules allow us to display this fact to the current user
-	public function canShow($access_level=WT_USER_ACCESS_LEVEL) {
+	public function canShow($access_level=null) {
 		// TODO - use the privacy settings for $this->gedcom_id, not the default gedcom.
 		global $person_facts, $global_facts;
+
+		global $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 
 		// Does this record have an explicit RESN?
 		if (strpos($this->gedcom, "\n2 RESN confidential")) {
