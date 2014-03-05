@@ -31,7 +31,6 @@ $controller
 	->pageHeader()
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 	->addInlineJavascript('
-		var pastefield; function paste_id(value) { pastefield.value=value; }  // For the "find indi" link
 		var timer;
 		var offSetNum = 20; // amount timeline moves with each mouse click
 		var speed;
@@ -98,10 +97,11 @@ $controller
 		}
 		// Main function to retrieve mouse x-y pos.s
 		function getMouseXY(e) {
-			if (IE) { // grab the x-y pos.s if browser is IE
+			var event = e || window.event;
+			if (typeof event.pageX === "undefined" || typeof event.pageY === "undefined") {
 				msX = event.clientX + document.documentElement.scrollLeft;
 				msY = event.clientY + document.documentElement.scrollTop;
-			} else {  // grab the x-y pos.s if browser is NS
+			} else {
 				msX = e.pageX;
 				msY = e.pageY;
 			}
@@ -124,8 +124,6 @@ $controller
 			}
 		}
 
-		var IE = document.all?true:false;
-		if (!IE) document.captureEvents(Event.MOUSEMOVE | Event.MOUSEUP)
 		document.onmousemove = getMouseXY;
 		document.onmouseup = releaseimage;
 ');

@@ -37,7 +37,7 @@ if (!defined('WT_WEBTREES')) {
 * @param int $count on some charts it is important to keep a count of how many boxes were printed
 */
 function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $GEDCOM;
+	global $GEDCOM;
 	global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT;
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
@@ -227,16 +227,16 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 // now added as a function here.
 
 function header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL) {
-	$header_links='';
-	if (!empty($LINK_CANONICAL)) {
-		$header_links.= '<link rel="canonical" href="'. $LINK_CANONICAL. '">';
+	$header_links = '';
+	if ($LINK_CANONICAL) {
+		$header_links .= '<link rel="canonical" href="' . $LINK_CANONICAL . '">';
 	}
-	if (!empty($META_DESCRIPTION)) {
-		$header_links.= '<meta name="description" content="'. WT_Filter::escapeHtml($META_DESCRIPTION). '">';
+	if ($META_DESCRIPTION) {
+		$header_links .= '<meta name="description" content="' . $META_DESCRIPTION . '">';
 	}
-	$header_links.= '<meta name="robots" content="'. $META_ROBOTS. '">';
-	if (!empty($META_GENERATOR)) {
-		$header_links.= '<meta name="generator" content="'. $META_GENERATOR. '">';
+	$header_links .= '<meta name="robots" content="' . $META_ROBOTS . '">';
+	if ($META_GENERATOR) {
+		$header_links .= '<meta name="generator" content="' . $META_GENERATOR . '">';
 	}
 	return $header_links;
 }
@@ -424,11 +424,12 @@ function print_note_record($text, $nlevel, $nrec, $textOnly=false) {
 	} else {
 		// A multi-line note, with an expand/collapse option
 		$element_id = uniqid('n-');
+		// NOTE: class "note-details" is (currently) used only by some third-party themes
 		return
 			'<div class="fact_NOTE"><span class="label">' .
 			'<a href="#" onclick="expand_layer(\'' . $element_id . '\'); return false;"><i id="' . $element_id . '_img" class="icon-plus"></i></a> ' . WT_Gedcom_Tag::getLabel($label) . ': ' .
 			'</div>' .
-			'<div id="' . $element_id . '" style="display:none">' . $html . '</div>';
+			'<div class="note-details" id="' . $element_id . '" style="display:none">' . $html . '</div>';
 	}
 }
 
@@ -819,21 +820,20 @@ function format_fact_place(WT_Fact $event, $anchor=false, $sub_records=false, $l
 			$cts = preg_match('/\d LATI (.*)/', $placerec, $match);
 			if ($cts>0) {
 				$map_lati=$match[1];
-				$html.='<br><span class="label">'.WT_Gedcom_Tag::getLabel('LATI').': </span>'.$map_lati;
+				$html .= '<br><span class="label">' . WT_Gedcom_Tag::getLabel('LATI') . ': </span>' . $map_lati;
 			}
-			$map_long="";
+			$map_long = '';
 			$cts = preg_match('/\d LONG (.*)/', $placerec, $match);
-			if ($cts>0) {
-				$map_long=$match[1];
-				$html.=' <span class="label">'.WT_Gedcom_Tag::getLabel('LONG').': </span>'.$map_long;
+			if ($cts > 0) {
+				$map_long = $match[1];
+				$html .= ' <span class="label">' . WT_Gedcom_Tag::getLabel('LONG') . ': </span>' . $map_long;
 			}
-			if ($map_lati && $map_long && empty($SEARCH_SPIDER)) {
-				$map_lati=trim(strtr($map_lati, "NSEW,�", " - -. ")); // S5,6789 ==> -5.6789
-				$map_long=trim(strtr($map_long, "NSEW,�", " - -. ")); // E3.456� ==> 3.456
-				$html.=' <a target="_BLANK" href="'."//www.mapquest.com/maps/map.adp?searchtype=address&amp;formtype=latlong&amp;latlongtype=decimal&amp;latitude={$map_lati}&amp;longitude={$map_long}".'" class="icon-mapquest" title="MapQuest™"></a>';
-				$html.=' <a target="_BLANK" href="'."//maps.google.com/maps?q={$map_lati},{$map_long}(".rawurlencode($event->getPlace()->getGedcomName()).")".'" class="icon-googlemaps" title="'.WT_I18N::translate('Google Maps™').'"></a>';
-				$html.=' <a target="_BLANK" href="'."//www.multimap.com/map/browse.cgi?lat={$map_lati}&amp;lon={$map_long}&amp;scale=&amp;icon=x".'" class="icon-bing" title="Bing Maps™"></a>';
-				$html.=' <a target="_BLANK" href="'."//www.terraserver.com/imagery/image_gx.asp?cpx={$map_long}&amp;cpy={$map_lati}&amp;res=30&amp;provider_id=340".'" class="icon-terraserver" title="TerraServer™"></a>';
+			if ($map_lati && $map_long) {
+				$map_lati = trim(strtr($map_lati, "NSEW,�", " - -. ")); // S5,6789 ==> -5.6789
+				$map_long = trim(strtr($map_long, "NSEW,�", " - -. ")); // E3.456� ==> 3.456
+				$html .= ' <a rel="nollow" href="https://maps.google.com/maps?q=' . $map_lati . ',' . $map_long . '" class="icon-googlemaps" title="' . WT_I18N::translate('Google Maps™') . '"></a>';
+				$html .= ' <a rel="nollow" href="https://www.bing.com/maps/?lvl=15&cp=' . $map_lati . '~' . $map_long . '" class="icon-bing" title="' . WT_I18N::translate('Bing Maps™') . '"></a>';
+				$html .= ' <a rel="nollow" href="https://www.openstreetmap.org/#map=15/' . $map_lati . '/' . $map_long . '" class="icon-osm" title="' . WT_I18N::translate('OpenStreetMap™') . '"></a>';
 			}
 			if (preg_match('/\d NOTE (.*)/', $placerec, $match)) {
 				$html .= '<br>' . print_fact_notes($placerec, 3);
@@ -1031,7 +1031,7 @@ function print_findfamily_link($element_id) {
 }
 
 function print_specialchar_link($element_id) {
-	return '<span onclick="findSpecialChar(document.getElementById(\''.$element_id.'\')); updatewholename(); return false;" class="icon-button_keyboard" title="'.WT_I18N::translate('Find a special character').'"></span>';
+	return '<span onclick="findSpecialChar(document.getElementById(\''.$element_id.'\')); if (window.updatewholename) { updatewholename(); } return false;" class="icon-button_keyboard" title="'.WT_I18N::translate('Find a special character').'"></span>';
 }
 
 function print_autopaste_link($element_id, $choices) {
