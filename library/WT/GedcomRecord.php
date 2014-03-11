@@ -328,7 +328,11 @@ class WT_GedcomRecord {
 	}
 
 	// Can the details of this record be shown?
-	public function canShow($access_level=WT_USER_ACCESS_LEVEL) {
+	public function canShow($access_level=null) {
+		global $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 		// CACHING: this function can take three different parameters,
 		// and therefore needs three different caches for the result.
 		switch ($access_level) {
@@ -789,8 +793,12 @@ class WT_GedcomRecord {
 	// The facts and events for this record
 	// $override allows us to implement $SHOW_PRIVATE_RELATIONSHIPS and $SHOW_LIVING_NAMES, by giving
 	// access to otherwise private records.
-	public function getFacts($filter=null, $sort=false, $access_level=WT_USER_ACCESS_LEVEL, $override=false) {
+	public function getFacts($filter=null, $sort=false, $access_level=null, $override=false) {
 		$facts=array();
+		global $USER_ACCESS_LEVEL;
+		if ($access_level === null) {
+			$access_level = $USER_ACCESS_LEVEL;
+		}
 		if ($this->canShow($access_level) || $override) {
 			foreach ($this->facts as $fact) {
 				if (($filter==null || preg_match('/^' . $filter . '$/', $fact->getTag())) && $fact->canShow($access_level)) {

@@ -43,11 +43,11 @@ define('WT_STATIC_URL', ''); // For example, http://my.cdn.com/webtrees-static-1
 // Optionally, load major JS libraries from Google’s public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js');
 } else {
-	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.10.2.js');
-	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.3.js');
+	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.11.0.js');
+	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.4.js');
 }
 define('WT_JQUERY_COLORBOX_URL',   WT_STATIC_URL.'js/jquery.colorbox-1.4.15.js');
 define('WT_JQUERY_COOKIE_URL',     WT_STATIC_URL.'js/jquery.cookie-1.4.0.js');
@@ -55,7 +55,7 @@ define('WT_JQUERY_DATATABLES_URL', WT_STATIC_URL.'js/jquery.datatables-1.9.4.js'
 define('WT_JQUERY_JEDITABLE_URL',  WT_STATIC_URL.'js/jquery.jeditable-1.7.1.js');
 define('WT_JQUERY_WHEELZOOM_URL',  WT_STATIC_URL.'js/jquery.wheelzoom-1.1.2.js');
 define('WT_MODERNIZR_URL',         WT_STATIC_URL.'js/modernizr.custom-2.6.2.js');
-define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.2.js');
+define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.3.js');
 
 // Location of our modules and themes.  These are used as URLs and folder paths.
 define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
@@ -387,15 +387,27 @@ define('WT_USER_IS_ADMIN', userIsAdmin(WT_USER_ID));
 if (isset($_REQUEST['ged'])) {
 	// .... from the URL or form action
 	$GEDCOM=$_REQUEST['ged'];
-} elseif ($WT_SESSION->GEDCOM) {
-	// .... the most recently used one
-	$GEDCOM=$WT_SESSION->GEDCOM;
-} else {
-	// Try the site default
-	$GEDCOM=WT_Site::preference('DEFAULT_GEDCOM');
+} elseif (isset($_REQUEST['url'])) {
+	//Workaround for login.php to get the right title
+	if (strpos($_REQUEST['url'], '?') !== false) {
+		$url = substr($_REQUEST['url'], strpos($_REQUEST['url'], '?')+1);
+		parse_str($url,$parameter);
+		if (isset($parameter['ged'])) {
+			$GEDCOM=$parameter['ged'];
+		}
+	}
+}
+if (!isset($GEDCOM)) {
+	if ($WT_SESSION->GEDCOM) {
+		// .... the most recently used one
+		$GEDCOM=$WT_SESSION->GEDCOM;
+	} else {
+		// Try the site default
+		$GEDCOM=WT_Site::preference('DEFAULT_GEDCOM');
+	}
 }
 
-// Choose the selected tree (if it exists), or any valid tree otherwise
+// Choose the selected tree (if it exists)
 $WT_TREE=null;
 foreach (WT_Tree::getAll() as $tree) {
 	if ($tree->tree_name == $GEDCOM && ($tree->imported || WT_USER_IS_ADMIN)) {
@@ -427,33 +439,27 @@ if ($WT_TREE) {
 	}
 	load_gedcom_settings(WT_GED_ID);
 } else {
-	$tree_temp=null;
-	$tree_temp2=null;
+	//tree not accessible but may still exist
+	$temptree=null; //first tree = default tree (if the requested one does not exist)
 	foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
-		if ($tree_temp2==null) { $tree_temp2=$tree; }
+		if ($temptree==null) $temptree=$tree;
 		if ($tree->tree_name == $GEDCOM) {
-			$tree_temp=$tree;
+			$temptree=$tree;
 			break;
 		}
 	}
-	if ($tree_temp==null) {
-		if ($tree_temp2!=null) {
-			define('WT_GEDCOM',            $tree_temp2->tree_name);
-			define('WT_TREE_TITLE',        $tree_temp2->tree_title_html);
-			define('WT_GEDURL',            $tree_temp2->tree_name_url);
-		}
-		else {
-			define('WT_GEDCOM',            '');
-			define('WT_TREE_TITLE',        WT_WEBTREES);
-			define('WT_GEDURL',            '');
-		}
+	if ($temptree==null){
+		define('WT_GEDCOM',            '');
+		define('WT_TREE_TITLE',        WT_WEBTREES);
+		define('WT_GEDURL',            '');
+		define('WT_GED_ID',            null);
 	}
-	else {
-		define('WT_GEDCOM',            $tree_temp->tree_name);
-		define('WT_TREE_TITLE',        $tree_temp->tree_title_html);
-		define('WT_GEDURL',            $tree_temp->tree_name_url);
+	else{
+		define('WT_GEDCOM',            $temptree->tree_name);
+		define('WT_GEDURL',            $temptree->tree_name_url);
+		define('WT_TREE_TITLE',        $temptree->tree_title_html);
+		define('WT_GED_ID',            $temptree->tree_id);
 	}
-	define('WT_GED_ID',            null);
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
 	define('WT_USER_CAN_ACCEPT',   false);
