@@ -1076,6 +1076,12 @@ function create_user($username, $realname, $email, $password) {
 	$user_id=
 		WT_DB::prepare("SELECT SQL_CACHE user_id FROM `##user` WHERE user_name=?")
 		->execute(array($username))->fetchOne();
+	// Set user role to "Members" for all gedcoms
+	WT_DB::prepare(
+		"INSERT INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".
+		" SELECT ?, gedcom_id, 'canedit', 'access' FROM `##gedcom` WHERE gedcom_id>0"
+	)->execute(array($user_id));
+
 	return $user_id;
 }
 

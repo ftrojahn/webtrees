@@ -452,7 +452,7 @@ case 'createform':
 										echo '<select name="', $varname, '">';
 										foreach ($ALL_EDIT_OPTIONS as $EDIT_OPTION=>$desc) {
 											echo '<option value="', $EDIT_OPTION, '" ';
-											if ($EDIT_OPTION == WT_I18N::translate('None')) {
+											if ($EDIT_OPTION == 'access') {
 												echo 'selected="selected" ';
 											}
 											echo '>', $desc, '</option>';
