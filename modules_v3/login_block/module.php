@@ -85,6 +85,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 				</div>';
 			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
+				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=delete">'. WT_I18N::translate('Delete user account'). '</a></div>';
 			}
 		$content.= '</form>'; // close "login-form"
 
