@@ -185,6 +185,15 @@ default:
 				echo '<div><a href="'.WT_LOGIN_URL.'?action=delete">', WT_I18N::translate('Delete user account'), '</a></div>';
 			}
 		}
+		else {
+			$first_tree = reset(WT_Tree::getAll());
+			if ($first_tree!=null) {
+				if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
+					echo '<div><a href="'.WT_LOGIN_URL.'?action=register&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Request new user account'), '</a></div>';
+					echo '<div><a href="'.WT_LOGIN_URL.'?action=delete&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Delete user account'), '</a></div>';
+				}
+			}
+		}
 	echo '</form>';
 
 	// hidden New Password block
