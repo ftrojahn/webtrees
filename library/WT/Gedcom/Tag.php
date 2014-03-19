@@ -840,7 +840,7 @@ class WT_Gedcom_Tag {
 			return
 			'<'.$element.' class="fact_' . $tag . '">'.
 			/* I18N: a label/value pair, such as “Occupation: Farmer”.  Some languages may need to change the punctuation. */
-			WT_I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', self::getLabel($tag, $record), $value).
+			WT_I18N::translate('<span class="label">%1$s:</span> <span class="field">%2$s</span>', self::getLabel($tag, $record), $value).
 			'</'.$element.'>';
 	}
 
