@@ -185,13 +185,33 @@ default:
 				echo '<div><a href="'.WT_LOGIN_URL.'?action=delete">', WT_I18N::translate('Delete user account'), '</a></div>';
 			}
 		}
+		else {
+			$first_tree = reset(WT_Tree::getAll());
+			if ($first_tree!=null) {
+				echo '
+				<div>
+					<a href="#" id="passwd_click">', WT_I18N::translate('Request new password'), '</a>
+				</div>';
+				if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
+					echo '<div><a href="'.WT_LOGIN_URL.'?action=register&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Request new user account'), '</a></div>';
+					echo '<div><a href="'.WT_LOGIN_URL.'?action=delete&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Delete user account'), '</a></div>';
+				}
+			}
+		}
 	echo '</form>';
 
 	// hidden New Password block
 	echo '<div id="new_passwd">
 		<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">
-		<input type="hidden" name="action" value="requestpw">
-		<h4>', WT_I18N::translate('Lost password request'), '</h4>
+		<input type="hidden" name="action" value="requestpw">';
+	if (!$WT_TREE) {
+		$first_tree = reset(WT_Tree::getAll());
+		if ($first_tree!=null) {
+			echo '<input type="hidden" name="ctype" value="gedcom">';
+			echo '<input type="hidden" name="ged" value="'.$first_tree->tree_name.'">';
+		}
+	}
+	echo '<h4>', WT_I18N::translate('Lost password request'), '</h4>
 		<div>
 			<label for="new_passwd_username">', WT_I18N::translate('Username or email address'),
 				'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">
