@@ -415,7 +415,8 @@ case 'register':
 		<h2>', $controller->getPageTitle(), '</h2>';
 		if (WT_Site::preference('SHOW_REGISTER_CAUTION')) {
 			echo '<div id="register-text">';
-			echo WT_I18N::translate('<div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living individuals listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div>');
+			echo '<div class="largeError">'.WT_I18N::translate('Notice:').'</div>';
+			echo '<div class="error">'.WT_I18N::translate('user-newaccount-message').'</div>';
 			echo '</div>';
 		}
 		echo '<div id="register-box">
@@ -639,7 +640,9 @@ case 'delete':
 
 	echo '<div id="deletion-page">';
 	echo '<div id="deletion-text">';
-	echo WT_I18N::translate('<center><h2>Delete user account</h2></center><br><div class="largeError">Notice:</div><div class="error">By filling in and submitting this form you will be removed permanently from the database.<br>You have always the possibility to register as a user again.<br>For changes to your user data (password, email address) login normally and edit them under My page -> My account</div>');
+        echo '<center><h2>'.WT_I18N::translate('Delete user account').'</h2></center><br>';
+        echo '<div class="largeError">'.WT_I18N::translate('Notice:').'</div>';
+	echo '<div class="error">'.WT_I18N::translate('user-deletion-message').'</div>';
 	echo '</div>';
 
 	echo '<div id="deletion-box">';
