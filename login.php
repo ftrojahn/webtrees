@@ -186,7 +186,8 @@ default:
 			}
 		}
 		else {
-			$first_tree = reset(WT_Tree::getAll());
+			$trees = WT_Tree::getAll();
+			$first_tree = reset($trees);
 			if ($first_tree!=null) {
 				echo '
 				<div>
@@ -205,7 +206,8 @@ default:
 		<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">
 		<input type="hidden" name="action" value="requestpw">';
 	if (!$WT_TREE) {
-		$first_tree = reset(WT_Tree::getAll());
+		$trees = WT_Tree::getAll();
+		$first_tree = reset($trees);
 		if ($first_tree!=null) {
 			echo '<input type="hidden" name="ctype" value="gedcom">';
 			echo '<input type="hidden" name="ged" value="'.$first_tree->tree_name.'">';
