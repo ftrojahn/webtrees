@@ -364,6 +364,11 @@ class WT_Tree {
 			" FROM `##block`".
 			" WHERE gedcom_id=-1"
 		)->execute(array($tree_id));
+		// Set role to "Members" for all users
+		WT_DB::prepare(
+			"INSERT INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".
+			" SELECT user_id, ?, 'canedit', 'access' FROM `##user` WHERE user_id>0"
+		)->execute(array($tree_id));
 
 		// Update the list of trees - to include the new configuration settings
 		self::$trees=null;
