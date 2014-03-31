@@ -1245,9 +1245,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			scrollwheel: true
 		};
 		var pm_map = new google.maps.Map(document.getElementById("pm_map"), myOptions);
-		google.maps.event.addListener(pm_map, "maptypechanged", function() {
-			map_type.refresh();
-		});
 		google.maps.event.addListener(pm_map, "click", function() {
 			if (document.getElementById(lastlinkid) != null) {
 				document.getElementById(lastlinkid).className = "person_box:target";
@@ -1803,18 +1800,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		$retlist[]=$placename; // Exact
 
 		return $retlist;
-	}
-
-	private function abbreviate($text) {
-		if (utf8_strlen($text)>13) {
-			if (trim(utf8_substr($text, 10, 1))!='') {
-				$desc = utf8_substr($text, 0, 11).'.';
-			} else {
-				$desc = trim(utf8_substr($text, 0, 11));
-			}
-		}
-		else $desc = $text;
-		return $desc;
 	}
 
 	private function get_lati_long_placelocation($place) {
@@ -2633,13 +2618,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			$i--;
 		}
 		return $levelo;
-	}
-
-	private function check_place($place_names, $place) {
-		if ($place == "Unknown") $place="";
-		if (in_array($place, $place_names)) {
-			return true;
-		}
 	}
 
 	private function print_how_many_people($level, $parent) {
