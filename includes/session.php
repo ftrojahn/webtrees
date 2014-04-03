@@ -438,21 +438,22 @@ if ($WT_TREE) {
 	foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
 		if ($temptree==null) $temptree=$tree;
 		if ($tree->tree_name == $GEDCOM) {
-			$temptree=$tree;
+			$WT_TREE=$tree;
 			break;
 		}
 	}
-	if ($temptree==null){
+	if ($WT_TREE==null) $WT_TREE=$temptree;
+	if ($WT_TREE==null){
 		define('WT_GEDCOM',            '');
 		define('WT_TREE_TITLE',        WT_WEBTREES);
 		define('WT_GEDURL',            '');
 		define('WT_GED_ID',            null);
 	}
 	else{
-		define('WT_GEDCOM',            $temptree->tree_name);
-		define('WT_GEDURL',            $temptree->tree_name_url);
-		define('WT_TREE_TITLE',        $temptree->tree_title_html);
-		define('WT_GED_ID',            $temptree->tree_id);
+		define('WT_GEDCOM',            $WT_TREE->tree_name);
+		define('WT_GEDURL',            $WT_TREE->tree_name_url);
+		define('WT_TREE_TITLE',        $WT_TREE->tree_title_html);
+		define('WT_GED_ID',            $WT_TREE->tree_id);
 	}
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
