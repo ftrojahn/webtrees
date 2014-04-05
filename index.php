@@ -35,8 +35,8 @@ require './includes/session.php';
 // The only option for action is "ajax"
 $action = WT_Filter::get('action');
 
-// The default view depends on whether we are logged in
-$ctype = WT_Filter::get('ctype', 'gedcom|user', WT_USER_ID ? 'user' : 'gedcom');
+// The default view is 'gedcom'
+$ctype = WT_Filter::get('ctype', 'gedcom|user', 'gedcom');
 
 // Get the blocks list
 if (WT_USER_ID && $ctype=='user') {
