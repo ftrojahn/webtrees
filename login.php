@@ -624,7 +624,44 @@ case 'delete':
 		}
 		else {
 			AddToLog('deleted user ->' . get_user_name($user_id) . '<-', 'auth');
+
+			// Generate an email in the admin’s language
+			$webmaster_user_id=get_gedcom_setting(WT_GED_ID, 'WEBMASTER_USER_ID');
+			WT_I18N::init(get_user_setting($webmaster_user_id, 'language'));
+
+			$mail1_body =
+				WT_I18N::translate('Hello administrator…') . WT_Mail::EOL . WT_Mail::EOL .
+				/* I18N: %s is a server name/URL */
+				WT_I18N::translate('A user has deleted his account at %s.', WT_SERVER_NAME . WT_SCRIPT_PATH . ' ' . $WT_TREE->tree_title_html) . WT_Mail::EOL . WT_Mail::EOL .
+				WT_I18N::translate('Username')      .' '.$username     . WT_Mail::EOL .
+				WT_I18N::translate('Real name')     .' '.$user_realname . WT_Mail::EOL .
+				WT_I18N::translate('Email address:').' '.$user_email    . WT_Mail::EOL;
+			$mail1_body .= WT_Mail::auditFooter();
+
+			$mail1_subject = /* I18N: %s is a server name/URL */ WT_I18N::translate('Account deletion at %s', WT_SERVER_NAME . WT_SCRIPT_PATH . ' ' . $WT_TREE->tree_title);
+			WT_I18N::init(WT_LOCALE);
+
 			delete_user($user_id);
+
+			// Send admin message by email and/or internal messaging
+			WT_Mail::send(
+				// From:
+				$WT_TREE,
+				// To:
+				getUserEmail($webmaster_user_id),
+				getUserFullName($webmaster_user_id),
+				// Reply-To:
+				$WEBTREES_EMAIL,
+				$WEBTREES_EMAIL,
+				// Message
+				$mail1_subject,
+				$mail1_body
+			);
+			$mail1_method = get_user_setting($webmaster_user_id, 'contact_method');
+			if ($mail1_method!='messaging3' && $mail1_method!='mailto' && $mail1_method!='none') {
+				WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
+					->execute(array($user_email, $WT_REQUEST->getClientIp(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
+			}
 
 			$controller
 				->setPageTitle(WT_I18N::translate('Delete user account'))
