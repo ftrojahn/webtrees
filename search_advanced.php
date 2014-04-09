@@ -24,6 +24,7 @@
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'data/search_config.ini.php';
 
 $controller=new WT_Controller_AdvancedSearch();
 $controller
@@ -35,7 +36,15 @@ echo '<script>';
 	function checknames(frm) {
 		action = "<?php echo $controller->action; ?>";
 
-		return true;
+		for (var i=0;i<frm.getElementsByTagName('input').length;i++) {
+			if (frm.getElementsByTagName('input')[i].type=='text') {
+				if (frm.getElementsByTagName('input')[i].value!='') {
+					return true;
+				}
+			}
+		}
+		alert("<?php echo WT_I18N::translate('Please enter a search term'); ?>");
+		return false;
 	}
 
 	var numfields = <?php echo count($controller->fields); ?>;
@@ -81,8 +90,9 @@ echo '<script>';
 		trow.appendChild(val);
 		var lastRow = tbl.lastChild.previousSibling;
 
-		tbl.insertBefore(trow, lastRow.nextSibling);
+		tbl.insertBefore(trow, lastRow.previousSibling);
 		numfields++;
+		tbl.getElementsByTagName('tr')[0].getElementsByTagName('td')[2].setAttribute('rowspan',numfields-4);
 	}
 
 	/**
@@ -128,7 +138,7 @@ echo '</script>';
 ?>
 <div id="search-page">
 <h2 class="center"><?php echo $controller->getPageTitle(); ?></h2>
-<?php $somethingPrinted = $controller->PrintResults(); ?>
+<div id="search-notice"><?php echo WT_I18N::translate('The search result is displayed at the end of the page.') ?><br><br></div>
 <!-- /*************************************************** Search Form Outer Table **************************************************/ -->
 <form method="post" name="searchform" onsubmit="return checknames(this);" action="search_advanced.php">
 <input type="hidden" name="action" value="<?php echo $controller->action; ?>">
@@ -200,7 +210,7 @@ echo '</script>';
 			}
 			?>
 
-			<td rowspan="100" class="list_value">
+			<td rowspan="<?php echo $fct-4; ?>" class="list_value">
 				<table>
 					<!--  father -->
 					<tr>
@@ -285,6 +295,87 @@ echo '</script>';
 	</tr>
 
 	<?php } ?>
+	<!-- search trees -->
+	<?php
+	if ((count(WT_Tree::getAllIgnoreAccess()) > 1) && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+		// More Than 3 Gedcom Filess enable elect all & select none buttons
+		if (count(WT_Tree::getAllIgnoreAccess())>3) {
+			echo '<tr><td class="list_label">&nbsp;</td>
+				<td colspan="2" class="list_value">
+				<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', true);});return false;">
+				<input type="button" value="', /* I18N: select none (of the family trees) */ WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', false);});return false;">';
+				// More Than 10 Gedcom Files enable invert selection button
+				//if (count(WT_Tree::getAll())>10) {
+					echo '<input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).prop(\'checked\', !jQuery(this).prop(\'checked\'));});return false;">';
+				//}
+				echo '</td></tr>';
+		}
+		echo '<tr><td class="list_label" style="vertical-align:top;">'.WT_I18N::translate('Family trees').'</td>';
+		echo '<td colspan="2" id="search_trees" class="list_value">';
+			//Create Groups
+			$groups = array();
+			foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+				if (!in_array($tree->tree_name,$search_excluded_trees)){
+					if (strpos($tree->tree_title, ':') !== false){
+						$group = substr($tree->tree_title, 0, strpos($tree->tree_title, ':'));
+						$groups[$group][] = $tree;
+					}
+					else{
+						$groups[WT_I18N::translate('Miscellaneous')][] = $tree;
+					}
+				}
+			}
+			//Sort Groups
+			$groups_sort = array();
+			foreach ($groups as $groupname => $group) {
+				$groups_sort[] = $groupname;
+			}
+			sort($groups_sort, SORT_STRING);
+			//Print Groups
+			$groupindex = 1;
+			foreach ($groups_sort as $groupname) {
+				echo '<input type="checkbox" name="grp_', $groupname,'" value="yes" onclick="jQuery(\'#search_group_', $groupindex ,' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])" ';
+				if (isset ($_REQUEST['grp_'.$groupname])) {
+					echo 'checked="checked" ';
+				}
+				else {
+					$allchecked = true;
+					foreach ($groups[$groupname] as $tree) {
+						$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+						if (!isset ($_REQUEST["$str"])) {
+							$allchecked = false;
+							break;
+						}
+					}
+					if ($allchecked) {
+						echo 'checked="checked" ';
+					}
+				}
+				echo '>';
+				echo '<a href="javascript:void(0)" onclick="jQuery(\'#search_group_', $groupindex, '\').is(\':hidden\')?jQuery(\'#search_group_', $groupindex, '\').show():jQuery(\'#search_group_', $groupindex, '\').hide()">', $groupname, '</a><br/>', "\n";
+				echo '<div id="search_group_', $groupindex,'" style="margin-left:18px;display:none">';
+				foreach ($groups[$groupname] as $tree) {
+					$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+					$controller->inputFieldNames[] = "$str";
+					echo '<p style="margin:0px;"><input type="checkbox" ';
+					if (isset ($_REQUEST["$str"])) {
+						echo 'checked="checked" ';
+					}
+					if (strpos($tree->tree_title, ':') !== false){
+						$new_tree_title = trim(substr($tree->tree_title, strpos($tree->tree_title, ':') + 1));
+						$new_tree_title = '<span dir="auto">' . WT_Filter::escapeHtml($new_tree_title) . '</span>';
+					}
+					else{
+						$new_tree_title = $tree->tree_title;
+					}
+					echo 'value="yes" id="checkbox_', $tree->tree_id , '" name="', $str, '"><label for="checkbox_', $tree->tree_id , '">', $new_tree_title, '</label></p>', "\n";
+				}
+				echo '</div>', "\n";
+				$groupindex++;
+			}
+		echo '</td></tr>';
+	}
+	?>
 	</table>
 		<div class="center" style="margin-top:10px;">
 			<a href="#" onclick="addFields();"><?php echo WT_I18N::translate('Add More Fields'); ?></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -294,3 +385,9 @@ echo '</script>';
 		</div>
 </form>
 </div>
+<?php
+	$somethingPrinted = $controller->PrintResults();
+	if (!$somethingPrinted){
+		$controller->addInlineJavascript('jQuery("#search-notice").hide();');
+	}
+ ?>

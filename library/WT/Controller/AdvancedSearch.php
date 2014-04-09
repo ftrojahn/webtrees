@@ -31,6 +31,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 	var $values = array();
 	var $plusminus = array();
 	var $errors = array();
+	var $sgeds = array();
 
 	function __construct() {
 		parent::__construct();
@@ -70,6 +71,20 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 				'FAMC:WIFE:NAME:SURN:SDX',
 			);
 		}
+
+		// Retrieve the gedcoms to search in
+		if (count(WT_Tree::getAllIgnoreAccess())>1 && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+			foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+				if (isset ($_REQUEST["$str"])) {
+					$this->sgeds[$tree->tree_id] = $tree->tree_name;
+					$_REQUEST["$str"] = 'yes';
+				}
+			}
+		} else {
+			$this->sgeds[WT_GED_ID] = WT_GEDCOM;
+		}
+
 	}
 
 	function getOtherFields() {
@@ -194,6 +209,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 
 	function advancedSearch($justSql=false, $table="individuals", $prefix="i") {
 		$this->myindilist = array ();
+		if (!$this->sgeds) return;
 		$fct = count($this->fields);
 		if ($fct==0) {
 			return;
@@ -295,8 +311,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 					") AS f_p ON (f_p.file  =ind.i_file AND f_pl.pl_p_id= f_p.id)";
 		}
 		// Add the where clause
-		$sql.=" WHERE ind.i_file=?";
-		$bind[]=WT_GED_ID;
+		$sql.=" WHERE ind.i_file IN (".implode(',',array_keys($this->sgeds)).")";
 		for ($i=0; $i<$fct; $i++) {
 			$field = $this->fields[$i];
 			$value = $this->values[$i];
@@ -580,9 +595,45 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 	function PrintResults() {
 		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 		if ($this->myindilist) {
-			uasort($this->myindilist, array('WT_GedcomRecord', 'Compare'));
-			echo format_indi_table($this->myindilist);
-			return true;
+			$somethingPrinted = false; // whether anything printed
+
+			$this->addInlineJavascript('jQuery("#search-result-tabs").tabs();');
+			$this->addInlineJavascript('jQuery("#search-result-tabs").css("visibility", "visible");');
+			$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
+			echo '<br>';
+			echo '<div class="loading-image">&nbsp;</div>';
+			echo '<div id="search-result-tabs"><ul>';
+			echo '<li><a href="#searchAccordion-indi"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';
+			echo '</ul>';
+			// individual results
+			echo '<div id="searchAccordion-indi">';
+			// Split individuals by tree
+			$trees=WT_Tree::getAllIgnoreAccess();
+			foreach ($this->sgeds as $ged_id=>$gedcom) {
+				$datalist = array();
+				foreach ($this->myindilist as $individual) {
+					if ($individual->getGedcomId()==$ged_id) {
+						$datalist[]=$individual;
+					}
+				}
+				if ($datalist) {
+					$somethingPrinted = true;
+					usort($datalist, array('WT_GedcomRecord', 'Compare'));
+					$GEDCOM=$gedcom;
+					load_gedcom_settings($ged_id);
+					echo '<h3 class="indi-acc-header" style="text-align:center;"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
+						<div class="indi-acc_content">',
+						format_indi_table($datalist);
+					echo '</div>';//indi-acc_content
+				}
+			}
+			echo '</div>';//#searchAccordion-indi
+			echo '</div>'; //#search-result-tabs
+			$this->addInlineJavascript('jQuery("#searchAccordion-indi").accordion({heightStyle: "content", collapsible: true});');
+
+			$GEDCOM=WT_GEDCOM;
+			load_gedcom_settings(WT_GED_ID);
+			return $somethingPrinted;
 		} else {
 			if ($this->isPostBack) {
 				echo '<p class="ui-state-highlight">', WT_I18N::translate('No results found.'), '</p>';
