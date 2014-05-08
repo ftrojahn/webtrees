@@ -216,12 +216,12 @@ class WT_MenuBar {
 					asort($menuList);
 
 					// Produce the submenus in localized name order
-					foreach ($menuList as $menuType => $menuName) {
-						switch ($menuType) {
+					foreach ($menuList as $submenuType => $submenuName) {
+						switch ($submenuType) {
 						case 'parentTimeLine':
 							// charts / parents_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show couple on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('HUSB','WIFE')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-parents'
 							);
@@ -231,7 +231,7 @@ class WT_MenuBar {
 						case 'childTimeLine':
 							// charts / children_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show children on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('CHIL')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-children'
 							);
@@ -241,7 +241,7 @@ class WT_MenuBar {
 						case 'familyTimeLine':
 							// charts / family_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show family on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('HUSB','WIFE','CHIL')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-family'
 							);

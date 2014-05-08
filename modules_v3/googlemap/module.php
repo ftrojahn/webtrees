@@ -2035,7 +2035,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			};
 
 			function getMarkerImage(iconColor) {
-				if ((typeof(iconColor)=='undefined') || (iconColor==null)) {
+				if (typeof(iconColor) === 'undefined' || iconColor === null) {
 					iconColor = 'red';
 				}
 				if (!gicons[iconColor]) {
@@ -2578,7 +2578,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 				?>
 				<div>
-				<iframe style="background:transparent; margin-top:-3px; margin-left:2px; width:530px;height:405px;padding:0;border:solid 0px black" src="module.php?mod=googlemap&amp;mod_action=wt_v3_street_view&amp;x=<?php echo $sv_lng; ?>&amp;y=<?php echo $sv_lat; ?>&amp;z=18&amp;t=2&amp;c=1&amp;s=1&amp;b=<?php echo $sv_dir; ?>&amp;p=<?php echo $sv_pitch; ?>&amp;m=<?php echo $sv_zoom; ?>&amp;j=1&amp;k=1&amp;v=1" marginwidth="0" marginheight="0" frameborder="0" scrolling="no"></iframe>
+				<iframe style="background: transparent; margin-top: -3px; margin-left: 2px; width: 530px; height: 405px; padding: 0; border: 0;" src="module.php?mod=googlemap&amp;mod_action=wt_v3_street_view&amp;x=<?php echo $sv_lng; ?>&amp;y=<?php echo $sv_lat; ?>&amp;z=18&amp;t=2&amp;c=1&amp;s=1&amp;b=<?php echo $sv_dir; ?>&amp;p=<?php echo $sv_pitch; ?>&amp;m=<?php echo $sv_zoom; ?>&amp;j=1&amp;k=1&amp;v=1" marginwidth="0" marginheight="0" frameborder="0" scrolling="no"></iframe>
 				</div>
 
 				<?php
@@ -3550,7 +3550,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				geocoder = new google.maps.Geocoder();
 				if (zoom) {
 					zoom = zoom;
-				}else {
+				} else {
 					zoom = pl_zoom;
 				}
 				// Define map
@@ -3750,9 +3750,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					if (response.length > 0) {
 						for (i=0; i<response.length; i++) {
 							// 5 decimal places is approx 1 metre accuracy.
-							var name  = '<div id="gname" class="iwstyle">'+response[i].address_components[0].short_name+'<br>('+response[i].geometry.location.lng().toFixed(5)+','+response[i].geometry.location.lat().toFixed(5)+''
-								name +=	'<br><a href="#" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo WT_I18N::translate('Use this value'); ?></div></a>'
-								name += '</div>'
+							var name  = '<div id="gname" class="iwstyle">'+response[i].address_components[0].short_name+'<br>('+response[i].geometry.location.lng().toFixed(5)+','+response[i].geometry.location.lat().toFixed(5)+'';
+								name +=	'<br><a href="#" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo WT_I18N::translate('Use this value'); ?></div></a>';
+								name += '</div>';
 							var point = response[i].geometry.location;
 							var marker = createMarker(i, point, name);
 							bounds.extend(response[i].geometry.location);
@@ -3820,7 +3820,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			<table class="facts_table">
 			<tr>
 				<td class="optionbox" colspan="3">
-				<center><div id="map_pane" style="width: 100%; height: 300px"></div></center>
+				<center><div id="map_pane" style="width: 100%; height: 300px;"></div></center>
 				</td>
 			</tr>
 			<tr>
@@ -4318,7 +4318,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		?>
 		<script>
 		function updateList(inactive) {
-			window.location.href='<?php if (strstrb($_SERVER['REQUEST_URI'], '&inactive')) { $uri=strstrb($_SERVER['REQUEST_URI'], '&inactive');} else { $uri=$_SERVER['REQUEST_URI']; } echo $uri, '&inactive='; ?>'+inactive;
+			window.location.href='<?php if (strstr($_SERVER['REQUEST_URI'], '&inactive', true)) { $uri=strstr($_SERVER['REQUEST_URI'], '&inactive', true);} else { $uri=$_SERVER['REQUEST_URI']; } echo $uri, '&inactive='; ?>'+inactive;
 		}
 
 		function edit_place_location(placeid) {
