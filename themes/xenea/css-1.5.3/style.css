@@ -345,6 +345,7 @@ textarea:required:invalid {
 	left: 100%;
 	right: auto;
 	margin-top: 0;
+	margin-left: 0;
 }
 
 #main-menu > li:hover > ul {
@@ -380,6 +381,13 @@ textarea:required:invalid {
 	font-size: 11px;
 	line-height: 1.5;
 	padding: 0 10px 1px 5px;
+}
+
+ #menu-tree:hover > ul > li:hover > ul {
+	max-height:400px;
+	padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+	overflow-y:auto;
+	overflow-x:hidden;
 }
 
 /* Menu icons */
@@ -2663,21 +2671,24 @@ dt {
 
 #login-text,
 #register-text,
-#user-verify {
+#user-verify,
+#deletion-text {
 	margin: 20px auto;
 	width: 610px;
 	text-align: justify;
 }
 
 #login-box,
-#register-box {
+#register-box ,
+#deletion-box {
 	text-align: center;
 }
 
 #login-form,
 #new_passwd_form,
 #register-form,
-#verify-form {
+#verify-form,
+#deletion-form {
 	background-color: #c3dfff;
 	display: inline-block;
 	margin: 10px auto 0 auto;
@@ -2688,7 +2699,8 @@ dt {
 #login-form div a,
 #new_passwd_form div,
 #register-form div,
-#verify-form div {
+#verify-form div,
+#deletion-form div{
 	color: #006;
 	padding: 5px;
 	text-align: center;
@@ -2709,14 +2721,16 @@ dt {
 }
 
 #new_passwd_form h4,
-#register-form h4 {
+#register-form h4,
+#deletion-form h4 {
 	color: #006;
 	font-weight: normal;
 	text-align: center;
 }
 
 #register-form div,
-#verify-form div {
+#verify-form div,
+#deletion-form div {
 	text-align: right;
 }
 
@@ -2733,7 +2747,7 @@ dt {
 }
 
 #register-form textarea {
-	margin: 0 3px;
+	margin: 0 10px;
 	vertical-align: top;
 }
 
@@ -2747,10 +2761,32 @@ dt {
 	background: none;
 }
 
+#deletion-form label input,
+#deletion-form label select,
+#deletion-form textarea {
+	width:220px;
+	margin:0 10px;
+}
+
+#deletion-form label select {
+	margin:0 9px;
+	width:223px;
+}
+
+#deletion-form textarea {
+	margin:0 3px;
+	vertical-align:top;
+}
+
+#deletion-form div#deletion-submit {
+	text-align:center;
+}
+
 [dir=rtl] #login-form label,
 [dir=rtl] #new_passwd_form label,
 [dir=rtl] #register-form label,
-[dir=rtl] #verify-form label {
+[dir=rtl] #verify-form label,
+[dir=rtl] #deletion-form label {
 	text-align: left;
 }
 
@@ -4193,6 +4229,10 @@ dd .deletelink {
 
 [dir=rtl] #search-page-table .value {
 	margin: 0 170px 0 0;
+}
+
+#search-notice {
+	text-align:center;
 }
 
 /* ============== edituser.php ======================= */
