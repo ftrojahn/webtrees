@@ -255,6 +255,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 				}
 			}
 		}
+		if (!$anything_to_find) return;
 
 		if ($father_name || $mother_name) {
 			$sql.=" JOIN `##link`   l_1 ON (l_1.l_file=ind.i_file AND l_1.l_from=ind.i_id AND l_1.l_type='FAMC')";
