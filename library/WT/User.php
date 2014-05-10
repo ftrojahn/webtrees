@@ -130,6 +130,12 @@ class User {
 			"INSERT INTO `##user` (user_name, real_name, email, password) VALUES (?, ?, ?, ?)"
 		)->execute(array($user_name, $real_name, $email, password_hash($password, PASSWORD_DEFAULT)));
 
+		// Set user role to "Members" for all gedcoms
+		WT_DB::prepare(
+			"INSERT INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".
+			" SELECT ?, gedcom_id, 'canedit', 'access' FROM `##gedcom` WHERE gedcom_id>0"
+		)->execute(array(User::findByIdentifier($user_name)->user_id));
+
 		return User::findByIdentifier($user_name);
 	}
 
