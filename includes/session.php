@@ -471,8 +471,8 @@ if (!isset($GEDCOM)) {
 // Choose the selected tree (if it exists)
 $WT_TREE=null;
 foreach (WT_Tree::getAll() as $tree) {
-	$WT_TREE=$tree;
-	if ($WT_TREE->tree_name == $GEDCOM && ($WT_TREE->imported || \WT\Auth::isAdmin())) {
+	if ($tree->tree_name == $GEDCOM && ($tree->imported || \WT\Auth::isAdmin())) {
+		$WT_TREE=$tree;
 		break;
 	}
 }
