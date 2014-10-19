@@ -21,6 +21,8 @@
 // along with this program; if not, write to the Free Software
 // // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use WT\Auth;
+
 class WT_MenuBar {
 	public static function getGedcomMenu() {
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
@@ -89,7 +91,7 @@ class WT_MenuBar {
 		$showFull = ($PEDIGREE_FULL_DETAILS) ? 1 : 0;
 		$showLayout = ($PEDIGREE_LAYOUT) ? 1 : 0;
 
-		if (!\WT\Auth::id()) {
+		if (!Auth::id()) {
 			return null;
 		}
 
@@ -100,7 +102,7 @@ class WT_MenuBar {
 		$submenu = new WT_Menu(WT_I18N::translate('My page'), 'index.php?ctype=user&amp;ged='.WT_GEDURL, 'menu-mypage');
 		$menu->addSubmenu($submenu);
 		//-- editaccount submenu
-		if (\WT\Auth::user()->getSetting('editaccount')) {
+		if (Auth::user()->getPreference('editaccount')) {
 			$submenu = new WT_Menu(WT_I18N::translate('My account'), 'edituser.php', 'menu-myaccount');
 			$menu->addSubmenu($submenu);
 		}
@@ -421,12 +423,9 @@ class WT_MenuBar {
 	/**
 	 * get the reports menu
 	 *
-	 * @param string $pid
-	 * @param string $famid
-	 *
 	 * @return WT_Menu the menu item
 	 */
-	public static function getReportsMenu($pid='', $famid='') {
+	public static function getReportsMenu() {
 		global $SEARCH_SPIDER;
 
 		$active_reports=WT_Module::getActiveReports();
@@ -482,9 +481,9 @@ class WT_MenuBar {
 	}
 
 	public static function getThemeMenu() {
-		global $SEARCH_SPIDER;
+		global $SEARCH_SPIDER, $WT_TREE;
 
-		if (WT_GED_ID && !$SEARCH_SPIDER && WT_Site::preference('ALLOW_USER_THEMES') && get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')) {
+		if ($WT_TREE && !$SEARCH_SPIDER && WT_Site::getPreference('ALLOW_USER_THEMES') && $WT_TREE->getPreference('ALLOW_THEME_DROPDOWN')) {
 			$menu=new WT_Menu(WT_I18N::translate('Theme'), '#', 'menu-theme');
 			foreach (get_theme_names() as $themename=>$themedir) {
 				$submenu=new WT_Menu($themename, get_query_url(array('theme'=>$themedir), '&amp;'), 'menu-theme-'.$themedir);

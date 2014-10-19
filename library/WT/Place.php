@@ -27,9 +27,8 @@ class WT_Place {
 		if ($gedcom_place) {
 			$this->gedcom_place=explode(self::GEDCOM_SEPARATOR, $gedcom_place);
 		} else {
-			// Empty => "Top Level"
+			// Empty => "Top level"
 			$this->gedcom_place=array();
-			$this->place_id=0;
 		}
 		$this->gedcom_id=$gedcom_id;
 	}

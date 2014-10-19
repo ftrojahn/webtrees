@@ -21,12 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
-require_once WT_ROOT.'includes/functions/functions_import.php';
+use Rhumsaa\Uuid\Uuid;
 
 // Create an edit control for inline editing using jeditable
 function edit_field_inline($name, $value, $controller=null) {
@@ -115,15 +110,19 @@ function select_edit_control_inline($name, $values, $empty, $selected, $controll
 	}
 }
 
-// Create a set of radio buttons for a form
-// $name     - the ID for the form element
-// $values   - array of value=>display items
-// $selected - the currently selected item (if any)
-// $extra    - extra markup for field (e.g. tab key sequence)
-function radio_buttons($name, $values, $selected, $extra='') {
+/**
+ * Create a set of radio buttons for a form
+ *
+ * @param string   $name      The ID for the form element
+ * @param string[] $values    Array of value=>display items
+ * @param string   $selected  The currently selected item
+ *
+ * @return string
+ */
+function radio_buttons($name, $values, $selected) {
 	$html='';
 	foreach ($values as $key=>$value) {
-		$uniqueID = $name.(int)(microtime() * 1000000);
+		$uniqueID = Uuid::uuid4();
 		$html.='<input type="radio" name="'.$name.'" id="'.$uniqueID.'" value="'.WT_Filter::escapeHtml($key).'"';
 		if ((string)$key===(string)$selected) { // Beware PHP array keys are cast to integers!  Cast them back
 			$html.=' checked';
@@ -134,9 +133,9 @@ function radio_buttons($name, $values, $selected, $extra='') {
 }
 
 // Print an edit control for a Yes/No field
-function edit_field_yes_no($name, $selected=false, $extra='') {
+function edit_field_yes_no($name, $selected=false) {
 	return radio_buttons(
-		$name, array(false=>WT_I18N::translate('no'), true=>WT_I18N::translate('yes')), $selected, $extra
+		$name, array(false=>WT_I18N::translate('no'), true=>WT_I18N::translate('yes')), $selected
 	);
 }
 
@@ -164,10 +163,18 @@ function two_state_checkbox($name, $is_checked=0, $extra='') {
 		' onclick="document.getElementById(\''.$name.'\').value=(this.checked?1:0);" '.$extra.'>';
 }
 
-// Print a set of edit controls to select languages
+/**
+ * Print a set of edit controls to select languages
+ *
+ * @param $field_prefix
+ * @param $languages
+ *
+ * @return string
+ */
 function edit_language_checkboxes($field_prefix, $languages) {
-	echo '<table>';
-	$i=0;
+	$html = '';
+	$i    = 0;
+
 	foreach (WT_I18N::installed_languages() as $code=>$name) {
 		$content = '<input type="checkbox" name="'.$field_prefix.$code.'" id="'.$field_prefix.$code.'"';
 		if (strpos(",{$languages},", ",{$code},")!==false) {
@@ -176,18 +183,30 @@ function edit_language_checkboxes($field_prefix, $languages) {
 		$content .= '><label for="'.$field_prefix.$code.'"> '.$name.'</label>';
 		// print in three columns
 		switch ($i % 3) {
-		case 0: echo '<tr><td>', $content, '</td>'; break;
-		case 1: echo '<td>', $content, '</td>'; break;
-		case 2: echo '<td>', $content, '</td></tr>'; break;
+		case 0:
+			$html .= '<tr><td>' . $content . '</td>';
+			break;
+		case 1:
+			$html .= '<td>' . $content . '</td>';
+			break;
+		case 2:
+			$html .= '<td>' . $content . '</td></tr>';
+			break;
 		}
 		$i++;
 	}
 	switch ($i % 3) {
-	case 0: break;
-	case 1: echo '<td></td><td></td></tr>'; break;
-	case 2: echo '<td></td></tr>'; break;
+	case 0:
+		break;
+	case 1:
+		$html .= '<td></td><td></td></tr>';
+		break;
+	case 2:
+		$html .= '<td></td></tr>';
+		break;
 	}
-	echo '</table>';
+
+	return '<table>' . $html . '</table>';
 }
 
 // Print an edit control for access level
@@ -313,11 +332,11 @@ function print_calendar_popup($id) {
 }
 
 function print_addnewmedia_link($element_id) {
-	return '<a href="#" onclick="pastefield=document.getElementById(\''.$element_id.'\'); window.open(\'addmedia.php?action=showmediaform\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="'.WT_I18N::translate('Add a new media object').'"></a>';
+	return '<a href="#" onclick="pastefield=document.getElementById(\''.$element_id.'\'); window.open(\'addmedia.php?action=showmediaform\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="'.WT_I18N::translate('Create a new media object').'"></a>';
 }
 
 function print_addnewrepository_link($element_id) {
-	return '<a href="#" onclick="addnewrepository(document.getElementById(\''.$element_id.'\')); return false;" class="icon-button_addrepository" title="'.WT_I18N::translate('Create repository').'"></a>';
+	return '<a href="#" onclick="addnewrepository(document.getElementById(\''.$element_id.'\')); return false;" class="icon-button_addrepository" title="'.WT_I18N::translate('Create a new repository').'"></a>';
 }
 
 function print_addnewnote_link($element_id) {
@@ -364,30 +383,33 @@ function add_simple_tag(
 
 	// element name : used to POST data
 	if ($level==0) {
-		if ($upperlevel) $element_name=$upperlevel."_".$fact; // ex: BIRT_DATE | DEAT_DATE | ...
+		if ($upperlevel) $element_name=$upperlevel . '_' . $fact;
 		else $element_name=$fact; // ex: OCCU
 	} else $element_name="text[]";
 	if ($level==1) $main_fact=$fact;
 
 	// element id : used by javascript functions
 	if ($level==0)
-		$element_id = $fact; // ex: NPFX | GIVN ...
+		$element_id = $fact;
 	else
-		$element_id = $fact . (int)(microtime()*1000000); // ex: SOUR56402
+		$element_id = $fact . Uuid::uuid4();
 	if ($upperlevel)
-		$element_id = $upperlevel . "_" . $fact . (int)(microtime()*1000000); // ex: BIRT_DATE56402 | DEAT_DATE56402 ...
+		$element_id = $upperlevel . '_' . $fact . Uuid::uuid4();
 
 	// field value
-	$islink = (substr($value, 0, 1)=="@" and substr($value, 0, 2)!="@#");
+	$islink = (substr($value, 0, 1) === '@' && substr($value, 0, 2) != '@#');
 	if ($islink) {
-		$value=trim(trim(substr($tag, strlen($fact)+3)), " @\r");
+		$value = trim(substr($tag, strlen($fact)+3), " @\r");
 	} else {
-		$value=trim(substr($tag, strlen($fact)+3));
+		$value = substr($tag, strlen($fact)+3);
 	}
-	if ($fact=='REPO' || $fact=='SOUR' || $fact=='OBJE' || $fact=='FAMC')
+	if ($fact == 'REPO' || $fact == 'SOUR' || $fact == 'OBJE' || $fact == 'FAMC')
 		$islink = true;
 
-	if ($fact=='SHARED_NOTE_EDIT' || $fact=='SHARED_NOTE') {$islink=1;$fact="NOTE";}
+	if ($fact == 'SHARED_NOTE_EDIT' || $fact == 'SHARED_NOTE') {
+		$islink = true;
+		$fact = 'NOTE';
+	}
 
 	// label
 	echo "<tr id=\"", $element_id, "_tr\" ";
@@ -481,7 +503,7 @@ function add_simple_tag(
 	}
 	// tag level
 	if ($level>0) {
-		if ($fact=="TEXT" and $level>1) {
+		if ($fact=='TEXT' && $level>1) {
 			echo "<input type=\"hidden\" name=\"glevels[]\" value=\"", $level-1, "\">";
 			echo "<input type=\"hidden\" name=\"islink[]\" value=\"0\">";
 			echo "<input type=\"hidden\" name=\"tag[]\" value=\"DATA\">";
@@ -592,17 +614,41 @@ function add_simple_tag(
 			if (in_array($fact, $subnamefacts)) {
 				echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
 			}
-			if ($fact=='GIVN') {
-				echo ' autofocus';
-			}
-			if ($fact=="DATE") {
+
+			// Extra markup for specific fact types
+			switch ($fact) {
+			case 'DATE':
 				echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
-			}
-			if ($fact=="LATI") {
+				break;
+			case 'GIVN':
+				echo ' autofocus data-autocomplete-type="GIVN"';
+				break;
+			case 'LATI':
 				echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
-			}
-			if ($fact=="LONG") {
+				break;
+			case 'LONG':
 				echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
+				break;
+			case 'NOTE':
+				// Shared notes.  Inline notes are handled elsewhere.
+				echo ' data-autocomplete-type="NOTE"';
+				break;
+			case 'OBJE':
+				echo ' data-autocomplete-type="OBJE"';
+				break;
+			case 'PLAC':
+				echo ' data-autocomplete-type="PLAC"';
+				break;
+			case 'REPO':
+				echo ' data-autocomplete-type="REPO"';
+				break;
+			case 'SOUR':
+				echo ' data-autocomplete-type="SOUR"';
+				break;
+			case 'SURN':
+			case '_MARNM_SURN':
+				echo ' data-autocomplete-type="SURN"';
+				break;
 			}
 			echo '>';
 		}
@@ -613,7 +659,7 @@ function add_simple_tag(
 		if ($fact=='PLAC') {
 			echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
 			echo print_specialchar_link($element_id), ' ', print_findplace_link($element_id);
-			echo '<span  onclick="jQuery(\'#', $upperlevel, '_LATI_tr,#', $upperlevel, '_LONG_tr,#INDI_LATI_tr,#INDI_LONG_tr,tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></span>';
+			echo '<span  onclick="jQuery(\'tr[id^=', $upperlevel,'_LATI],tr[id^=', $upperlevel,'_LONG],tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></span>';
 			echo '</div>';
 			if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
 				places_assistant_WT_Module::setup_place_subfields($element_id);
@@ -634,7 +680,9 @@ function add_simple_tag(
 			else echo "<option value=\"", $key, "\"";
 			$a=strtolower($key);
 			$b=strtolower($value);
-			if (@strpos($a, $b)!==false or @strpos($b, $a)!==false) echo " selected=\"selected\"";
+			if (@strpos($a, $b) !== false || @strpos($b, $a) !== false) {
+				echo ' selected="selected"';
+			}
 			$tmp="MARR_".strtoupper($key);
 			echo ">", WT_Gedcom_Tag::getLabel($tmp), "</option>";
 		}
@@ -749,11 +797,11 @@ function add_simple_tag(
 	echo '<div id="' . $element_id . '_description">';
 
 	// current value
-	if ($fact=='DATE') {
-		$date=new WT_Date($value);
-		echo $date->Display(false);
+	if ($fact == 'DATE') {
+		$date = new WT_Date($value);
+		echo $date->display();
 	}
-	if ($value && $value!='new' && $islink) {
+	if ($value && $value != 'new' && $islink) {
 		switch ($fact) {
 		case 'ASSO':
 		case '_ASSO':
@@ -798,7 +846,7 @@ function add_simple_tag(
 
 // prints collapsable fields to add ASSO/RELA, SOUR, OBJE ...
 function print_add_layer($tag, $level=2) {
-	global $FULL_SOURCES;
+	global $FULL_SOURCES, $WT_TREE;
 
 	switch ($tag) {
 	case 'SOUR':
@@ -877,7 +925,7 @@ function print_add_layer($tag, $level=2) {
 		break;
 
 	case 'OBJE':
-		if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
+		if ($WT_TREE->getPreference('MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
 			echo "<a href=\"#\" onclick=\"return expand_layer('newobje');\"><i id=\"newobje_img\" class=\"icon-plus\"></i> ", WT_I18N::translate('Add a new media object'), '</a>';
 			echo help_link('OBJE');
 			echo '<br>';
@@ -932,7 +980,7 @@ function addSimpleTags($fact) {
 
 // Assemble the pieces of a newly created record into gedcom
 function addNewName() {
-	global $ADVANCED_NAME_FACTS;
+	global $ADVANCED_NAME_FACTS, $WT_TREE;
 
 	$gedrec="\n1 NAME ".WT_Filter::post('NAME');
 
@@ -943,7 +991,7 @@ function addNewName() {
 	}
 
 	// Paternal and Polish and Lithuanian surname traditions can also create a _MARNM
-	$SURNAME_TRADITION=get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION');
+	$SURNAME_TRADITION = $WT_TREE->getPreference('SURNAME_TRADITION');
 	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish' || $SURNAME_TRADITION=='lithuanian') {
 		$tags[]='_MARNM';
 	}
@@ -1179,12 +1227,12 @@ function updateRest($inputRec, $levelOverride = 'no') {
  * a 2 PLAC or 2 DATE line following it.  If there are no sub lines, then the line
  * can be safely removed.
  *
- * @param string     $newged        the new gedcom record to add the lines to
- * @param int|string $levelOverride Override GEDCOM level specified in $glevels[0]
+ * @param string $newged        the new gedcom record to add the lines to
+ * @param string $levelOverride Override GEDCOM level specified in $glevels[0]
  *
  * @return string The updated gedcom record
  */
-function handle_updates($newged, $levelOverride="no") {
+function handle_updates($newged, $levelOverride = 'no') {
 	global $glevels, $islink, $tag, $uploaded_files, $text;
 
 	if ($levelOverride=="no" || count($glevels)==0) $levelAdjust = 0;
@@ -1264,32 +1312,32 @@ function create_add_form($fact) {
 	$tags = array();
 
 	// handle  MARRiage TYPE
-	if (substr($fact, 0, 5)=="MARR_") {
-		$tags[0] = "MARR";
-		add_simple_tag("1 MARR");
+	if (substr($fact, 0, 5) == 'MARR_') {
+		$tags[0] = 'MARR';
+		add_simple_tag('1 MARR');
 		insert_missing_subtags($fact);
 	} else {
 		$tags[0] = $fact;
-		if ($fact=='_UID') {
-			$fact.=' '.uuid();
+		if ($fact == '_UID') {
+			$fact .= ' ' . WT_Gedcom_Tag::createUid();
 		}
 		// These new level 1 tags need to be turned into links
 		if (in_array($fact, array('ASSO'))) {
-			$fact.=' @';
+			$fact .= ' @';
 		}
 		if (in_array($fact, $emptyfacts)) {
-			add_simple_tag('1 '.$fact.' Y');
+			add_simple_tag('1 ' . $fact . ' Y');
 		} else {
-			add_simple_tag('1 '.$fact);
+			add_simple_tag('1 ' . $fact);
 		}
 		insert_missing_subtags($tags[0]);
 		//-- handle the special SOURce case for level 1 sources [ 1759246 ]
-		if ($fact=="SOUR") {
-			add_simple_tag("2 PAGE");
-			add_simple_tag("3 TEXT");
+		if ($fact == 'SOUR') {
+			add_simple_tag('2 PAGE');
+			add_simple_tag('3 TEXT');
 			if ($FULL_SOURCES) {
-				add_simple_tag("3 DATE", '', WT_Gedcom_Tag::getLabel('DATA:DATE'));
-				add_simple_tag("2 QUAY");
+				add_simple_tag('3 DATE', '', WT_Gedcom_Tag::getLabel('DATA:DATE'));
+				add_simple_tag('2 QUAY');
 			}
 		}
 	}
@@ -1435,8 +1483,8 @@ function create_edit_form(WT_GedcomRecord $record, WT_Fact $fact) {
 /**
  * Populates the global $tags array with any missing sub-tags.
  *
- * @param string $level1tag the type of the level 1 gedcom record
- * @param bool   $add_date
+ * @param string  $level1tag the type of the level 1 gedcom record
+ * @param boolean $add_date
  */
 function insert_missing_subtags($level1tag, $add_date=false) {
 	global $tags, $date_and_time, $level2_tags, $ADVANCED_PLAC_FACTS, $ADVANCED_NAME_FACTS;

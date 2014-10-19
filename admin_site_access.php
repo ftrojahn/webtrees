@@ -18,13 +18,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use WT\Auth;
+
 define('WT_SCRIPT_NAME', 'admin_site_access.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Page();
+$controller = new WT_Controller_Page();
 $controller
-	->restrictAccess(\WT\Auth::isAdmin())
+	->restrictAccess(Auth::isAdmin())
 	->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 	->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 	->setPageTitle(WT_I18N::translate('Site access rules'));
@@ -50,7 +52,7 @@ case 'load_rules':
 	$length = WT_Filter::getInteger('length');
 
 	$sql=
-		"SELECT SQL_CALC_FOUND_ROWS".
+		"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS".
 		" INET_NTOA(ip_address_start), ip_address_start, INET_NTOA(ip_address_end), ip_address_end, user_agent_pattern, rule, comment, site_access_rule_id".
 		" FROM `##site_access_rule`".
 		" WHERE rule<>'unknown'";
@@ -115,8 +117,8 @@ case 'load_rules':
 	}
 
 	// Total filtered/unfiltered rows
-	$recordsFiltered = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
-	$recordsTotal = WT_DB::prepare("SELECT COUNT(*) FROM `##site_access_rule` WHERE rule<>'unknown'")->fetchColumn();
+	$recordsFiltered = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchOne();
+	$recordsTotal = WT_DB::prepare("SELECT COUNT(*) FROM `##site_access_rule` WHERE rule <> 'unknown'")->fetchOne();
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
@@ -135,7 +137,7 @@ case 'load_unknown':
 	$length = WT_Filter::getInteger('length');
 
 	$sql=
-		"SELECT SQL_CALC_FOUND_ROWS".
+		"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS".
 		" INET_NTOA(ip_address_start), ip_address_start, user_agent_pattern, DATE(updated) AS updated, site_access_rule_id".
 		" FROM `##site_access_rule`".
 		" WHERE rule='unknown'";
@@ -187,8 +189,8 @@ case 'load_unknown':
 	}
 
 	// Total filtered/unfiltered rows
-	$recordsFiltered = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
-	$recordsTotal    = WT_DB::prepare("SELECT COUNT(*) FROM `##site_access_rule` WHERE rule<>'unknown'")->fetchColumn();
+	$recordsFiltered = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchOne();
+	$recordsTotal    = WT_DB::prepare("SELECT COUNT(*) FROM `##site_access_rule` WHERE rule = 'unknown'")->fetchOne();
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
@@ -218,9 +220,9 @@ $controller
 			stateDuration: 180,
 			columns: [
 				/* 0 ip_address_start        */ { dataSort: 1, class: "ip_address" },
-				/* 1 ip_address_start (sort) */ { type: "numeric", visible: false },
+				/* 1 ip_address_start (sort) */ { type: "num", visible: false },
 				/* 2 ip_address_end          */ { dataSort: 3, class: "ip_address" },
-				/* 3 ip_address_end (sort)   */ { type: "numeric", visible: false },
+				/* 3 ip_address_end (sort)   */ { type: "num", visible: false },
 				/* 4 user_agent_pattern      */ { class: "ua_string" },
 				/* 5 comment                 */ { },
 				/* 6 rule                    */ { },
@@ -247,7 +249,7 @@ $controller
 			pagingType: "full_numbers",
 			columns: [
 				/* 0 ip_address         */ { dataSort: 1, class: "ip_address" },
-				/* 0 ip_address (sort)  */ { type: "numeric", visible: false },
+				/* 0 ip_address (sort)  */ { type: "num", visible: false },
 				/* 1 user_agent_pattern */ { class: "ua_string" },
 				/* 2 updated            */ { class: "ua_string" },
 				/* 3 <allowed>          */ { sortable: false, class: "center" },

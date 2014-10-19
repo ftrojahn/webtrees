@@ -27,10 +27,11 @@ define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$controller=new WT_Controller_Ancestry();
+$controller = new WT_Controller_Ancestry();
 $controller
 	->pageHeader()
-	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL . 'js/autocomplete.js')
+	->addInlineJavascript('autocomplete();');
 
 ?>
 <div id="ancestry-page">
@@ -45,7 +46,7 @@ $controller
 					<?php echo WT_I18N::translate('Individual'); ?>
 				</td>
 				<td class="optionbox">
-					<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
+					<input class="pedigree_form" data-autocomplete-type="INDI" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
 					<?php echo print_findindi_link('rootid'); ?>
 				</td>
 				<td class="descriptionbox">
@@ -152,7 +153,7 @@ case 1:
 	echo '<div id="ancestry_chart">';
 	// Booklet
 	// first page : show indi facts
-	print_pedigree_person($controller->root, 1, 1);
+	print_pedigree_person($controller->root);
 	// process the tree
 	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	foreach ($treeid as $i=>$pid) {

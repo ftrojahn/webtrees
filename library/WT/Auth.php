@@ -1,4 +1,5 @@
-<?php namespace WT;
+<?php
+namespace WT;
 
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team
@@ -27,7 +28,7 @@ class Auth {
 	/**
 	 * Are we currently logged in?
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function check() {
 		return Auth::id() !== null;
@@ -38,14 +39,14 @@ class Auth {
 	 *
 	 * @param User|null $user
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function isAdmin(User $user = null) {
 		if ($user === null) {
 			$user = self::user();
 		}
 
-		return $user && $user->getSetting('canadmin') === '1';
+		return $user && $user->getPreference('canadmin') === '1';
 	}
 
 	/**
@@ -54,7 +55,7 @@ class Auth {
 	 * @param WT_Tree|null $tree
 	 * @param User|null    $user
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function isManager(WT_Tree $tree = null, User $user = null) {
 		global $WT_TREE;
@@ -67,7 +68,7 @@ class Auth {
 			$user = self::user();
 		}
 
-		return self::isAdmin($user) || $user && $tree->userPreference($user->getUserId(), 'canedit') === 'admin';
+		return self::isAdmin($user) || $user && $tree->getUserPreference($user, 'canedit') === 'admin';
 	}
 
 	/**
@@ -76,7 +77,7 @@ class Auth {
 	 * @param WT_Tree|null $tree
 	 * @param User|null    $user
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function isModerator(WT_Tree $tree = null, User $user = null) {
 		global $WT_TREE;
@@ -89,7 +90,7 @@ class Auth {
 			$user = self::user();
 		}
 
-		return self::isManager($tree, $user) || $user && $tree->userPreference($user->getUserId(), 'canedit') === 'accept';
+		return self::isManager($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'accept';
 	}
 
 	/**
@@ -99,7 +100,7 @@ class Auth {
 	 * @param User|null    $user
 	 *
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function isEditor(WT_Tree $tree = null, User $user = null) {
 		global $WT_TREE;
@@ -112,7 +113,7 @@ class Auth {
 			$user = self::user();
 		}
 
-		return self::isModerator($tree, $user) || $user && $tree->userPreference($user->getUserId(), 'canedit') === 'edit';
+		return self::isModerator($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'edit';
 	}
 
 	/**
@@ -121,7 +122,7 @@ class Auth {
 	 * @param WT_Tree|null $tree
 	 * @param User|null    $user
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public static function isMember(WT_Tree $tree = null, User $user=null) {
 		global $WT_TREE;
@@ -134,7 +135,7 @@ class Auth {
 			$user = self::user();
 		}
 
-		return self::isEditor($tree, $user) || $user && $tree->userPreference($user->getUserId(), 'canedit') === 'access';
+		return self::isEditor($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'access';
 	}
 
 	/**
@@ -154,7 +155,18 @@ class Auth {
 	 * @return User|null
 	 */
 	public static function user() {
-		return User::find(Auth::id());
+		$user = User::find(Auth::id());
+		if ($user === null) {
+			$visitor = new \stdClass;
+			$visitor->user_id = '';
+			$visitor->user_name = '';
+			$visitor->real_name = '';
+			$visitor->email = '';
+
+			return new User($visitor);
+		} else {
+			return $user;
+		}
 	}
 
 	/**

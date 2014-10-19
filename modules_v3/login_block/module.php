@@ -21,11 +21,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 	// Extend class WT_Module
 	public function getTitle() {
@@ -43,14 +38,15 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
 		$controller->addInlineJavascript('
-				jQuery("#new_passwd").hide();
-				jQuery("#passwd_click").click(function() {
-					jQuery("#new_passwd").slideToggle(100, function() {
-						jQuery("#new_passwd_username").focus();
-					});
-					return false;
+			jQuery("#new_passwd").hide();
+			jQuery("#passwd_click").click(function() {
+				jQuery("#new_passwd").slideToggle(100, function() {
+					jQuery("#new_passwd_username").focus();
 				});
-			');
+				return false;
+			});
+		');
+
 		if (WT_USER_ID) {
 			$title = WT_I18N::translate('Logout');
 			$content = '<div class="center"><form method="post" action="logout.php" name="logoutform" onsubmit="return true;">';
@@ -81,7 +77,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 				<div>
 					<a href="#" id="passwd_click">'. WT_I18N::translate('Request new password').'</a>
 				</div>';
-			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
+			if (WT_Site::getPreference('USE_REGISTRATION_MODULE')) {
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=delete">'. WT_I18N::translate('Delete user account'). '</a></div>';
 			}

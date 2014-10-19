@@ -19,9 +19,44 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 interface WT_Module_Block {
+	/**
+	 * Generate the HTML content of this block.
+	 * 
+	 * @param integer $block_id
+	 *
+	 * @return string
+	 */
 	public function getBlock($block_id);
+
+	/**
+	 * Should this block load asynchronously using AJAX?
+	 * Simple blocks are faster in-line, more comples ones
+	 * can be loaded later.
+	 *
+	 * @return boolean
+	 */
 	public function loadAjax();
+
+	/**
+	 * Can this block be shown on the user’s home page?
+	 *
+	 * @return boolean
+	 */
 	public function isUserBlock();
+
+	/**
+	 * Can this block be shown on the tree’s home page?
+	 *
+	 * @return boolean
+	 */
 	public function isGedcomBlock();
+
+	/**
+	 * An HTML form to edit block settings
+	 *
+	 * @param integer $block_id
+	 *
+	 * @return void
+	 */
 	public function configureBlock($block_id);
 }

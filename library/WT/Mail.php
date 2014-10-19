@@ -18,10 +18,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use WT\Log;
+use WT\User;
+
 class WT_Mail {
 	const EOL = "<br>\r\n"; // End-of-line that works for both TEXT and HTML messages
 
-	// Audit information to add to email footer
+	/**
+	 * Audit information to add to email footer
+	 *
+	 * @return string
+	 */
 	public static function auditFooter() {
 		global $WT_REQUEST;
 
@@ -29,11 +36,23 @@ class WT_Mail {
 			self::EOL .
 			'---------------------------------------' . self::EOL .
 			'IP ADDRESS: ' . $WT_REQUEST->getClientIp() . self::EOL .
-			'LANGUAGE: '   . WT_LOCALE . self::EOL;
+			'LANGUAGE: ' . WT_LOCALE . self::EOL;
 	}
 
-	// Send an external email message
-	// Caution! gmail may rewrite the "From" header unless you have added the address to your account.
+	/**
+	 * Send an external email message
+	 * Caution! gmail may rewrite the "From" header unless you have added the address to your account.
+	 *
+	 * @param WT_Tree $tree
+	 * @param string  $to_email
+	 * @param string  $to_name
+	 * @param string  $replyto_email
+	 * @param string  $replyto_name
+	 * @param string  $subject
+	 * @param string  $message
+	 *
+	 * @return boolean
+	 */
 	public static function send(WT_Tree $tree, $to_email, $to_name, $replyto_email, $replyto_name, $subject, $message) {
 		try {
 			$mail = new Zend_Mail('UTF-8');
@@ -41,58 +60,63 @@ class WT_Mail {
 				->setSubject ($subject)
 				->setBodyHtml($message)
 				->setBodyText(WT_Filter::unescapeHtml($message))
-				->setFrom    (WT_Site::preference('SMTP_FROM_NAME'), $tree->preference('title'))
-				->addTo      ($to_email,                             $to_name)
-				->setReplyTo ($replyto_email,                        $replyto_name)
+				->setFrom    (WT_Site::getPreference('SMTP_FROM_NAME'), $tree->getPreference('title'))
+				->addTo      ($to_email,                                $to_name)
+				->setReplyTo ($replyto_email,                           $replyto_name)
 				->send       (WT_Mail::transport());
 		} catch (Exception $ex) {
-			\WT\Log::addErrorLog('Mail: ' . $ex->getMessage());
+			Log::addErrorLog('Mail: ' . $ex->getMessage());
+
 			return false;
 		}
+
 		return true;
 	}
 
 	/**
 	 * Send an automated system message (such as a password reminder) from a tree to a user.
 	 *
-	 * @param WT_Tree  $tree
-	 * @param \WT\User $user
-	 * @param string   $subject
-	 * @param string   $message
+	 * @param WT_Tree $tree
+	 * @param User    $user
+	 * @param string  $subject
+	 * @param string  $message
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
-	public static function system_message(WT_Tree $tree, \WT\User $user, $subject, $message) {
+	public static function systemMessage(WT_Tree $tree, User $user, $subject, $message) {
 		return self::send(
 			$tree,
-			$user->getEmail(),                     $user->getRealName(),
-			WT_Site::preference('SMTP_FROM_NAME'), $tree->preference('title'),
+			$user->getEmail(),                        $user->getRealName(),
+			WT_Site::getPreference('SMTP_FROM_NAME'), $tree->getPreference('title'),
 			$subject,
 			$message
 		);
 	}
 
-
-	// Create a transport mechanism for sending mail
+	/**
+	 * Create a transport mechanism for sending mail
+	 *
+	 * @return Zend_Mail_Transport_File|Zend_Mail_Transport_Smtp
+	 */
 	public static function transport() {
-		switch (WT_Site::preference('SMTP_ACTIVE')) {
+		switch (WT_Site::getPreference('SMTP_ACTIVE')) {
 		case 'internal':
 			return new Zend_Mail_Transport_Sendmail();
 		case 'external':
 			$config = array(
-				'name' => WT_Site::preference('SMTP_HELO'),
-				'port' => WT_Site::preference('SMTP_PORT'),
+				'name' => WT_Site::getPreference('SMTP_HELO'),
+				'port' => WT_Site::getPreference('SMTP_PORT'),
 			);
-			if (WT_Site::preference('SMTP_AUTH')) {
+			if (WT_Site::getPreference('SMTP_AUTH')) {
 				$config['auth']     = 'login';
-				$config['username'] = WT_Site::preference('SMTP_AUTH_USER');
-				$config['password'] = WT_Site::preference('SMTP_AUTH_PASS');
+				$config['username'] = WT_Site::getPreference('SMTP_AUTH_USER');
+				$config['password'] = WT_Site::getPreference('SMTP_AUTH_PASS');
 			}
-			if (WT_Site::preference('SMTP_SSL') !== 'none') {
-				$config['ssl'] = WT_Site::preference('SMTP_SSL');
+			if (WT_Site::getPreference('SMTP_SSL') !== 'none') {
+				$config['ssl'] = WT_Site::getPreference('SMTP_SSL');
 			}
 
-			return new Zend_Mail_Transport_Smtp(WT_Site::preference('SMTP_HOST'), $config);
+			return new Zend_Mail_Transport_Smtp(WT_Site::getPreference('SMTP_HOST'), $config);
 		default:
 			// For testing
 			return new Zend_Mail_Transport_File();

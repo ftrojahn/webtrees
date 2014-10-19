@@ -35,7 +35,7 @@ $followspouse = WT_Filter::getBool('followspouse');
 $asc          = WT_Filter::getBool('asc');
 
 $asc = $asc ? -1 : 1;
-
+$Dbwidth=$bwidth;
 if (!$show_full) {
 	$bwidth  = $cbwidth;
 	$bheight = $cbheight;
@@ -52,7 +52,8 @@ $person1=WT_Individual::getInstance($pid1);
 $person2=WT_Individual::getInstance($pid2);
 
 $controller
-	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL . 'js/autocomplete.js')
+	->addInlineJavascript('autocomplete();');
 
 if ($person1 && $person1->canShowName() && $person2 && $person2->canShowName()) {
 	$controller
@@ -93,7 +94,7 @@ if ($person1 && $person1->canShowName() && $person2 && $person2->canShowName()) 
 					<?php echo WT_I18N::translate('Individual 1'); ?>
 				</td>
 				<td class="optionbox vmiddle">
-					<input tabindex="1" class="pedigree_form" type="text" name="pid1" id="pid1" size="3" value="<?php echo $pid1; ?>">
+					<input tabindex="1" class="pedigree_form" data-autocomplete-type="INDI" type="text" name="pid1" id="pid1" size="3" value="<?php echo $pid1; ?>">
 					<?php echo print_findindi_link('pid1'); ?>
 				</td>
 				<td class="descriptionbox">
@@ -108,7 +109,7 @@ if ($person1 && $person1->canShowName() && $person2 && $person2->canShowName()) 
 					<?php echo WT_I18N::translate('Individual 2'); ?>
 				</td>
 				<td class="optionbox vmiddle">
-					<input tabindex="2" class="pedigree_form" type="text" name="pid2" id="pid2" size="3" value="<?php echo $pid2; ?>">
+					<input tabindex="2" class="pedigree_form" data-autocomplete-type="INDI" type="text" name="pid2" id="pid2" size="3" value="<?php echo $pid2; ?>">
 					<?php echo print_findindi_link('pid2'); ?>
 				</td>
 				<td class="descriptionbox">
@@ -234,11 +235,16 @@ if ($person1 && $person2) {
 			foreach ($node['path'] as $index=>$person) {
 				$linex = $xoffset;
 				$liney = $yoffset;
-				$mfstyle = 'NN';
 				switch ($person->getSex()) {
-				case 'M': $mfstyle='';   break;
-				case 'F': $mfstyle='F';  break;
-				case 'U': $mfstyle='NN'; break;
+				case 'M':
+					$mfstyle='';
+					break;
+				case 'F':
+					$mfstyle='F';
+					break;
+				default:
+					$mfstyle='NN';
+					break;
 				}
 				switch ($node['relations'][$index]) {
 				case 'father':
@@ -380,7 +386,7 @@ if ($person1 && $person2) {
 				$zIndex = 200 - ($colNum * $depth + $rowNum);
 
 				echo '<div style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $pxoffset, 'px; top:', $pyoffset, 'px; width:', $Dbwidth, 'px; height:', $Dbheight, 'px; z-index:', $zIndex, ';">';
-				print_pedigree_person($person, 1);
+				print_pedigree_person($person);
 				echo '</div>';
 			}
 		}
@@ -392,11 +398,10 @@ echo '</div>'; // close #relationshippage
 // The contents of <div id="relationship_chart"> use relative positions.
 // Need to expand the div to include the children, or we'll overlap the footer.
 // $maxyoffset is the top edge of the lowest box.
-$controller
-	->addInlineJavascript('
-		relationship_chart_div = document.getElementById("relationship_chart");
-		if (relationship_chart_div) {
-			relationship_chart_div.style.height = "'.($maxyoffset+$Dbheight+20).'px";
-			relationship_chart_div.style.width = "100%";
-		}'
-	);
+$controller->addInlineJavascript('
+	relationship_chart_div = document.getElementById("relationship_chart");
+	if (relationship_chart_div) {
+		relationship_chart_div.style.height = "'.($maxyoffset+$Dbheight+20).'px";
+		relationship_chart_div.style.width = "100%";
+	}'
+);

@@ -27,7 +27,7 @@ define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$controller=new WT_Controller_Media();
+$controller = new WT_Controller_Media();
 
 if ($controller->record && $controller->record->canShow()) {
 	$controller->pageHeader();
@@ -75,10 +75,14 @@ if ($controller->record && $controller->record->canShow()) {
 	exit;
 }
 
-$controller
-	->addInlineJavascript('function show_gedcom_record() {var recwin=window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
-	->addInlineJavascript('jQuery("#media-tabs").tabs();')
-	->addInlineJavascript('jQuery("#media-tabs").css("visibility", "visible");');
+$controller->addInlineJavascript('
+	jQuery("#media-tabs")
+		.tabs({
+			create: function(e, ui){
+				jQuery(e.target).css("visibility", "visible");  // prevent FOUC
+			}
+		});
+');
 
 $linked_indi = $controller->record->linkedIndividuals('OBJE');
 $linked_fam  = $controller->record->linkedFamilies('OBJE');
@@ -101,7 +105,7 @@ echo '<div id="media-tabs">';
 					if (!$tmp->isExternal()) {
 						if ($tmp->fileExists('main')) {
 							if ($SHOW_MEDIA_DOWNLOAD) {
-								echo '<p><a href="' . $tmp->getHtmlUrlDirect('main', true).'">' . WT_I18N::translate('Download File') . '</a></p>';
+								echo '<p><a href="' . $tmp->getHtmlUrlDirect('main', true).'">' . WT_I18N::translate('Download file') . '</a></p>';
 							}
 						} else {
 							echo '<p class="ui-state-error">' . WT_I18N::translate('The file “%s” does not exist.', $tmp->getFilename()) . '</p>';
@@ -113,7 +117,7 @@ echo '<div id="media-tabs">';
 						<tr>
 							<td>
 								<table class="facts_table">';
-										$facts = $controller->getFacts(WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT);
+										$facts = $controller->getFacts();
 										foreach ($facts as $f=>$fact) {
 											print_fact($fact, $controller->record);
 										}

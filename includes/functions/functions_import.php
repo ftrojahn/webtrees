@@ -21,12 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
-require_once WT_ROOT.'includes/functions/functions_export.php';
+use WT\Log;
 
 // Tidy up a gedcom record on import, so that we can access it consistently/efficiently.
 function reformat_record_import($rec) {
@@ -631,7 +626,7 @@ function import_record($gedrec, $ged_id, $update) {
 		list(,$xref, $type) = $match;
 		// check for a _UID, if the record doesn't have one, add one
 		if ($GENERATE_UIDS && !strpos($gedrec, "\n1 _UID ")) {
-			$gedrec .= "\n1 _UID " . uuid();
+			$gedrec .= "\n1 _UID " . WT_Gedcom_Tag::createUid();
 		}
 	} elseif (preg_match('/0 (HEAD|TRLR)/', $gedrec, $match)) {
 		$type = $match[1];
@@ -799,7 +794,7 @@ function update_places($gid, $ged_id, $gedrec) {
 	$pt = preg_match_all("/^[2-9] PLAC (.+)/m", $gedrec, $match, PREG_SET_ORDER);
 	for ($i = 0; $i < $pt; $i++) {
 		$place = trim($match[$i][1]);
-		$lowplace = utf8_strtolower($place);
+		$lowplace = WT_I18N::strtolower($place);
 		//-- if we have already visited this place for this person then we don't need to again
 		if (isset($personplace[$lowplace])) {
 			continue;
@@ -868,9 +863,9 @@ function update_dates($xref, $ged_id, $gedrec) {
 				$fact=$tmatch[1];
 			}
 			$date=new WT_Date($match[2]);
-			$sql_insert_date->execute(array($date->date1->d, $date->date1->Format('%O'), $date->date1->m, $date->date1->y, $date->date1->minJD, $date->date1->maxJD, $fact, $xref, $ged_id, $date->date1->Format('%@')));
+			$sql_insert_date->execute(array($date->date1->d, $date->date1->format('%O'), $date->date1->m, $date->date1->y, $date->date1->minJD, $date->date1->maxJD, $fact, $xref, $ged_id, $date->date1->format('%@')));
 			if ($date->date2) {
-				$sql_insert_date->execute(array($date->date2->d, $date->date2->Format('%O'), $date->date2->m, $date->date2->y, $date->date2->minJD, $date->date2->maxJD, $fact, $xref, $ged_id, $date->date2->Format('%@')));
+				$sql_insert_date->execute(array($date->date2->d, $date->date2->format('%O'), $date->date2->m, $date->date2->y, $date->date2->minJD, $date->date2->maxJD, $fact, $xref, $ged_id, $date->date2->format('%@')));
 			}
 		}
 	}
@@ -1039,7 +1034,7 @@ function accept_all_changes($xref, $ged_id) {
 			" SET status='accepted'".
 			" WHERE status='pending' AND xref=? AND gedcom_id=?"
 		)->execute(array($xref, $ged_id));
-		\WT\Log::addEditLog("Accepted change {$change->change_id} for {$xref} / {$change->gedcom_name} into database");
+		Log::addEditLog("Accepted change {$change->change_id} for {$xref} / {$change->gedcom_name} into database");
 	}
 }
 
@@ -1055,9 +1050,9 @@ function reject_all_changes($xref, $ged_id) {
 /**
  * update a record in the database
  *
- * @param string $gedrec
- * @param int    $ged_id
- * @param bool   $delete
+ * @param string  $gedrec
+ * @param integer $ged_id
+ * @param boolean $delete
  */
 function update_record($gedrec, $ged_id, $delete) {
 	if (preg_match('/^0 @('.WT_REGEX_XREF.')@ ('.WT_REGEX_TAG.')/', $gedrec, $match)) {
@@ -1111,55 +1106,4 @@ function update_record($gedrec, $ged_id, $delete) {
 	if (!$delete) {
 		import_record($gedrec, $ged_id, true);
 	}
-}
-
-// Create a pseudo-random UUID
-function uuid() {
-	// Official Format with dashes ('%04x%04x-%04x-%04x-%04x-%04x%04x%04x')
-	// Most users want this format (for compatibility with PAF)
-	$fmt='%04X%04X%04X%04X%04X%04X%04X%04X';
-
-	$uid = sprintf(
-		$fmt,
-    // 32 bits for "time_low"
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-
-    // 16 bits for "time_mid"
-    mt_rand(0, 0xffff),
-
-    // 16 bits for "time_hi_and_version",
-    // four most significant bits holds version number 4
-    mt_rand(0, 0x0fff) | 0x4000,
-
-    // 16 bits, 8 bits for "clk_seq_hi_res",
-    // 8 bits for "clk_seq_low",
-    // two most significant bits holds zero and one for variant RFC4122
-    mt_rand(0, 0x3fff) | 0x8000,
-
-    // 48 bits for "node"
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-    );
-	return sprintf('%s%s', $uid, getCheckSums($uid));
-}
-
-/**
- * Produces checksums compliant with a Family Search guideline from 2007
- *
- * These checksums are compatible with PAF, Legacy, RootsMagic and other applications
- * following these guidelines. This prevents dropping and recreation of UID's
- *
- * @param string $uid the 32 hexadecimal character long uid
- *
- * @return string containing the checksum string for the uid
- */
-function getCheckSums($uid) {
-	$checkA=0; // a sum of the bytes
-	$checkB=0; // a sum of the incremental values of checkA
-
-	// Compute both checksums
-	for ($i = 0; $i < 32; $i+=2) {
-		$checkA += hexdec(substr($uid, $i, 2));
-		$checkB += $checkA & 0xFF;
-	}
-	return strtoupper(sprintf('%s%s', substr(dechex($checkA), -2), substr(dechex($checkB), -2)));
 }

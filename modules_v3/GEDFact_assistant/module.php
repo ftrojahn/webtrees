@@ -21,11 +21,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 class GEDFact_assistant_WT_Module extends WT_Module {
 	// Extend WT_Module
 	public function getTitle() {
@@ -133,7 +128,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		$myindilist=search_indis_names($filter_array, array(WT_GED_ID), 'AND');
 		if ($myindilist) {
 			echo "<td class=\"list_value_wrap\"><ul>";
-			usort($myindilist, array('WT_GedcomRecord', 'Compare'));
+			usort($myindilist, array('WT_GedcomRecord', 'compare'));
 			foreach ($myindilist as $indi) {
 				$nam = WT_Filter::escapeHtml($indi->getFullName());
 				echo "<li><a href=\"#\" onclick=\"pasterow(
@@ -162,7 +157,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 	private static function media_query_3a() {
 		$iid2 = WT_Filter::get('iid', WT_REGEX_XREF);
 
-		$controller=new WT_Controller_Simple();
+		$controller = new WT_Controller_Simple();
 		$controller
 			->setPageTitle(WT_I18N::translate('Link to an existing media object'))
 			->pageHeader();
@@ -193,7 +188,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 			?>
 			<script>
 			function insertId() {
-				window.opener.alert('<?php echo strtoupper($iid2); ?> - <?php echo WT_I18N::translate('Not a valid Individual, Family or Source ID'); ?>');
+				window.opener.alert('<?php echo strtoupper($iid2); ?> - <?php echo WT_I18N::translate('Not a valid individual, family, or source ID'); ?>');
 				window.close();
 			}
 			</script>
@@ -354,6 +349,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 					return false;
 				}
 			');
+
 			return '
 				<select id="selcensdate" name="selcensdate" onchange = "if (this.options[this.selectedIndex].value!=\'\') {
 										addDate(this.options[this.selectedIndex].value);

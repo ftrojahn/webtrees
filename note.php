@@ -26,7 +26,7 @@ define('WT_SCRIPT_NAME', 'note.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$controller=new WT_Controller_Note();
+$controller = new WT_Controller_Note();
 
 if ($controller->record && $controller->record->canShow()) {
 	$controller->pageHeader();
@@ -74,10 +74,14 @@ if ($controller->record && $controller->record->canShow()) {
 	exit;
 }
 
-$controller
-	->addInlineJavascript('function show_gedcom_record() {var recwin=window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
-	->addInlineJavascript('jQuery("#note-tabs").tabs();')
-	->addInlineJavascript('jQuery("#note-tabs").css("visibility", "visible");');
+$controller->addInlineJavascript('
+	jQuery("#note-tabs")
+		.tabs({
+			create: function(e, ui){
+				jQuery(e.target).css("visibility", "visible");  // prevent FOUC
+			}
+		});
+');
 
 $linked_indi = $controller->record->linkedIndividuals('NOTE');
 $linked_fam  = $controller->record->linkedFamilies('NOTE');
