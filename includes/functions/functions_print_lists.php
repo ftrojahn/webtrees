@@ -63,25 +63,19 @@ function format_indi_table($datalist, $option = '') {
 					/*  5 SOSA      */ { type: "num", visible: false },
 					/*  6 birt date */ { dataSort: 7 },
 					/*  7 BIRT:DATE */ { visible: false },
-					/*  8 anniv     */ { dataSort: 7, class: "center" },
-					/*  9 birt plac */ { type: "unicode" },
-					/* 10 children  */ { dataSort: 11, class: "center" },
-					/* 11 children  */ { type: "num", visible: false },
-					/* 12 deat date */ { dataSort: 13 },
-					/* 13 DEAT:DATE */ { visible: false },
-					/* 14 anniv     */ { dataSort: 13, class: "center" },
-					/* 15 age       */ { dataSort: 16, class: "center" },
-					/* 16 AGE       */ { type: "num", visible: false },
-					/* 17 deat plac */ { type: "unicode" },
-					/* 18 CHAN      */ { dataSort: 19, visible: ' . ($SHOW_LAST_CHANGE ? 'true' : 'false') . ' },
-					/* 19 CHAN_sort */ { visible: false },
-					/* 20 SEX       */ { visible: false },
-					/* 21 BIRT      */ { visible: false },
-					/* 22 DEAT      */ { visible: false },
-					/* 23 TREE      */ { visible: false }
+					/*  8 birt plac */ { type: "unicode" },
+					/*  9 deat date */ { dataSort: 10 },
+					/* 10 DEAT:DATE */ { visible: false },
+					/* 11 deat plac */ { type: "unicode" },
+					/* 12 CHAN      */ { dataSort: 13, visible: ' . ($SHOW_LAST_CHANGE ? 'true' : 'false') . ' },
+					/* 13 CHAN_sort */ { visible: false },
+					/* 14 SEX       */ { visible: false },
+					/* 15 BIRT      */ { visible: false },
+					/* 16 DEAT      */ { visible: false },
+					/* 17 TREE      */ { visible: false }
 				],
 				sorting: [[' . ($option == 'sosa' ? '4, "asc"' : '1, "asc"') . ']],
-				displayLength: 20,
+				displayLength: 14,
 				pagingType: "full_numbers"
 			});
 
@@ -139,12 +133,12 @@ function format_indi_table($datalist, $option = '') {
 			<table id="' . $table_id . '">
 				<thead>
 					<tr>
-						<th colspan="24">
+						<th colspan="18">
 							<div class="btn-toolbar">
 								<div class="btn-group">
 									<button
 										class="ui-state-default"
-										data-filter-column="20"
+										data-filter-column="14"
 										data-filter-value="M"
 										title="' . WT_I18N::translate('Show only males.') . '"
 										type="button"
@@ -153,7 +147,7 @@ function format_indi_table($datalist, $option = '') {
 									</button>
 									<button
 										class="ui-state-default"
-										data-filter-column="20"
+										data-filter-column="14"
 										data-filter-value="F"
 										title="' . WT_I18N::translate('Show only females.') . '"
 										type="button"
@@ -162,90 +156,12 @@ function format_indi_table($datalist, $option = '') {
 									</button>
 									<button
 										class="ui-state-default"
-										data-filter-column="20"
+										data-filter-column="14"
 										data-filter-value="U"
 										title="' . WT_I18N::translate('Show only individuals for whom the gender is not known.') . '"
 										type="button"
 									>
 										' . WT_Individual::sexImage('U', 'large') . '
-									</button>
-								</div>
-								<div class="btn-group">
-									<button
-										class="ui-state-default"
-										data-filter-column="22"
-										data-filter-value="N"
-										title="' . WT_I18N::translate('Show individuals who are alive or couples where both partners are alive.') . '"
-										type="button"
-									>
-										' . WT_I18N::translate('Alive') . '
-									</button>
-									<button
-										class="ui-state-default"
-										data-filter-column="22"
-										data-filter-value="Y"
-										title="' . WT_I18N::translate('Show individuals who are dead or couples where both partners are deceased.') . '"
-										type="button"
-									>
-										' . WT_I18N::translate('Dead') . '
-									</button>
-									<button
-										class="ui-state-default"
-										data-filter-column="22"
-										data-filter-value="YES"
-										title="' . WT_I18N::translate('Show individuals who died more than 100 years ago.') . '"
-										type="button"
-									>
-										' . WT_Gedcom_Tag::getLabel('DEAT') . '&gt;100
-									</button>
-									<button
-										class="ui-state-default"
-										data-filter-column="22"
-										data-filter-value="Y100"
-										title="' . WT_I18N::translate('Show individuals who died within the last 100 years.') . '"
-										type="button"
-									>
-										' . WT_Gedcom_Tag::getLabel('DEAT') . '&lt;=100
-									</button>
-								</div>
-								<div class="btn-group">
-									<button
-										class="ui-state-default"
-										data-filter-column="21"
-										data-filter-value="YES"
-										title="' . WT_I18N::translate('Show individuals born more than 100 years ago.') . '"
-										type="button"
-									>
-										' . WT_Gedcom_Tag::getLabel('BIRT') . '&gt;100
-									</button>
-									<button
-										class="ui-state-default"
-										data-filter-column="21"
-										data-filter-value="Y100"
-										title="' . WT_I18N::translate('Show individuals born within the last 100 years.') . '"
-										type="button"
-									>
-										' . WT_Gedcom_Tag::getLabel('BIRT') . '&lt;=100
-									</button>
-								</div>
-								<div class="btn-group">
-									<button
-										class="ui-state-default"
-										data-filter-column="23"
-										data-filter-value="R"
-										title="' . WT_I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.') . '"
-										type="button"
-									>
-										' . WT_I18N::translate('Roots') . '
-									</button>
-									<button
-										class="ui-state-default"
-										data-filter-column="23"
-										data-filter-value="L"
-										title="' . WT_I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.') . '"
-										type="button"
-									>
-										' . WT_I18N::translate('Leaves') . '
 									</button>
 								</div>
 							</div>
@@ -260,15 +176,9 @@ function format_indi_table($datalist, $option = '') {
 						<th>SOSA</th>
 						<th>' . WT_Gedcom_Tag::getLabel('BIRT') . '</th>
 						<th>SORT_BIRT</th>
-						<th><i class="icon-reminder" title="' . WT_I18N::translate('Anniversary') . '"></i></th>
 						<th>' . WT_Gedcom_Tag::getLabel('PLAC') . '</th>
-						<th><i class="icon-children" title="' . WT_I18N::translate('Children') . '"></i></th>
-						<th>NCHI</th>
 						<th>' . WT_Gedcom_Tag::getLabel('DEAT') . '</th>
 						<th>SORT_DEAT</th>
-						<th><i class="icon-reminder" title="' . WT_I18N::translate('Anniversary') . '"></i></th>
-						<th>' . WT_Gedcom_Tag::getLabel('AGE') . '</th>
-						<th>AGE</th>
 						<th>' . WT_Gedcom_Tag::getLabel('PLAC') . '</th>
 						<th>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>
 						<th>CHAN</th>
@@ -280,7 +190,7 @@ function format_indi_table($datalist, $option = '') {
 				</thead>
 				<tfoot>
 					<tr>
-						<th colspan="24">
+						<th colspan="18">
 							<div class="btn-toolbar">
 								<div class="btn-group">
 									<button type="button" class="ui-state-default btn-toggle-parents">
@@ -383,8 +293,6 @@ function format_indi_table($datalist, $option = '') {
 		$html .= '</td>';
 		//-- Event date (sortable)hidden by datatables code
 		$html .= '<td>' . $birth_date->JD() . '</td>';
-		//-- Birth anniversary
-		$html .= '<td>' . WT_Date::getAge($birth_dates[0], null, 2) . '</td>';
 		//-- Birth place
 		$html .= '<td>';
 		foreach ($person->getAllBirthPlaces() as $n => $birth_place) {
@@ -400,9 +308,6 @@ function format_indi_table($datalist, $option = '') {
 			}
 		}
 		$html .= '</td>';
-		//-- Number of children
-		$nchi = $person->getNumberOfChildren();
-		$html .= '<td>' . WT_I18N::number($nchi) . '</td><td>' . $nchi . '</td>';
 		//-- Death date
 		$html .= '<td>';
 		if ($death_dates = $person->getAllDeathDates()) {
@@ -431,15 +336,6 @@ function format_indi_table($datalist, $option = '') {
 		$html .= '</td>';
 		//-- Event date (sortable)hidden by datatables code
 		$html .= '<td>' . $death_date->JD() . '</td>';
-		//-- Death anniversary
-		$html .= '<td>' . WT_Date::getAge($death_dates[0], null, 2) . '</td>';
-		//-- Age at death
-		$age = WT_Date::getAge($birth_dates[0], $death_dates[0], 0);
-		if (!isset($unique_indis[$person->getXref()]) && $age >= 0 && $age <= $max_age) {
-			$deat_by_age[$age] .= $person->getSex();
-		}
-		// Need both display and sortable age
-		$html .= '<td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 2) . '</td><td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 1) . '</td>';
 		//-- Death place
 		$html .= '<td>';
 		foreach ($person->getAllDeathPlaces() as $n => $death_place) {
@@ -559,28 +455,21 @@ function format_fam_table($datalist) {
 					/*  1 husb surn */ {dataSort: 3},
 					/*  2 GIVN,SURN */ {type: "unicode", visible: false},
 					/*  3 SURN,GIVN */ {type: "unicode", visible: false},
-					/*  4 age       */ {dataSort: 5, class: "center"},
-					/*  5 AGE       */ {type: "num", visible: false},
-					/*  6 wife givn */ {dataSort: 8},
-					/*  7 wife surn */ {dataSort: 9},
-					/*  8 GIVN,SURN */ {type: "unicode", visible: false},
-					/*  9 SURN,GIVN */ {type: "unicode", visible: false},
-					/* 10 age       */ {dataSort: 11, class: "center"},
-					/* 11 AGE       */ {type: "num", visible: false},
-					/* 12 marr date */ {dataSort: 13},
-					/* 13 MARR:DATE */ {visible: false},
-					/* 14 anniv     */ {dataSort: 13, class: "center"},
-					/* 15 marr plac */ {type: "unicode"},
-					/* 16 children  */ {dataSort: 17, class: "center"},
-					/* 17 NCHI      */ {type: "num", visible: false},
-					/* 18 CHAN      */ {dataSort: 19, visible: ' . ($SHOW_LAST_CHANGE ? 'true' : 'false') . '},
-					/* 19 CHAN_sort */ {visible: false},
-					/* 20 MARR      */ {visible: false},
-					/* 21 DEAT      */ {visible: false},
-					/* 22 TREE      */ {visible: false}
+					/*  4 wife givn */ {dataSort: 6},
+					/*  5 wife surn */ {dataSort: 7},
+					/*  6 GIVN,SURN */ {type: "unicode", visible: false},
+					/*  7 SURN,GIVN */ {type: "unicode", visible: false},
+					/*  8 marr date */ {dataSort: 9},
+					/*  9 MARR:DATE */ {visible: false},
+					/* 10 marr plac */ {type: "unicode"},
+					/* 11 CHAN      */ {dataSort: 12, visible: ' . ($SHOW_LAST_CHANGE ? 'true' : 'false') . '},
+					/* 12 CHAN_sort */ {visible: false},
+					/* 13 MARR      */ {visible: false},
+					/* 14 DEAT      */ {visible: false},
+					/* 15 TREE      */ {visible: false}
 				],
 				sorting: [[1, "asc"]],
-				displayLength: 20,
+				displayLength: 13,
 				pagingType: "full_numbers"
 		   });
 
@@ -636,135 +525,17 @@ function format_fam_table($datalist) {
 			<table id="' . $table_id . '">
 				<thead>
 					<tr>
-						<th colspan="23">
-							<div class="btn-toolbar">
-								<div class="btn-group">
-									<button
-										type="button"
-										data-filter-column="21"
-										data-filter-value="N"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show individuals who are alive or couples where both partners are alive.') . '"
-									>
-										' . WT_I18N::translate('Both alive') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="21"
-										data-filter-value="W"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples where only the female partner is deceased.') . '"
-									>
-										' . WT_I18N::translate('Widower') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="21"
-										data-filter-value="H"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples where only the male partner is deceased.') . '"
-									>
-										' . WT_I18N::translate('Widow') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="21"
-										data-filter-value="Y"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show individuals who are dead or couples where both partners are deceased.') . '"
-									>
-										' . WT_I18N::translate('Both dead') . '
-									</button>
-								</div>
-								<div class="btn-group">
-									<button
-										type="button"
-										data-filter-column="22"
-										data-filter-value="R"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.') . '"
-									>
-										' . WT_I18N::translate('Roots') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="22"
-										data-filter-value="L"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.') . '"
-									>
-										' . WT_I18N::translate('Leaves') . '
-									</button>
-								</div>
-								<div class="btn-group">
-									<button
-										type="button"
-										data-filter-column="20"
-										data-filter-value="U"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples with an unknown marriage date.') . '"
-									>
-										' . WT_Gedcom_Tag::getLabel('MARR') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="20"
-										data-filter-value="YES"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples who married more than 100 years ago.') . '"
-									>
-										' . WT_Gedcom_Tag::getLabel('MARR') . '&gt;100
-									</button>
-									<button
-										type="button"
-										data-filter-column="20"
-										data-filter-value="Y100"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples who married within the last 100 years.') . '"
-									>
-										' . WT_Gedcom_Tag::getLabel('MARR') . '&lt;=100
-									</button>
-									<button
-										type="button"
-										data-filter-column="20"
-										data-filter-value="D"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show divorced couples.') . '"
-									>
-										' . WT_Gedcom_Tag::getLabel('DIV') . '
-									</button>
-									<button
-										type="button"
-										data-filter-column="20"
-										data-filter-value="M"
-										class="ui-state-default"
-										title="' . WT_I18N::translate('Show couples where either partner married more than once.') . '"
-									>
-										' . WT_I18N::translate('Multiple marriages') . '
-									</button>
-								</div>
-							</div>
-						</th>
-					</tr>
-					<tr>
 						<th>' . WT_Gedcom_Tag::getLabel('GIVN') . '</th>
 						<th>' . WT_Gedcom_Tag::getLabel('SURN') . '</th>
 						<th>HUSB:GIVN_SURN</th>
 						<th>HUSB:SURN_GIVN</th>
-						<th>' . WT_Gedcom_Tag::getLabel('AGE') . '</th>
-						<th>AGE</th>
 						<th>' . WT_Gedcom_Tag::getLabel('GIVN') . '</th>
 						<th>' . WT_Gedcom_Tag::getLabel('SURN') . '</th>
 						<th>WIFE:GIVN_SURN</th>
 						<th>WIFE:SURN_GIVN</th>
-						<th>' . WT_Gedcom_Tag::getLabel('AGE') . '</th>
-						<th>AGE</th>
 						<th>' . WT_Gedcom_Tag::getLabel('MARR') . '</th>
 						<th>MARR:DATE</th>
-						<th><i class="icon-reminder" title="' . WT_I18N::translate('Anniversary') . '"></i></th>
 						<th>' . WT_Gedcom_Tag::getLabel('PLAC') . '</th>
-						<th><i class="icon-children" title="' . WT_I18N::translate('Children') . '"></i></th>
-					<th>NCHI</th>
 					<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>
 					<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>CHAN</th>
 					<th>MARR</th>
@@ -774,7 +545,7 @@ function format_fam_table($datalist) {
 			</thead>
 			<tfoot>
 				<tr>
-					<th colspan="23">
+					<th colspan="16">
 						<div class="btn-toolbar">
 							<div class="btn-group">
 								<button type="button" class="ui-state-default btn-toggle-parents">
@@ -845,18 +616,6 @@ function format_fam_table($datalist) {
 		$html .= '<td>' . WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)) . 'AAAA' . WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)) . '</td>';
 		$html .= '<td>' . WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)) . 'AAAA' . WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)) . '</td>';
 		$mdate = $family->getMarriageDate();
-		//-- Husband age
-		$hdate = $husb->getBirthDate();
-		if ($hdate->isOK() && $mdate->isOK()) {
-			if ($hdate->gregorianYear() >= 1550 && $hdate->gregorianYear() < 2030) {
-				$birt_by_decade[(int)($hdate->gregorianYear() / 10) * 10] .= $husb->getSex();
-			}
-			$hage = WT_Date::getAge($hdate, $mdate, 0);
-			if ($hage >= 0 && $hage <= $max_age) {
-				$marr_by_age[$hage] .= $husb->getSex();
-			}
-		}
-		$html .= '<td>' . WT_Date::getAge($hdate, $mdate, 2) . '</td><td>' . WT_Date::getAge($hdate, $mdate, 1) . '</td>';
 		//-- Wife name(s)
 		$html .= '<td colspan="2">';
 		foreach ($wife->getAllNames() as $num => $name) {
@@ -891,18 +650,6 @@ function format_fam_table($datalist) {
 		$html .= '<td>' . WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)) . 'AAAA' . WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)) . '</td>';
 		$html .= '<td>' . WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)) . 'AAAA' . WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)) . '</td>';
 		$mdate = $family->getMarriageDate();
-		//-- Wife age
-		$wdate = $wife->getBirthDate();
-		if ($wdate->isOK() && $mdate->isOK()) {
-			if ($wdate->gregorianYear() >= 1550 && $wdate->gregorianYear() < 2030) {
-				$birt_by_decade[(int)($wdate->gregorianYear() / 10) * 10] .= $wife->getSex();
-			}
-			$wage = WT_Date::getAge($wdate, $mdate, 0);
-			if ($wage >= 0 && $wage <= $max_age) {
-				$marr_by_age[$wage] .= $wife->getSex();
-			}
-		}
-		$html .= '<td>' . WT_Date::getAge($wdate, $mdate, 2) . '</td><td>' . WT_Date::getAge($wdate, $mdate, 1) . '</td>';
 		//-- Marriage date
 		$html .= '<td>';
 		if ($marriage_dates = $family->getAllMarriageDates()) {
@@ -931,8 +678,6 @@ function format_fam_table($datalist) {
 			$html .= 0;
 		}
 		$html .= '</td>';
-		//-- Marriage anniversary
-		$html .= '<td>' . WT_Date::getAge($mdate, null, 2) . '</td>';
 		//-- Marriage place
 		$html .= '<td>';
 		foreach ($family->getAllMarriagePlaces() as $n => $marriage_place) {
@@ -948,9 +693,6 @@ function format_fam_table($datalist) {
 			}
 		}
 		$html .= '</td>';
-		//-- Number of children
-		$nchi = $family->getNumberOfChildren();
-		$html .= '<td>' . WT_I18N::number($nchi) . '</td><td>' . $nchi . '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $family->LastChangeTimestamp() . '</td>';
