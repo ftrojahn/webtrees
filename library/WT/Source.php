@@ -1,6 +1,4 @@
 <?php
-// Class file for a Source (SOUR) object
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,9 +19,33 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Source - A GEDCOM source (SOUR) object
+ */
 class WT_Source extends WT_GedcomRecord {
 	const RECORD_TYPE = 'SOUR';
 	const URL_PREFIX = 'source.php?sid=';
+
+	/**
+	 * Get an instance of a source object.  For single records,
+	 * we just receive the XREF.  For bulk records (such as lists
+	 * and search results) we can receive the GEDCOM data as well.
+	 *
+	 * @param string       $xref
+	 * @param integer|null $gedcom_id
+	 * @param string|null  $gedcom
+	 *
+	 * @return WT_Source|null
+	 */
+	public static function getInstance($xref, $gedcom_id = WT_GED_ID, $gedcom = null) {
+		$record = parent::getInstance($xref, $gedcom_id, $gedcom);
+
+		if ($record instanceof WT_Source) {
+			return $record;
+		} else {
+			return null;
+		}
+	}
 
 	/**
 	 * {@inheritdoc}

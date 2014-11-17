@@ -1,6 +1,4 @@
 <?php
-//	Controller for the familybook chart
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,6 +19,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Controller_Familybook - Controller for the familybook chart
+ */
 class WT_Controller_Familybook extends WT_Controller_Chart {
 	// Data for the view
 	public $pid = null;
@@ -34,6 +35,9 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 	// Data for the controller
 	private $dgenerations = null;
 
+	/**
+	 * Create a family-book controller
+	 */
 	public function __construct() {
 		global $WT_TREE;
 
@@ -52,7 +56,6 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		// Box sizes are set globally in the theme.  Modify them here.
 		global $bwidth, $bheight, $cbwidth, $cbheight, $Dbwidth, $bhalfheight, $Dbheight;
 		$Dbwidth = $this->box_width * $bwidth / 100;
-		//$Dbheight=$this->box_width * $bheight / 100;
 		$bwidth = $Dbwidth;
 		$bheight = $Dbheight;
 
@@ -64,7 +67,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		$bhalfheight = $bheight / 2;
 		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
-			/* I18N: %s is an individual’s name */
+				/* I18N: %s is an individual’s name */
 				WT_I18N::translate('Family book of %s', $this->root->getFullName())
 			);
 		} else {
@@ -189,7 +192,6 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 					$tempw = $bwidth;
 					$temph = $bheight;
 					$bwidth -= 5;
-					//$bheight -= 5;
 					print_pedigree_person($spouse);
 					$bwidth = $tempw;
 					$bheight = $temph;

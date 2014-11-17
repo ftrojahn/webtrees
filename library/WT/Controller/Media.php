@@ -1,6 +1,4 @@
 <?php
-// Controller for the media page
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -25,8 +23,13 @@ use WT\Auth;
 
 require_once WT_ROOT . 'includes/functions/functions_print_facts.php';
 
+/**
+ * Class WT_Controller_Media - Controller for the media page
+ */
 class WT_Controller_Media extends WT_Controller_GedcomRecord {
-
+	/**
+	 * Startup activity
+	 */
 	public function __construct() {
 		$xref = WT_Filter::get('mid', WT_REGEX_XREF);
 		$this->record = WT_Media::getInstance($xref);
@@ -42,7 +45,7 @@ class WT_Controller_Media extends WT_Controller_GedcomRecord {
 
 		$SHOW_GEDCOM_RECORD = $WT_TREE->getPreference('SHOW_GEDCOM_RECORD');
 
-		if (!$this->record || $this->record->isOld()) {
+		if (!$this->record || $this->record->isPendingDeletion()) {
 			return null;
 		}
 

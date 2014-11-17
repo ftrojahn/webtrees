@@ -7,7 +7,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -85,7 +85,6 @@ $controller
 			oldMy = msY;
 		}
 		i = document.getElementById("topInner");
-		//alert(i.style.top);
 		movei1 = i;
 		i = document.getElementById("inner");
 		movei2 = i;

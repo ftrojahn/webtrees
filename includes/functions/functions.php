@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -103,9 +103,7 @@ function load_gedcom_settings($ged_id) {
 	global $EXPAND_NOTES;                 $EXPAND_NOTES                 = $tree->getPreference('EXPAND_NOTES');
 	global $EXPAND_RELATIVES_EVENTS;      $EXPAND_RELATIVES_EVENTS      = $tree->getPreference('EXPAND_RELATIVES_EVENTS');
 	global $EXPAND_SOURCES;               $EXPAND_SOURCES               = $tree->getPreference('EXPAND_SOURCES');
-	global $FAM_ID_PREFIX;                $FAM_ID_PREFIX                = $tree->getPreference('FAM_ID_PREFIX');
 	global $FULL_SOURCES;                 $FULL_SOURCES                 = $tree->getPreference('FULL_SOURCES');
-	global $GEDCOM_ID_PREFIX;             $GEDCOM_ID_PREFIX             = $tree->getPreference('GEDCOM_ID_PREFIX');
 	global $GEDCOM_MEDIA_PATH;            $GEDCOM_MEDIA_PATH            = $tree->getPreference('GEDCOM_MEDIA_PATH');
 	global $GENERATE_UIDS;                $GENERATE_UIDS                = $tree->getPreference('GENERATE_UIDS');
 	global $HIDE_GEDCOM_ERRORS;           $HIDE_GEDCOM_ERRORS           = $tree->getPreference('HIDE_GEDCOM_ERRORS');
@@ -117,8 +115,6 @@ function load_gedcom_settings($ged_id) {
 	global $MAX_DESCENDANCY_GENERATIONS;  $MAX_DESCENDANCY_GENERATIONS  = $tree->getPreference('MAX_DESCENDANCY_GENERATIONS');
 	global $MAX_PEDIGREE_GENERATIONS;     $MAX_PEDIGREE_GENERATIONS     = $tree->getPreference('MAX_PEDIGREE_GENERATIONS');
 	global $MEDIA_DIRECTORY;              $MEDIA_DIRECTORY              = $tree->getPreference('MEDIA_DIRECTORY');
-	global $MEDIA_ID_PREFIX;              $MEDIA_ID_PREFIX              = $tree->getPreference('MEDIA_ID_PREFIX');
-	global $NOTE_ID_PREFIX;               $NOTE_ID_PREFIX               = $tree->getPreference('NOTE_ID_PREFIX');
 	global $NO_UPDATE_CHAN;               $NO_UPDATE_CHAN               = $tree->getPreference('NO_UPDATE_CHAN');
 	global $PEDIGREE_FULL_DETAILS;        $PEDIGREE_FULL_DETAILS        = $tree->getPreference('PEDIGREE_FULL_DETAILS');
 	global $PEDIGREE_LAYOUT;              $PEDIGREE_LAYOUT              = $tree->getPreference('PEDIGREE_LAYOUT');
@@ -126,7 +122,6 @@ function load_gedcom_settings($ged_id) {
 	global $PREFER_LEVEL2_SOURCES;        $PREFER_LEVEL2_SOURCES        = $tree->getPreference('PREFER_LEVEL2_SOURCES');
 	global $QUICK_REQUIRED_FACTS;         $QUICK_REQUIRED_FACTS         = $tree->getPreference('QUICK_REQUIRED_FACTS');
 	global $QUICK_REQUIRED_FAMFACTS;      $QUICK_REQUIRED_FAMFACTS      = $tree->getPreference('QUICK_REQUIRED_FAMFACTS');
-	global $REPO_ID_PREFIX;               $REPO_ID_PREFIX               = $tree->getPreference('REPO_ID_PREFIX');
 	global $REQUIRE_AUTHENTICATION;       $REQUIRE_AUTHENTICATION       = $tree->getPreference('REQUIRE_AUTHENTICATION');
 	global $SAVE_WATERMARK_IMAGE;         $SAVE_WATERMARK_IMAGE         = $tree->getPreference('SAVE_WATERMARK_IMAGE');
 	global $SAVE_WATERMARK_THUMB;         $SAVE_WATERMARK_THUMB         = $tree->getPreference('SAVE_WATERMARK_THUMB');
@@ -146,7 +141,6 @@ function load_gedcom_settings($ged_id) {
 	global $SHOW_PEDIGREE_PLACES_SUFFIX;  $SHOW_PEDIGREE_PLACES_SUFFIX  = $tree->getPreference('SHOW_PEDIGREE_PLACES_SUFFIX');
 	global $SHOW_PRIVATE_RELATIONSHIPS;   $SHOW_PRIVATE_RELATIONSHIPS   = $tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS');
 	global $SHOW_RELATIVES_EVENTS;        $SHOW_RELATIVES_EVENTS        = $tree->getPreference('SHOW_RELATIVES_EVENTS');
-	global $SOURCE_ID_PREFIX;             $SOURCE_ID_PREFIX             = $tree->getPreference('SOURCE_ID_PREFIX');
 	global $THUMBNAIL_WIDTH;              $THUMBNAIL_WIDTH              = $tree->getPreference('THUMBNAIL_WIDTH');
 	global $USE_RIN;                      $USE_RIN                      = $tree->getPreference('USE_RIN');
 	global $USE_SILHOUETTE;               $USE_SILHOUETTE               = $tree->getPreference('USE_SILHOUETTE');
@@ -271,9 +265,14 @@ function get_cont($nlevel, $nrec) {
 	return rtrim($text, " ");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Sort a list events for the today/upcoming blocks
-////////////////////////////////////////////////////////////////////////////////
+/**
+ * Sort a list events for the today/upcoming blocks
+ *
+ * @param array $a
+ * @param array $b
+ *
+ * @return integer
+ */
 function event_sort($a, $b) {
 	if ($a['jd'] == $b['jd']) {
 		if ($a['anniv'] == $b['anniv']) {
@@ -286,6 +285,14 @@ function event_sort($a, $b) {
 	}
 }
 
+/**
+ * Sort a list events for the today/upcoming blocks
+ *
+ * @param array $a
+ * @param array $b
+ *
+ * @return integer
+ */
 function event_sort_name($a, $b) {
 	if ($a['jd'] == $b['jd']) {
 		return WT_GedcomRecord::compare($a['record'], $b['record']);
@@ -350,10 +357,17 @@ function sort_facts(&$arr) {
 
 }
 
-// For close family relationships, such as the families tab and the family navigator
-// Display a tick if both individuals are the same.
-// Stop after 3 steps, because pending edits may mean that there is no longer a
-// relationship to find.
+/**
+ * For close family relationships, such as the families tab and the family navigator
+ * Display a tick if both individuals are the same.
+ * Stop after 3 steps, because pending edits may mean that there is no longer a
+ * relationship to find.
+ *
+ * @param WT_Individual $person1
+ * @param WT_Individual $person2
+ *
+ * @return string
+ */
 function get_close_relationship_name(WT_Individual $person1, WT_Individual $person2) {
 	if ($person1 === $person2) {
 		$label = '<i class="icon-selected" title="' . WT_I18N::translate('self') . '"></i>';
@@ -364,9 +378,16 @@ function get_close_relationship_name(WT_Individual $person1, WT_Individual $pers
 	return $label;
 }
 
-// For facts on the individual/family pages.
-// Stop after 4 steps, as distant relationships may take a long time to find.
-// TODO review the limit of 4 when the performance of the function is improved
+/**
+ * For facts on the individual/family pages.
+ * Stop after 4 steps, as distant relationships may take a long time to find.
+ * Review the limit of 4 if/when the performance of the function is improved.
+ *
+ * @param WT_Individual $person1
+ * @param WT_Individual $person2
+ *
+ * @return string
+ */
 function get_associate_relationship_name(WT_Individual $person1, WT_Individual $person2) {
 	if ($person1 === $person2) {
 		$label = WT_I18N::translate('self');
@@ -572,7 +593,13 @@ function get_relationship(WT_Individual $person1, WT_Individual $person2, $follo
 	return $resnode;
 }
 
-// Convert the result of get_relationship() into a relationship name.
+/**
+ * Convert the result of get_relationship() into a relationship name.
+ *
+ * @param mixed[][] $nodes
+ *
+ * @return string
+ */
 function get_relationship_name($nodes) {
 	if (!is_array($nodes)) {
 		return '';
@@ -2305,7 +2332,7 @@ function get_relationship_name_from_path($path, WT_Individual $person1 = null, W
  *
  * @throws Exception
  *
- * @return array An array of theme names and their corresponding folder
+ * @return string[] An array of theme names and their corresponding folder
  */
 function get_theme_names() {
 	static $themes;
@@ -2372,38 +2399,33 @@ function get_query_url($overwrite = null, $separator = '&') {
 	}
 }
 
-// Generate a new XREF, unique across all family trees
+/**
+ * Generate a new XREF, unique across all family trees
+ *
+ * @param string  $type
+ * @param integer $ged_id
+ *
+ * @return string
+ */
 function get_new_xref($type = 'INDI', $ged_id = WT_GED_ID) {
-	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $NOTE_ID_PREFIX;
+	global $WT_TREE;
 
-	switch ($type) {
-	case 'INDI':
-		$prefix = $GEDCOM_ID_PREFIX;
-		break;
+	/** @var string[] Which tree preference is used for which record type */
+	static $type_to_preference = array(
+		'INDI' => 'GEDCOM_ID_PREFIX',
+		'FAM'  => 'FAM_ID_PREFIX',
+		'OBJE' => 'MEDIA_ID_PREFIX',
+		'NOTE' => 'NOTE_ID_PREFIX',
+		'SOUR' => 'SOURCE_ID_PREFIX',
+		'REPO' => 'REPO_ID_PREFIX',
+		'REPO' => 'REPO_ID_PREFIX',
+	);
 
-	case 'FAM':
-		$prefix = $FAM_ID_PREFIX;
-		break;
-
-	case 'OBJE':
-		$prefix = $MEDIA_ID_PREFIX;
-		break;
-
-	case 'SOUR':
-		$prefix = $SOURCE_ID_PREFIX;
-		break;
-
-	case 'REPO':
-		$prefix = $REPO_ID_PREFIX;
-		break;
-
-	case 'NOTE':
-		$prefix = $NOTE_ID_PREFIX;
-		break;
-
-	default:
-		$prefix = $type{0};
-		break;
+	if (array_key_exists($type, $type_to_preference)) {
+		$prefix = $WT_TREE->getPreference($type_to_preference[$type]);
+	} else {
+		// Use the first non-underscore character
+		$prefix = substr(trim($type, '_'), 0, 1);
 	}
 
 	$num = WT_DB::prepare("SELECT next_id FROM `##next_id` WHERE record_type=? AND gedcom_id=?")

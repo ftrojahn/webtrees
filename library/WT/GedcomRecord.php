@@ -1,6 +1,4 @@
 <?php
-// Base class for all gedcom records
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -24,6 +22,9 @@
 use WT\Auth;
 use WT\Log;
 
+/**
+ * Class WT_GedcomRecord - Base class for all gedcom records
+ */
 class WT_GedcomRecord {
 	const RECORD_TYPE = 'UNKNOWN';
 	const URL_PREFIX  = 'gedrecord.php?pid=';
@@ -91,14 +92,14 @@ class WT_GedcomRecord {
 		foreach ($gedcom_facts as $gedcom_fact) {
 			$fact = new WT_Fact($gedcom_fact, $this, md5($gedcom_fact));
 			if ($this->pending !== null && !in_array($gedcom_fact, $pending_facts)) {
-				$fact->setIsOld();
+				$fact->setPendingDeletion();
 			}
 			$this->facts[] = $fact;
 		}
 		foreach ($pending_facts as $pending_fact) {
 			if (!in_array($pending_fact, $gedcom_facts)) {
 				$fact = new WT_Fact($pending_fact, $this, md5($pending_fact));
-				$fact->setIsNew();
+				$fact->setPendingAddition();
 				$this->facts[] = $fact;
 			}
 		}
@@ -281,7 +282,7 @@ class WT_GedcomRecord {
 	 *
 	 * @return boolean
 	 */
-	public function isNew() {
+	public function isPendingAddtion() {
 		return $this->pending !== null;
 	}
 
@@ -290,7 +291,7 @@ class WT_GedcomRecord {
 	 *
 	 * @return boolean
 	 */
-	public function isOld() {
+	public function isPendingDeletion() {
 		return $this->pending === '';
 	}
 
@@ -467,7 +468,7 @@ class WT_GedcomRecord {
 	 * Remove private data from the raw gedcom record.
 	 * Return both the visible and invisible data.  We need the invisible data when editing.
 	 *
-	 * @param $access_level
+	 * @param integer $access_level
 	 *
 	 * @return string
 	 */
@@ -496,7 +497,7 @@ class WT_GedcomRecord {
 	/**
 	 * Generate a private version of this record
 	 *
-	 * @param $access_level
+	 * @param integer $access_level
 	 *
 	 * @return string
 	 */
@@ -512,12 +513,12 @@ class WT_GedcomRecord {
 	 * @param string $value
 	 * @param string $gedcom
 	 */
-	protected function _addName($type, $value, $gedcom) {
-		$this->_getAllNames[]=array(
-			'type'=>$type,
-			'sort'=>preg_replace_callback('/([0-9]+)/', function($matches) { return str_pad($matches[0], 10, '0', STR_PAD_LEFT); }, $value),
-			'full'=>'<span dir="auto">'.WT_Filter::escapeHtml($value).'</span>',    // This is used for display
-			'fullNN'=>$value, // This goes into the database
+	protected function addName($type, $value, $gedcom) {
+		$this->_getAllNames[] = array(
+			'type'   => $type,
+			'sort'   => preg_replace_callback('/([0-9]+)/', function($matches) { return str_pad($matches[0], 10, '0', STR_PAD_LEFT); }, $value),
+			'full'   => '<span dir="auto">'.WT_Filter::escapeHtml($value).'</span>',    // This is used for display
+			'fullNN' => $value, // This goes into the database
 		);
 	}
 
@@ -542,13 +543,13 @@ class WT_GedcomRecord {
 				foreach ($matches as $match) {
 					// Treat 1 NAME / 2 TYPE married the same as _MARNM
 					if ($match[1]=='NAME' && strpos($match[3], "\n2 TYPE married")!==false) {
-						$this->_addName('_MARNM', $match[2], $fact->getGedcom());
+						$this->addName('_MARNM', $match[2], $fact->getGedcom());
 					} else {
-						$this->_addName($match[1], $match[2], $fact->getGedcom());
+						$this->addName($match[1], $match[2], $fact->getGedcom());
 					}
 					if ($match[3] && preg_match_all("/^{$sublevel} (ROMN|FONE|_\w+) (.+)((\n[{$subsublevel}-9].+)*)/m", $match[3], $submatches, PREG_SET_ORDER)) {
 						foreach ($submatches as $submatch) {
-							$this->_addName($submatch[1], $submatch[2], $match[3]);
+							$this->addName($submatch[1], $submatch[2], $match[3]);
 						}
 					}
 				}
@@ -560,7 +561,7 @@ class WT_GedcomRecord {
 	 * Default for "other" object types
 	 */
 	public function extractNames() {
-		$this->_addName(static::RECORD_TYPE, $this->getFallBackName(), null);
+		$this->addName(static::RECORD_TYPE, $this->getFallBackName(), null);
 	}
 
 	/**
@@ -576,10 +577,10 @@ class WT_GedcomRecord {
 				$this->extractNames();
 				// No name found?  Use a fallback.
 				if (!$this->_getAllNames) {
-					$this->_addName(static::RECORD_TYPE, $this->getFallBackName(), null);
+					$this->addName(static::RECORD_TYPE, $this->getFallBackName(), null);
 				}
 			} else {
-				$this->_addName(static::RECORD_TYPE, WT_I18N::translate('Private'), null);
+				$this->addName(static::RECORD_TYPE, WT_I18N::translate('Private'), null);
 			}
 		}
 		return $this->_getAllNames;
@@ -779,7 +780,7 @@ class WT_GedcomRecord {
 			$html.=' onclick="pasteid(\''.$this->getXref().'\', \'' . htmlentities($name) . '\');"';
 		}
 		$html.=' class="list_item"><b>'.$name.'</b>';
-		$html.=$this->format_list_details();
+		$html.=$this->formatListDetails();
 		$html='<'.$tag.'>'.$html.'</a></'.$tag.'>';
 		return $html;
 	}
@@ -790,7 +791,7 @@ class WT_GedcomRecord {
 	 *
 	 * @return string
 	 */
-	public function format_list_details() {
+	public function formatListDetails() {
 		return '';
 	}
 
@@ -990,7 +991,7 @@ class WT_GedcomRecord {
 	public function getAllEventDates($event_type) {
 		$dates = array();
 		foreach ($this->getFacts($event_type) as $event) {
-			if ($event->getDate()->isOK() && $event->canShow()) {
+			if ($event->getDate()->isOK()) {
 				$dates[] = $event->getDate();
 			}
 		}
@@ -1008,7 +1009,7 @@ class WT_GedcomRecord {
 	public function getAllEventPlaces($event_type) {
 		$places = array();
 		foreach ($this->getFacts($event_type) as $event) {
-			if (preg_match_all('/\n(?:2 PLAC|3 (?:ROMN|FONE|_HEB)) +(.+)/', $event->getGedcom(), $ged_places) && $event->canShow()) {
+			if (preg_match_all('/\n(?:2 PLAC|3 (?:ROMN|FONE|_HEB)) +(.+)/', $event->getGedcom(), $ged_places)) {
 				foreach ($ged_places[1] as $ged_place) {
 					$places[] = $ged_place;
 				}
@@ -1027,7 +1028,7 @@ class WT_GedcomRecord {
 	 */
 	public function getFirstFact($tag) {
 		foreach ($this->getFacts() as $fact) {
-			if ($fact->getTag() == $tag && $fact->canShow()) {
+			if ($fact->getTag() == $tag) {
 				return $fact;
 			}
 		}
@@ -1171,7 +1172,7 @@ class WT_GedcomRecord {
 
 		// Replacing (or deleting) an existing fact
 		foreach ($this->getFacts(null, false, WT_PRIV_HIDE) as $fact) {
-			if (!$fact->isOld()) {
+			if (!$fact->isPendingDeletion()) {
 				if ($fact->getFactId() === $fact_id) {
 					if ($gedcom) {
 						$new_gedcom .= "\n" . $gedcom;
@@ -1183,7 +1184,7 @@ class WT_GedcomRecord {
 			}
 		}
 		if ($update_chan) {
-			$new_gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . WT_USER_NAME;
+			$new_gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . Auth::user()->getUserName();
 		}
 
 		// Adding a new fact
@@ -1200,7 +1201,7 @@ class WT_GedcomRecord {
 				$this->xref,
 				$old_gedcom,
 				$new_gedcom,
-				WT_USER_ID
+				Auth::id()
 			));
 
 			$this->pending = $new_gedcom;
@@ -1243,7 +1244,7 @@ class WT_GedcomRecord {
 
 		// Create a change record, if not already present
 		if (!preg_match('/\n1 CHAN/', $gedcom)) {
-			$gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . WT_USER_NAME;
+			$gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . Auth::user()->getUserName();
 		}
 
 		// Create a pending change
@@ -1253,7 +1254,7 @@ class WT_GedcomRecord {
 			$gedcom_id,
 			$xref,
 			$gedcom,
-			WT_USER_ID
+			Auth::id()
 		));
 
 		// Accept this pending change
@@ -1284,7 +1285,7 @@ class WT_GedcomRecord {
 		// Update the CHAN record
 		if ($update_chan) {
 			$gedcom = preg_replace('/\n1 CHAN(\n[2-9].*)*/', '', $gedcom);
-			$gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . WT_USER_NAME;
+			$gedcom .= "\n1 CHAN\n2 DATE " . date('d M Y') . "\n3 TIME " . date('H:i:s') . "\n2 _WT_USER " . Auth::user()->getUserName();
 		}
 
 		// Create a pending change
@@ -1295,7 +1296,7 @@ class WT_GedcomRecord {
 			$this->xref,
 			$this->getGedcom(),
 			$gedcom,
-			WT_USER_ID
+			Auth::id()
 		));
 
 		// Clear the cache

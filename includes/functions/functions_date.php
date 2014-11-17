@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -59,26 +59,6 @@ function get_age_at_event($age_string, $show_years) {
 			$age_string
 		);
 	}
-}
-
-/**
- * Parse a time string into its different parts
- *
- * @param string $timestr the time as it was taken from the TIME tag
- *
- * @return array returns an array with the hour, minutes, and seconds
- */
-function parse_time($timestr)
-{
-	$time = explode(':', $timestr.':0:0');
-	$time[0] = min(((int) $time[0]), 23); // Hours: integer, 0 to 23
-	$time[1] = min(((int) $time[1]), 59); // Minutes: integer, 0 to 59
-	$time[2] = min(((int) $time[2]), 59); // Seconds: integer, 0 to 59
-	$time["hour"] = $time[0];
-	$time["minutes"] = $time[1];
-	$time["seconds"] = $time[2];
-
-	return $time;
 }
 
 /**

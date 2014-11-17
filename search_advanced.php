@@ -387,7 +387,7 @@ echo '</script>';
 </form>
 </div>
 <?php
-	$somethingPrinted = $controller->PrintResults();
+	$somethingPrinted = $controller->printResults();
 	if (!$somethingPrinted){
 		$controller->addInlineJavascript('jQuery("#search-notice").hide();');
 	}

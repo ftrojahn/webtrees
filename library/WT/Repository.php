@@ -1,6 +1,4 @@
 <?php
-// Class file for a Repository (REPO) object
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,9 +19,33 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Repository - Class file for a Repository (REPO) object
+ */
 class WT_Repository extends WT_GedcomRecord {
 	const RECORD_TYPE = 'REPO';
 	const URL_PREFIX = 'repo.php?rid=';
+
+	/**
+	 * Get an instance of a repository object.  For single records,
+	 * we just receive the XREF.  For bulk records (such as lists
+	 * and search results) we can receive the GEDCOM data as well.
+	 *
+	 * @param string       $xref
+	 * @param integer|null $gedcom_id
+	 * @param string|null  $gedcom
+	 *
+	 * @return WT_Repository|null
+	 */
+	public static function getInstance($xref, $gedcom_id = WT_GED_ID, $gedcom = null) {
+		$record = parent::getInstance($xref, $gedcom_id, $gedcom);
+
+		if ($record instanceof WT_Repository) {
+			return $record;
+		} else {
+			return null;
+		}
+	}
 
 	/**
 	 * {@inheritdoc}

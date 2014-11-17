@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2011 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ global $controller;
 
 // Identify ourself
 define('WT_WEBTREES', 'webtrees');
-define('WT_VERSION',  '1.6.1-dev');
+define('WT_VERSION',  '1.6.2-dev');
 
 // External URLs
 define('WT_WEBTREES_URL',  'http://www.webtrees.net/');
@@ -79,7 +79,7 @@ define('WT_DEBUG_SQL', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 27);
+define('WT_SCHEMA_VERSION', 29);
 
 // Regular expressions for validating user input, etc.
 define('WT_MINIMUM_PASSWORD_LENGTH', 6);
@@ -135,65 +135,6 @@ $start_time = microtime(true);
 // We want to know about all PHP errors
 error_reporting(E_ALL | E_STRICT);
 
-////////////////////////////////////////////////////////////////////////////////
-// Provide password functions for PHP5.4 and earlier
-////////////////////////////////////////////////////////////////////////////////
-if (!function_exists('password_hash')) {
-	// The compatibility library requires the $2$y salt prefix, which is available
-	// in PHP5.3.7 and *some* earlier/patched versions.
-	$hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
-	if (crypt("password", $hash) === $hash) {
-		require WT_ROOT . 'library/ircmaxell/password-compat/lib/password.php';
-	} else {
-		/**
-		 * There is no secure password facility on this server.
-		 * Simply implement something that won't crash...
-		 *
-		 * @param string  $password
-		 * @param integer $algo
-		 *
-		 * @return string
-		 */
-		function password_hash($password, $algo) {
-			$salt = '$2a$12$';
-			$salt_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
-			for ($i = 0; $i < 22; ++$i) {
-				$salt .= substr($salt_chars, mt_rand(0, 63), 1);
-			}
-
-			return crypt($password, $salt);
-		}
-
-		/**
-		 * There is no secure password facility on this server.
-		 * Simply implement something that won't crash...
-		 *
-		 * @param string  $hash
-		 * @param integer $algo
-		 *
-		 * @return boolean
-		 */
-		function password_needs_rehash($hash, $algo) {
-			return false;
-		}
-
-		/**
-		 * There is no secure password facility on this server.
-		 * Simply implement something that won't crash...
-		 *
-		 * @param string  $password
-		 * @param integer $hash
-		 *
-		 * @return boolean
-		 */
-		function password_verify($password, $hash) {
-			return crypt($password, $hash) === $hash;
-		}
-
-		define('PASSWORD_DEFAULT', 1);
-	}
-}
-
 // PHP5.3 may be using magic-quotes :-(
 if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 	// http://php.net/manual/en/security.magicquotes.disabling.php
@@ -210,6 +151,45 @@ if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 		}
 	}
 	unset($process);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// The ircmaxell/password-compat library does not support unpatched versions of
+// PHP older than PHP5.3.6.  These versions of PHP have no secure crypt library.
+////////////////////////////////////////////////////////////////////////////////
+$hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
+if (!defined('PASSWORD_BCRYPT') && crypt("password", $hash) !== $hash) {
+	define('PASSWORD_BCRYPT', 1);
+	define('PASSWORD_DEFAULT', 1);
+	/**
+	 * @param string  $password
+	 * @param integer $algo
+	 *
+	 * @return string
+	 */
+	function password_hash($password, $algo) {
+		return crypt($password);
+	}
+
+	/**
+	 * @param string  $hash
+	 * @param integer $algo
+	 *
+	 * @return boolean
+	 */
+	function password_needs_rehash($hash, $algo) {
+		return false;
+	}
+
+	/**
+	 * @param string  $password
+	 * @param integer $hash
+	 *
+	 * @return boolean
+	 */
+	function password_verify($password, $hash) {
+		return crypt($password, $hash) === $hash;
+	}
 }
 
 require WT_ROOT . 'library/autoload.php';
@@ -345,8 +325,6 @@ if (file_exists(WT_ROOT . 'data/config.ini.php')) {
 }
 
 $WT_REQUEST = new Zend_Controller_Request_Http();
-
-require WT_ROOT . 'includes/authentication.php';
 
 // Connect to the database
 try {
@@ -489,8 +467,9 @@ if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
 	// An existing session
 }
 
-// Who are we?
-define('WT_USER_ID',   Auth::id());
+/** @deprecated Will be removed in 1.7.0 */
+define('WT_USER_ID', Auth::id());
+/** @deprecated Will be removed in 1.7.0 */
 define('WT_USER_NAME', Auth::id() ? Auth::user()->getUserName() : '');
 
 // Set the active GEDCOM
@@ -600,7 +579,7 @@ define('WT_TIMESTAMP', (int)WT_DB::prepare("SELECT UNIX_TIMESTAMP()")->fetchOne(
 // Server timezone is defined in php.ini
 define('WT_SERVER_TIMESTAMP', WT_TIMESTAMP + (int)date('Z'));
 
-if (WT_USER_ID) {
+if (Auth::check()) {
 	define('WT_CLIENT_TIMESTAMP', WT_TIMESTAMP - $WT_SESSION->timediff);
 } else {
 	define('WT_CLIENT_TIMESTAMP', WT_SERVER_TIMESTAMP);

@@ -1,16 +1,4 @@
 <?php
-// Classes for Gedcom Date/Calendar functionality.
-//
-// WT_Date_Calendar is a base class for classes such as WT_Date_Gregorian, etc.
-//
-// + All supported calendars have non-zero days/months/years.
-// + We store dates as both Y/M/D and Julian Days.
-// + For imprecise dates such as "JAN 2000" we store the start/end julian day.
-//
-// NOTE: Since different calendars start their days at different times, (civil
-// midnight, solar midnight, sunset, sunrise, etc.), we convert on the basis of
-// midday.
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 Greg Roach
 //
@@ -29,7 +17,20 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 use FishareBest\ExtCalendar\CalendarInterface;
+use FishareBest\ExtCalendar\JewishCalendar;
 
+/**
+ * Class WT_Date_Calendar - Classes for Gedcom Date/Calendar functionality.
+ *
+ * WT_Date_Calendar is a base class for classes such as WT_Date_Gregorian, etc.
+ * + All supported calendars have non-zero days/months/years.
+ * + We store dates as both Y/M/D and Julian Days.
+ * + For imprecise dates such as "JAN 2000" we store the start/end julian day.
+ *
+ * NOTE: Since different calendars start their days at different times, (civil
+ * midnight, solar midnight, sunset, sunrise, etc.), we convert on the basis of
+ * midday.
+ */
 class WT_Date_Calendar {
 	const CALENDAR_ESCAPE = '@#DUNKNOWN@';
 	const MONTHS_IN_YEAR = 12;
@@ -75,6 +76,12 @@ class WT_Date_Calendar {
 				$this->d = 0;
 			}
 			$this->y = $this->extractYear($date[0]);
+
+			// Our simple lookup table above does not take into account Adar and leap-years.
+			if ($this->m === 6 && $this->calendar instanceof JewishCalendar && !$this->calendar->isLeapYear($this->y)) {
+				$this->m = 7;
+			}
+
 			$this->setJdFromYmd();
 
 			return;
@@ -863,7 +870,12 @@ class WT_Date_Calendar {
 	 * @return string
 	 */
 	protected function formatGedcomMonth() {
-		return array_search($this->m, static::$MONTH_ABBREV);
+		// Our simple lookup table doesn't work correctly for Adar on leap years
+		if ($this->m == 7 && $this->calendar instanceof JewishCalendar && !$this->calendar->isLeapYear($this->y)) {
+			return 'ADR';
+		} else {
+			return array_search($this->m, static::$MONTH_ABBREV);
+		}
 	}
 
 	/**

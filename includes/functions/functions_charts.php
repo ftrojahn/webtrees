@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,9 +100,9 @@ function print_family_parents(WT_Family $family, $sosa=0, $label='', $parid='', 
 	} elseif ($sosa) {
 		print_sosa_number($sosa * 2);
 	}
-	if ($husb->isNew()) {
+	if ($husb->isPendingAddtion()) {
 		echo '<td valign="top" class="facts_value new">';
-	} elseif ($husb->isOld()) {
+	} elseif ($husb->isPendingDeletion()) {
 		echo '<td valign="top" class="facts_value old">';
 	} else {
 		echo '<td valign="top">';
@@ -179,9 +179,9 @@ function print_family_parents(WT_Family $family, $sosa=0, $label='', $parid='', 
 	} elseif ($sosa) {
 		print_sosa_number($sosa * 2 + 1);
 	}
-	if ($wife->isNew()) {
+	if ($wife->isPendingAddtion()) {
 		echo '<td valign="top" class="facts_value new">';
-	} elseif ($wife->isOld()) {
+	} elseif ($wife->isPendingDeletion()) {
 		echo '<td valign="top" class="facts_value old">';
 	} else {
 		echo '<td valign="top">';
@@ -287,9 +287,9 @@ function print_family_children(WT_Family $family, $childid = '', $sosa = 0, $lab
 					print_sosa_number($label.($nchi++).".");
 				}
 			}
-			if ($child->isNew()) {
+			if ($child->isPendingAddtion()) {
 				echo '<td valign="middle" class="new">';
-			} elseif ($child->isOld()) {
+			} elseif ($child->isPendingDeletion()) {
 				echo '<td valign="middle" class="old">';
 			} else {
 				echo '<td valign="middle">';
@@ -302,16 +302,17 @@ function print_family_children(WT_Family $family, $childid = '', $sosa = 0, $lab
 
 
 				$maxfam = count($famids)-1;
-				for ($f=0; $f<=$maxfam; $f++) {
+				for ($f = 0; $f <= $maxfam; $f++) {
 					$famid_child = $famids[$f]->getXref();
 					// multiple marriages
-					if ($f>0) {
-						echo "</tr><tr><td>&nbsp;</td>";
-						echo "<td valign=\"top\"";
-						if ($TEXT_DIRECTION == "rtl") echo " align=\"left\">";
-						else echo " align=\"right\">";
-						//if ($f==$maxfam) echo "<img height=\"50%\"";
-						//else echo "<img height=\"100%\"";
+					if ($f > 0) {
+						echo '</tr><tr><td>&nbsp;</td>';
+						echo '<td valign="top"';
+						if ($TEXT_DIRECTION == 'rtl') {
+							echo ' align="left">';
+						} else {
+							echo ' align="right">';
+						}
 
 						//find out how many cousins there are to establish vertical line on second families
 						$fchildren=$famids[$f]->getChildren();
@@ -397,47 +398,6 @@ function print_sosa_family($famid, $childid, $sosa, $label="", $parid="", $gpari
 	print_family_children(WT_Family::getInstance($famid), $childid, $sosa, $label);
 	echo "</td></tr></table>";
 	echo "<br>";
-}
-
-/**
- * creates an array with all of the individual ids to be displayed on an ascendancy chart
- *
- * the id in position 1 is the root person.  The other positions are filled according to the following algorithm
- * if an individual is at position $i then individual $i’s father will occupy position ($i*2) and $i’s mother
- * will occupy ($i*2)+1
- *
- * @param string  $rootid
- * @param integer $maxgen
- *
- * @return array $treeid
- */
-function ancestry_array($rootid, $maxgen=0) {
-	global $PEDIGREE_GENERATIONS;
-	// -- maximum size of the id array
-	if ($maxgen==0) $maxgen = $PEDIGREE_GENERATIONS;
-	$treesize = pow(2, ($maxgen));
-
-	$treeid = array();
-	$treeid[0] = "";
-	$treeid[1] = $rootid;
-	// -- fill in the id array
-	for ($i = 1; $i < ($treesize / 2); $i++) {
-		$treeid[($i * 2)] = false; // -- father
-		$treeid[($i * 2) + 1] = false; // -- mother
-		$person = WT_Individual::getInstance($treeid[$i]);
-		if ($person) {
-			$family = $person->getPrimaryChildFamily();
-			if ($family) {
-				if ($family->getHusband()) {
-					$treeid[$i*2]=$family->getHusband()->getXref();
-				}
-				if ($family->getWife()) {
-					$treeid[$i*2+1]=$family->getWife()->getXref();
-				}
-			}
-		}
-	}
-	return $treeid;
 }
 
 /**

@@ -1,8 +1,4 @@
 <?php
-// Base Report Generator
-//
-// used by the SAX parser to generate reports from the XML report file.
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,6 +19,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Report_Base_Element - Base Report Generator, used by the SAX
+ * parser to generate reports from the XML report file.
+ */
 class WT_Report_Base_Element {
 	/**
 	 * @var string
@@ -32,37 +32,34 @@ class WT_Report_Base_Element {
 	/**
 	 * Element renderer
 	 *
-	 * @param $renderer
+	 * @param WT_Report_HTML|PDF $renderer
 	 *
-	 * @return integer
+	 * @return void
 	 */
 	function render($renderer) {
-		//print "Nothing rendered.  Something bad happened";
-		//debug_print_backtrace();
 		//-- to be implemented in inherited classes
-		return 0;
 	}
 
 	/**
-	 * @param $renderer
+	 * @param WT_Report_HTML|PDF $renderer
 	 *
-	 * @return integer
+	 * @return float
 	 */
 	function getHeight($renderer) {
-		return 0;
+		return 0.0;
 	}
 
 	/**
-	 * @param $renderer
+	 * @param WT_Report_HTML|PDF $renderer
 	 *
-	 * @return integer
+	 * @return float
 	 */
 	function getWidth($renderer) {
-		return 0;
+		return 0.0;
 	}
 
 	/**
-	 * @param $t
+	 * @param string $t
 	 *
 	 * @return integer
 	 */
@@ -114,21 +111,18 @@ class WT_Report_Base_Element {
 	/**
 	 * @param $renderer
 	 *
-	 * @return boolean
+	 * @return void
 	 */
 	function renderFootnote($renderer) {
-		return false;
-		//-- to be implemented in inherited classes
+		// To be implemented in inherited classes
 	}
 
 	/**
 	 * @param $text
 	 *
-	 * @return integer
+	 * @return void
 	 */
 	function setText($text) {
 		$this->text = $text;
-
-		return 0;
 	}
 }

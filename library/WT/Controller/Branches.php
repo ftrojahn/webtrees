@@ -1,6 +1,4 @@
 <?php
-// Controller for the branches list
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -18,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Controller_Branches - Controller for the branches list
+ */
 class WT_Controller_Branches extends WT_Controller_Page {
 	/** @var string Generate the branches for this surname */
 	private $surname;
@@ -34,6 +35,9 @@ class WT_Controller_Branches extends WT_Controller_Page {
 	/** @var WT_Individual[] Ancestors of the root person - for SOSA numbers */
 	private $ancestors = array();
 
+	/**
+	 * Create a branches list controller
+	 */
 	public function __construct() {
 		parent::__construct();
 
@@ -94,7 +98,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			" AND (n_surn = ? OR n_surname = ?";
 		$args = array(WT_GED_ID, '_MARNM', $this->surname, $this->surname);
 		if ($this->soundex_std) {
-			$sdx = WT_Soundex::soundex_std($this->surname);
+			$sdx = WT_Soundex::russell($this->surname);
 			if ($sdx) {
 				foreach (explode(':', $sdx) as $value) {
 					$sql .= " OR n_soundex_surn_std LIKE CONCAT('%', ?, '%')";
@@ -103,7 +107,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			}
 		}
 		if ($this->soundex_dm) {
-			$sdx = WT_Soundex::soundex_dm($this->surname);
+			$sdx = WT_Soundex::daitchMokotoff($this->surname);
 			if ($sdx) {
 				foreach (explode(':', $sdx) as $value) {
 					$sql .= " OR n_soundex_surn_dm LIKE CONCAT('%', ?, '%')";
@@ -118,7 +122,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			$this->individuals[] = WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		}
 		// Sort by birth date, oldest first
-		usort($this->individuals, array('WT_Individual', 'CompareBirtDate'));
+		usort($this->individuals, array('WT_Individual', 'compareBirthDate'));
 	}
 
 	/**
@@ -177,8 +181,8 @@ class WT_Controller_Branches extends WT_Controller_Page {
 				stripos($surn1, $this->surname) !== false ||
 				stripos($this->surname, $surn1) !== false ||
 				// one name sounds like the other
-				$this->soundex_std && WT_Soundex::compare(WT_Soundex::soundex_std($surn1), WT_Soundex::soundex_std($this->surname)) ||
-				$this->soundex_dm && WT_Soundex::compare(WT_Soundex::soundex_dm($surn1), WT_Soundex::soundex_dm($this->surname))
+				$this->soundex_std && WT_Soundex::compare(WT_Soundex::russell($surn1), WT_Soundex::russell($this->surname)) ||
+				$this->soundex_dm && WT_Soundex::compare(WT_Soundex::daitchMokotoff($surn1), WT_Soundex::daitchMokotoff($this->surname))
 			) {
 				$person_name = $name['full'];
 				break;

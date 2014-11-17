@@ -1,6 +1,4 @@
 <?php
-// Class that defines a media object
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,6 +21,9 @@
 
 use WT\Log;
 
+/**
+ * Class WT_Media - Class that defines a media object
+ */
 class WT_Media extends WT_GedcomRecord {
 	const RECORD_TYPE = 'OBJE';
 	const URL_PREFIX = 'mediaviewer.php?mid=';
@@ -46,6 +47,27 @@ class WT_Media extends WT_GedcomRecord {
 			$this->title = $match[1];
 		} else {
 			$this->title = $this->file;
+		}
+	}
+
+	/**
+	 * Get an instance of a media object.  For single records,
+	 * we just receive the XREF.  For bulk records (such as lists
+	 * and search results) we can receive the GEDCOM data as well.
+	 *
+	 * @param string       $xref
+	 * @param integer|null $gedcom_id
+	 * @param string|null  $gedcom
+	 *
+	 * @return WT_Media|null
+	 */
+	public static function getInstance($xref, $gedcom_id = WT_GED_ID, $gedcom = null) {
+		$record = parent::getInstance($xref, $gedcom_id, $gedcom);
+
+		if ($record instanceof WT_Media) {
+			return $record;
+		} else {
+			return null;
 		}
 	}
 
@@ -90,7 +112,7 @@ class WT_Media extends WT_GedcomRecord {
 		$note = $this->getFirstFact('NOTE');
 		if ($note) {
 			$text = $note->getValue();
-			if (preg_match('/@' . WT_REGEX_XREF . '@/', $text)) {
+			if (preg_match('/^@' . WT_REGEX_XREF . '@$/', $text)) {
 				$text = $note->getTarget()->getNote();
 			}
 
@@ -221,7 +243,10 @@ class WT_Media extends WT_GedcomRecord {
 		return @file_exists($this->getServerFilename($which));
 	}
 
-	// determine if the file is an external url
+	/**
+	 * Determine if the file is an external url
+	 * @return bool
+	 */
 	public function isExternal() {
 		return strpos($this->file, '://') !== false;
 	}
@@ -559,7 +584,7 @@ class WT_Media extends WT_GedcomRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function format_list_details() {
+	public function formatListDetails() {
 		require_once WT_ROOT . 'includes/functions/functions_print_facts.php';
 		ob_start();
 		print_media_links('1 OBJE @' . $this->getXref() . '@', 1);

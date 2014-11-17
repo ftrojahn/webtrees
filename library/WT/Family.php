@@ -1,6 +1,4 @@
 <?php
-// Class file for a Family
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,11 +19,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Family - Class file for a Family
+ */
 class WT_Family extends WT_GedcomRecord {
 	const RECORD_TYPE = 'FAM';
 	const URL_PREFIX = 'family.php?famid=';
 
+	/** @var WT_Individual|null The husband (or first spouse for same-sex couples) */
 	private $husb = null;
+
+	/** @var WT_Individual|null The wife (or second spouse for same-sex couples) */
 	private $wife = null;
 
 	/**
@@ -45,6 +49,27 @@ class WT_Family extends WT_GedcomRecord {
 		// Make sure husb/wife are the right way round.
 		if ($this->husb && $this->husb->getSex() == 'F' || $this->wife && $this->wife->getSex() == 'M') {
 			list($this->husb, $this->wife) = array($this->wife, $this->husb);
+		}
+	}
+
+	/**
+	 * Get an instance of a family object.  For single records,
+	 * we just receive the XREF.  For bulk records (such as lists
+	 * and search results) we can receive the GEDCOM data as well.
+	 *
+	 * @param string       $xref
+	 * @param integer|null $gedcom_id
+	 * @param string|null  $gedcom
+	 *
+	 * @return WT_Family|null
+	 */
+	public static function getInstance($xref, $gedcom_id = WT_GED_ID, $gedcom = null) {
+		$record = parent::getInstance($xref, $gedcom_id, $gedcom);
+
+		if ($record instanceof WT_Family) {
+			return $record;
+		} else {
+			return null;
 		}
 	}
 
@@ -369,7 +394,7 @@ class WT_Family extends WT_GedcomRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	function format_list_details() {
+	function formatListDetails() {
 		return
 			$this->format_first_major_fact(WT_EVENTS_MARR, 1) .
 			$this->format_first_major_fact(WT_EVENTS_DIV, 1);

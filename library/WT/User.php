@@ -86,7 +86,7 @@ class User {
 	 *
 	 * @return User|null
 	 */
-	public static function findByGenealogyRecord(WT_Tree $tree, $individual) {
+	public static function findByGenealogyRecord(WT_Tree $tree, WT_Individual $individual) {
 		$user_id = WT_DB::prepare(
 			"SELECT SQL_CACHE user_id" .
 			" FROM `##user_gedcom_setting`" .
@@ -416,6 +416,23 @@ class User {
 			WT_DB::prepare("REPLACE INTO `##user_setting` (user_id, setting_name, setting_value) VALUES (?, ?, LEFT(?, 255))")
 				->execute(array($this->user_id, $setting_name, $setting_value));
 			$this->preferences[$setting_name] = $setting_value;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete a setting for the user.
+	 *
+	 * @param string $setting_name
+	 *
+	 * @return User
+	 */
+	public function deletePreference($setting_name) {
+		if ($this->user_id && $this->getPreference($setting_name) !== null) {
+			WT_DB::prepare("DELETE FROM `##user_setting` WHERE user_id = ? AND setting_name = ?")
+				->execute(array($this->user_id, $setting_name));
+			unset($this->preferences[$setting_name]);
 		}
 
 		return $this;
