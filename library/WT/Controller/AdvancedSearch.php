@@ -37,6 +37,19 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 
 		$this->setPageTitle(WT_I18N::translate('Advanced search'));
 
+		// Retrieve the gedcoms to search in
+		if (count(WT_Tree::getAllIgnoreAccess())>1 && WT_Site::getPreference('ALLOW_CHANGE_GEDCOM')) {
+			foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
+				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
+				if (isset ($_REQUEST["$str"])) {
+					$this->sgeds[$tree->tree_id] = $tree->tree_name;
+					$_REQUEST["$str"] = 'yes';
+				}
+			}
+		} else {
+			$this->sgeds[WT_GED_ID] = WT_GEDCOM;
+		}
+
 		if (empty($_REQUEST['action'])) {
 			$this->action="advanced";
 		}
@@ -70,20 +83,6 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 				'FAMC:WIFE:NAME:SURN:SDX',
 			);
 		}
-
-		// Retrieve the gedcoms to search in
-		if (count(WT_Tree::getAllIgnoreAccess())>1 && WT_Site::getPreference('ALLOW_CHANGE_GEDCOM')) {
-			foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
-				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
-				if (isset ($_REQUEST["$str"])) {
-					$this->sgeds[$tree->tree_id] = $tree->tree_name;
-					$_REQUEST["$str"] = 'yes';
-				}
-			}
-		} else {
-			$this->sgeds[WT_GED_ID] = WT_GEDCOM;
-		}
-
 	}
 
 	/**
