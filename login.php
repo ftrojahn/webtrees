@@ -619,7 +619,7 @@ case 'verify_hash':
 	echo '</div>';
 	break;
 case 'delete':
-	if (!WT_Site::preference('USE_REGISTRATION_MODULE')) {
+	if (!WT_Site::getPreference('USE_REGISTRATION_MODULE')) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 		exit;
 	}
