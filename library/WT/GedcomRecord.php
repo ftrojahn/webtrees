@@ -451,7 +451,7 @@ class WT_GedcomRecord {
 	 *
 	 * @return boolean
 	 */
-	public function canShowName($access_level=WT_USER_ACCESS_LEVEL) {
+	public function canShowName($access_level=null) {
 		return $this->canShow($access_level);
 	}
 
@@ -580,7 +580,7 @@ class WT_GedcomRecord {
 					$this->addName(static::RECORD_TYPE, $this->getFallBackName(), null);
 				}
 			} else {
-				$this->addName(static::RECORD_TYPE, WT_I18N::translate('Private'), null);
+				$this->addName(static::RECORD_TYPE, WT_I18N::translate('...'), null);
 			}
 		}
 		return $this->_getAllNames;
