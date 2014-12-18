@@ -624,22 +624,25 @@ case 'delete':
 		exit;
 	}
 	if ((isset($username)) && (isset($password))) {
-		$user_id=get_user_id($username);
-		if (!check_user_password($user_id, $password)) {
+		$user = User::findByIdentifier($username);
+		if (!$user) {
 			$message = WT_I18N::translate('The username or password is incorrect.');
 		}
-		else if (getUserFullName($user_id)<>$user_realname) {
+		else if (!$user->checkPassword($password)) {
+			$message = WT_I18N::translate('The username or password is incorrect.');
+		}
+		else if ($user->getRealName() != $user_realname) {
 			$message = WT_I18N::translate('The real name does not match the one for this account.');
 		}
-		else if (getUserEmail($user_id)<>$user_email) {
+		else if ($user->getEmail() != $user_email) {
 			$message = WT_I18N::translate('The email address does not match the one for this account.');
 		}
 		else {
-			AddToLog('deleted user ->' . get_user_name($user_id) . '<-', 'auth');
+			Log::addAuthenticationLog('User ' . $user->getUserName() . ' deleted his accunt.');
 
 			// Generate an email in the admin’s language
-			$webmaster_user_id=get_gedcom_setting(WT_GED_ID, 'WEBMASTER_USER_ID');
-			WT_I18N::init(get_user_setting($webmaster_user_id, 'language'));
+			$webmaster = User::find($WT_TREE->getPreference('WEBMASTER_USER_ID'));
+			WT_I18N::init($webmaster->getPreference('language'));
 
 			$mail1_body =
 				WT_I18N::translate('Hello administrator…') . WT_Mail::EOL . WT_Mail::EOL .
@@ -653,26 +656,26 @@ case 'delete':
 			$mail1_subject = /* I18N: %s is a server name/URL */ WT_I18N::translate('Account deletion at %s', WT_SERVER_NAME . WT_SCRIPT_PATH . ' ' . $WT_TREE->tree_title);
 			WT_I18N::init(WT_LOCALE);
 
-			delete_user($user_id);
+			$user->delete();
 
 			// Send admin message by email and/or internal messaging
 			WT_Mail::send(
-				// From:
+				// “From:” header
 				$WT_TREE,
-				// To:
-				getUserEmail($webmaster_user_id),
-				getUserFullName($webmaster_user_id),
-				// Reply-To:
+				// “To:” header
+				$webmaster->getEmail(),
+				$webmaster->getRealName(),
+				// “Reply-To:” header
 				$WEBTREES_EMAIL,
 				$WEBTREES_EMAIL,
-				// Message
+				// Message body
 				$mail1_subject,
 				$mail1_body
 			);
-			$mail1_method = get_user_setting($webmaster_user_id, 'contact_method');
+			$mail1_method  = $webmaster->getPreference('CONTACT_METHOD');
 			if ($mail1_method!='messaging3' && $mail1_method!='mailto' && $mail1_method!='none') {
 				WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
-					->execute(array($user_email, $WT_REQUEST->getClientIp(), $webmaster_user_id, $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
+					->execute(array($user_email, $WT_REQUEST->getClientIp(), $webmaster->getUserId(), $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
 			}
 
 			$controller
