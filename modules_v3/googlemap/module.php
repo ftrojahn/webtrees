@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -24,21 +22,25 @@
 use WT\Auth;
 use WT\Log;
 
-// http://www.google.com/permissions/guidelines.html
-//
-// "... an unregistered Google Brand Feature should be followed by
-// the superscripted letters TM or SM ..."
-//
-// Hence, use "Google Maps™"
-//
-// "... Use the trademark only as an adjective"
-//
-// "... Use a generic term following the trademark, for example:
-// GOOGLE search engine, Google search"
-//
-// Hence, use "Google Maps™ mapping service" where appropriate.
-
+/**
+ * Class googlemap_WT_Module
+ *
+ * @link http://www.google.com/permissions/guidelines.html
+ *
+ * "... an unregistered Google Brand Feature should be followed by
+ * the superscripted letters TM or SM ..."
+ *
+ * Hence, use "Google Maps™"
+ *
+ * "... Use the trademark only as an adjective"
+ *
+ * "... Use a generic term following the trademark, for example:
+ * GOOGLE search engine, Google search"
+ *
+ * Hence, use "Google Maps™ mapping service" where appropriate.
+ */
 class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Module_Tab {
+	/** {@inheritdoc} */
 	public function __construct() {
 		parent::__construct();
 
@@ -73,17 +75,17 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: The name of a module.  Google Maps™ is a trademark.  Do not translate it? http://en.wikipedia.org/wiki/Google_maps */ WT_I18N::translate('Google Maps™');
 	}
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Google Maps™” module */ WT_I18N::translate('Show the location of places and events using the Google Maps™ mapping service.');
 	}
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function modAction($mod_action) {
 		switch($mod_action) {
 		case 'admin_config':
@@ -113,17 +115,17 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
-	// Implement WT_Module_Config
+	/** {@inheritdoc} */
 	public function getConfigLink() {
 		return 'module.php?mod='.$this->getName().'&amp;mod_action=admin_config';
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function defaultTabOrder() {
 		return 80;
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function getPreLoadContent() {
 		ob_start();
 		?>
@@ -137,12 +139,12 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		return ob_get_clean();
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function canLoadAjax() {
 		return true;
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function getTabContent() {
 		global $WT_IMAGES, $controller;
 
@@ -208,18 +210,21 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function hasTabContent() {
 		global $SEARCH_SPIDER;
 
 		return !$SEARCH_SPIDER && (array_key_exists('googlemap', WT_Module::getActiveModules()) || Auth::isAdmin());
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function isGrayedOut() {
 		return false;
 	}
 
+	/**
+	 * A form to edit the module configuration.
+	 */
 	private function config() {
 		require WT_ROOT.'includes/functions/functions_edit.php';
 
@@ -392,12 +397,12 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 									</tr>
 								</table>
 							</td>
-							<td>&nbsp;</td>
+							<td></td>
 						</tr>
 							<th class="gm_prefix" colspan="3"><?php echo WT_I18N::translate('Optional prefixes and suffixes'), help_link('GM_NAME_PREFIX_SUFFIX','googlemap');?></th>
 						</tr>
 						<tr id="gm_level_titles">
-							<th>&nbsp;</th>
+							<th></th>
 							<th><?php echo WT_I18N::translate('Prefixes'); ?></th>
 							<th><?php echo WT_I18N::translate('Suffixes'); ?></th>
 						<?php for ($level=1; $level < 10; $level++) { ?>
@@ -469,6 +474,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		return 'https://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language=' . WT_LOCALE;
 	}
 
+	/**
+	 * ...
+	 */
 	private function flags() {
 		require WT_ROOT . 'includes/functions/functions_edit.php';
 
@@ -675,6 +683,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		<?php
 	}
 
+	/**
+	 * ...
+	 */
 	private function pedigreeMap() {
 		global $controller, $MAX_PEDIGREE_GENERATIONS;
 
@@ -837,7 +848,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			echo '</td></tr>';
 			echo '</table>';
 		}
-		echo '</td><td width="15px">&nbsp;</td>';
+		echo '</td><td width="15px"></td>';
 		echo '<td width="310px" valign="top">';
 		echo '<div id="side_bar" style="width:300px; font-size:0.9em; overflow:auto; overflow-x:hidden; overflow-y:auto; height:', $this->getSetting('GM_YSIZE'), 'px;"></div></td>';
 		echo '</tr>';
@@ -1475,6 +1486,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		return $js;
 	}
 
+	/**
+	 * ...
+	 */
 	private function adminPlaceCheck() {
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
 
@@ -1740,7 +1754,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							echo $lati[$z];
 							echo $long[$z];
 						} else {
-							echo '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
+							echo '<td></td><td></td><td></td>';
 						}
 						$z++;
 					}
@@ -2282,10 +2296,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			}
 
 			function loadMap() {
-				<?php
-					global $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $SHOW_HIGHLIGHT_IMAGES;
-				?>
-
 				// Create the map and mapOptions
 				var mapOptions = {
 					zoom: 7,
@@ -2744,6 +2754,15 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '<br><br>', WT_I18N::translate('Individuals'), ': ', $place_count_indi, ', ', WT_I18N::translate('Families'), ': ', $place_count_fam;
 	}
 
+	/**
+	 * @param string[] $place2
+	 * @param integer  $level
+	 * @param string[] $parent
+	 * @param integer  $levelm
+	 * @param string   $linklevels
+	 * @param string   $placelevels
+	 * @param boolean  $lastlevel
+	 */
 	private function printGoogleMapMarkers($place2, $level, $parent, $levelm, $linklevels, $placelevels, $lastlevel=false) {
 		if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == '0') && ($place2['long'] == '0'))) {
 			echo 'var icon_type = new google.maps.MarkerImage();';
@@ -3138,19 +3157,28 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 	 *
 	 * @return array[]
 	 */
-	private function getPlaceListLocation($parent_id, $inactive=false) {
+	private function getPlaceListLocation($parent_id, $inactive = false) {
 		if ($inactive) {
-			$rows=
-				WT_DB::prepare("SELECT pl_id, pl_place, pl_lati, pl_long, pl_zoom, pl_icon FROM `##placelocation` WHERE pl_parent_id=? ORDER BY pl_place COLLATE ".WT_I18N::$collation)
-				->execute(array($parent_id))
-				->fetchAll();
+			$rows = WT_DB::prepare(
+					"SELECT pl_id, pl_place, pl_lati, pl_long, pl_zoom, pl_icon" .
+					" FROM `##placelocation`" .
+					" WHERE pl_parent_id = :parent_id" .
+					" ORDER BY pl_place COLLATE :collation"
+				)->execute(array(
+					'parent_id' => $parent_id,
+					'collation' => WT_I18N::$collation,
+				))->fetchAll();
 		} else {
 			$rows = WT_DB::prepare(
 				"SELECT DISTINCT pl_id, pl_place, pl_lati, pl_long, pl_zoom, pl_icon".
 				" FROM `##placelocation`".
 				" INNER JOIN `##places` ON `##placelocation`.pl_place=`##places`.p_place".
-				" WHERE pl_parent_id=? ORDER BY pl_place COLLATE " . WT_I18N::$collation
-			)->execute(array($parent_id))->fetchAll();
+				" WHERE pl_parent_id = :parent_id" .
+				" ORDER BY pl_place COLLATE :collation"
+			)->execute(array(
+				'parent_id' => $parent_id,
+				'collation' => WT_I18N::$collation,
+			))->fetchAll();
 		}
 
 		$placelist = array();
@@ -3218,6 +3246,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
+	/**
+	 * ...
+	 */
 	private function placesEdit() {
 		require WT_ROOT.'includes/functions/functions_edit.php';
 
@@ -4025,6 +4056,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		<?php
 	}
 
+	/**
+	 * ...
+	 */
 	private function adminPlaces() {
 		require WT_ROOT.'includes/functions/functions_edit.php';
 
@@ -4253,9 +4287,10 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			exit;
 		}
 
-		if ($action=='ImportFile2') {
-			$country_names=array();
-			foreach (WT_Stats::iso3166() as $key=>$value) {
+		if ($action === 'ImportFile2') {
+			$country_names = array();
+			$stats = new WT_Stats(WT_GEDCOM);
+			foreach ($stats->iso3166() as $key=>$value) {
 				$country_names[$key]=WT_I18N::translate($key);
 			}
 			if (isset($_POST['cleardatabase'])) {
@@ -4267,7 +4302,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$lines = file(WT_MODULES_DIR.'googlemap/extra'.$_REQUEST['localfile']);
 			}
 			// Strip BYTE-ORDER-MARK, if present
-			if (!empty($lines[0]) && substr($lines[0], 0, 3)==WT_UTF8_BOM) $lines[0]=substr($lines[0], 3);
+			if (!empty($lines[0]) && substr($lines[0], 0, 3) === WT_UTF8_BOM) {
+				$lines[0] = substr($lines[0], 3);
+			}
 			asort($lines);
 			$highestIndex = $this->getHighestIndex();
 			$placelist = array();
@@ -4581,6 +4618,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		<?php
 	}
 
+	/**
+	 * ...
+	 */
 	private function wtStreetView() {
 	header('Content-type: text/html; charset=UTF-8');
 
@@ -4678,7 +4718,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 			var imageNum = Math.round(bearing/22.5) % 16;
 
-			var image = new google.maps.MarkerImage('<?php echo WT_SCRIPT_PATH . WT_MODULES_DIR; ?>/googlemap/images/panda-icons/panda-' + imageNum + '.png',
+			var image = new google.maps.MarkerImage('<?php echo WT_SCRIPT_PATH . WT_MODULES_DIR; ?>googlemap/images/panda-icons/panda-' + imageNum + '.png',
 				// This marker is 50 pixels wide by 50 pixels tall.
 				new google.maps.Size(50, 50),
 				// The origin for this image is 0,0.
@@ -4814,7 +4854,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			var street = new google.maps.ImageMapType({
 				getTileUrl: function(coord, zoom) {
 					var X = coord.x % (1 << zoom);  // wrap
-					return 'http://cbk0.google.com/cbk?output=overlay&zoom=' + zoom + '&x=' + X + '&y=' + coord.y + '&cb_client=api';
+					return 'https://cbk0.google.com/cbk?output=overlay&zoom=' + zoom + '&x=' + X + '&y=' + coord.y + '&cb_client=api';
 				},
 				tileSize: new google.maps.Size(256, 256),
 				isPng: true

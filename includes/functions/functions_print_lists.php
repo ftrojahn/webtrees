@@ -253,7 +253,7 @@ function format_indi_table($datalist, $option = '') {
 		if ($option == 'sosa') {
 			$html .= '<td><a href="relationship.php?pid1=' . $datalist[1] . '&amp;pid2=' . $person->getXref() . '" title="' . WT_I18N::translate('Relationships') . '">' . WT_I18N::number($key) . '</a></td><td>' . $key . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td><td>0</td>';
+			$html .= '<td></td><td>0</td>';
 		}
 		//-- Birth date
 		$html .= '<td>';
@@ -341,13 +341,13 @@ function format_indi_table($datalist, $option = '') {
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $person->lastChangeTimestamp() . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Last change hidden sort column
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $person->lastChangeTimestamp(true) . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Sorting by gender
 		$html .= '<td>';
@@ -364,9 +364,9 @@ function format_indi_table($datalist, $option = '') {
 		//-- Filtering by death date
 		$html .= '<td>';
 		// Died in last 100 years?  Died?  Not dead?
-		if (WT_Date::Compare($death_date, $d100y) > 0) {
+		if (WT_Date::Compare($death_dates[0], $d100y) > 0) {
 			$html .= 'Y100';
-		} elseif ($death_date->minJD() || $person->isDead()) {
+		} elseif ($death_dates[0]->minJD() || $person->isDead()) {
 			$html .= 'YES';
 		} else {
 			$html .= 'N';
@@ -683,13 +683,13 @@ function format_fam_table($datalist) {
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $family->LastChangeTimestamp() . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Last change hidden sort column
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $family->LastChangeTimestamp(true) . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Sorting by marriage date
 		$html .= '<td>';
@@ -834,7 +834,7 @@ function format_sour_table($datalist) {
 	$html .= '<th>#NOTE</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>CHAN</th>';
-	$html .= '<th>&nbsp;</th>';//delete
+	$html .= '<th></th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
 	$html .= '<tbody>';
@@ -890,19 +890,19 @@ function format_sour_table($datalist) {
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $source->LastChangeTimestamp() . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Last change hidden sort column
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $source->LastChangeTimestamp(true) . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
 			$html .= '<td><div title="' . WT_I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_source(\'' . WT_I18N::translate('Are you sure you want to delete “%s”?', WT_Filter::escapeJs(WT_Filter::unescapeHtml($source->getFullName()))) . "', '" . $source->getXref() . '\');"><span class="link_text">' . WT_I18N::translate('Delete') . '</span></div></td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		$html .= '</tr>';
 	}
@@ -970,7 +970,7 @@ function format_note_table($datalist) {
 	$html .= '<th>#SOUR</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>CHAN</th>';
-	$html .= '<th>&nbsp;</th>';//delete
+	$html .= '<th></th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
 	$html .= '<tbody>';
@@ -1010,7 +1010,7 @@ function format_note_table($datalist) {
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $note->LastChangeTimestamp(true) . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
@@ -1073,7 +1073,7 @@ function format_repo_table($repositories) {
 	$html .= '<th>#SOUR</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>';
 	$html .= '<th' . ($SHOW_LAST_CHANGE ? '' : '') . '>CHAN</th>';
-	$html .= '<th>&nbsp;</th>';//delete
+	$html .= '<th></th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
 	$html .= '<tbody>';
@@ -1110,19 +1110,19 @@ function format_repo_table($repositories) {
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $repository->LastChangeTimestamp() . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Last change hidden sort column
 		if ($SHOW_LAST_CHANGE) {
 			$html .= '<td>' . $repository->LastChangeTimestamp(true) . '</td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
 			$html .= '<td><div title="' . WT_I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_repository(\'' . WT_I18N::translate('Are you sure you want to delete “%s”?', WT_Filter::escapeJs(WT_Filter::unescapeHtml($repository->getFullName()))) . "', '" . $repository->getXref() . '\');"><span class="link_text">' . WT_I18N::translate('Delete') . '</span></div></td>';
 		} else {
-			$html .= '<td>&nbsp;</td>';
+			$html .= '<td></td>';
 		}
 		$html .= '</tr>';
 	}
@@ -1227,13 +1227,13 @@ function format_media_table($media_objects) {
 			if ($SHOW_LAST_CHANGE) {
 				$html .= '<td>' . $media_object->LastChangeTimestamp() . '</td>';
 			} else {
-				$html .= '<td>&nbsp;</td>';
+				$html .= '<td></td>';
 			}
 			//-- Last change hidden sort column
 			if ($SHOW_LAST_CHANGE) {
 				$html .= '<td>' . $media_object->LastChangeTimestamp(true) . '</td>';
 			} else {
-				$html .= '<td>&nbsp;</td>';
+				$html .= '<td></td>';
 			}
 			$html .= '</tr>';
 		}
@@ -1283,9 +1283,9 @@ function format_surname_table($surnames, $script) {
 	$html .= '<table class="surname-list">' .
 		'<thead><tr>' .
 		'<th>' . WT_Gedcom_Tag::getLabel('SURN') . '</th>' .
-		'<th>&nbsp;</th>' .
+		'<th></th>' .
 		'<th>' . $col_heading . '</th>' .
-		'<th>&nbsp;</th>' .
+		'<th></th>' .
 		'</tr></thead>';
 
 	$html .= '<tbody>';
@@ -1566,7 +1566,7 @@ function print_changes_table($change_ids, $sort) {
 	//-- table header
 	$html .= '<table id="' . $table_id . '" class="width100">';
 	$html .= '<thead><tr>';
-	$html .= '<th>&nbsp;</th>';
+	$html .= '<th></th>';
 	$html .= '<th>' . WT_I18N::translate('Record') . '</th>';
 	$html .= '<th>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>';
 	$html .= '<th>' . WT_Gedcom_Tag::getLabel('_WT_USER') . '</th>';

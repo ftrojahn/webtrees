@@ -127,16 +127,26 @@ class User {
 	 */
 	public static function create($user_name, $real_name, $email, $password) {
 		WT_DB::prepare(
-			"INSERT INTO `##user` (user_name, real_name, email, password) VALUES (?, ?, ?, ?)"
-		)->execute(array($user_name, $real_name, $email, password_hash($password, PASSWORD_DEFAULT)));
+			"INSERT INTO `##user` (user_name, real_name, email, password) VALUES (:user_name, :real_name, :email, :password)"
+		)->execute(array(
+			'user_name' => $user_name,
+			'real_name' => $real_name,
+			'email'     => $email,
+			'password'  => password_hash($password, PASSWORD_DEFAULT),
+		));
 
+		// Set default blocks for this user
+		$user = User::findByIdentifier($user_name);
+		WT_DB::prepare(
+			"INSERT INTO `##block` (`user_id`, `location`, `block_order`, `module_name`)" .
+			" SELECT :user_id , `location`, `block_order`, `module_name` FROM `##block` WHERE `user_id` = -1"
+		)->execute(array('user_id' => $user->getUserId()));
 		// Set user role to "Members" for all gedcoms
 		WT_DB::prepare(
-			"INSERT INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".
-			" SELECT ?, gedcom_id, 'canedit', 'access' FROM `##gedcom` WHERE gedcom_id>0"
-		)->execute(array(User::findByIdentifier($user_name)->user_id));
-
-		return User::findByIdentifier($user_name);
+			"INSERT INTO `##user_gedcom_setting` (`user_id`, `gedcom_id`, `setting_name`, `setting_value`)".
+			" SELECT :user_id , `gedcom_id`, 'canedit', 'access' FROM `##gedcom` WHERE `gedcom_id` > 0"
+		)->execute(array('user_id' => $user->getUserId()));
+		return $user;
 	}
 
 	/**

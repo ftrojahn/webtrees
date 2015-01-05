@@ -25,9 +25,9 @@ use Rhumsaa\Uuid\Uuid;
  * Class WT_Controller_Descendancy - Controller for the descendancy chart
  */
 class WT_Controller_Descendancy extends WT_Controller_Chart {
-	var $descPerson = null;
+	var $descPerson;
 
-	var $diffindi = null;
+	var $diffindi;
 	var $NAME_LINENUM = 1;
 	var $canedit = false;
 	var $name_count = 0;
@@ -143,7 +143,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		echo '</td>';
 
 		// check if child has parents and add an arrow
-		echo '<td>&nbsp;</td>';
+		echo '<td></td>';
 		echo '<td>';
 		foreach ($person->getChildFamilies() as $cfamily) {
 			foreach ($cfamily->getSpouses() as $parent) {
@@ -213,7 +213,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		echo '</td>';
 
 		// check if spouse has parents and add an arrow
-		echo '<td>&nbsp;</td>';
+		echo '<td></td>';
 		echo '<td>';
 		if ($spouse) {
 			foreach ($spouse->getChildFamilies() as $cfamily) {

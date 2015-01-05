@@ -163,9 +163,9 @@ class WT_Stats {
 	/**
 	 * Embed tags in text
 	 *
-	 * @param $text
+	 * @param string $text
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function embedTags($text) {
 		if (strpos($text, '#') !== false) {
@@ -1648,11 +1648,11 @@ class WT_Stats {
 	}
 
 	/**
-	 * @param boolean $simple
-	 * @param boolean $sex
-	 * @param integer $year1
-	 * @param integer $year2
-	 * @param array   $params
+	 * @param boolean  $simple
+	 * @param boolean  $sex
+	 * @param integer  $year1
+	 * @param integer  $year2
+	 * @param string[] $params
 	 *
 	 * @return array|string
 	 */
@@ -1736,11 +1736,11 @@ class WT_Stats {
 	}
 
 	/**
-	 * @param boolean $simple
-	 * @param boolean $sex
-	 * @param integer $year1
-	 * @param integer $year2
-	 * @param array   $params
+	 * @param boolean  $simple
+	 * @param boolean  $sex
+	 * @param integer  $year1
+	 * @param integer  $year2
+	 * @param string[] $params
 	 *
 	 * @return array|string
 	 */
@@ -4357,11 +4357,11 @@ class WT_Stats {
 	}
 
 	/**
-	 * @param boolean $simple
-	 * @param string  $sex
-	 * @param integer $year1
-	 * @param integer $year2
-	 * @param array   $params
+	 * @param boolean  $simple
+	 * @param string   $sex
+	 * @param integer  $year1
+	 * @param integer  $year2
+	 * @param string[] $params
 	 *
 	 * @return string|string[][]
 	 */
@@ -4525,10 +4525,9 @@ class WT_Stats {
 	}
 
 	/**
-	 * @param array $params
+	 * @param string[] $params
 	 *
-	 * @return array|mixed|string
-	 * @throws Exception
+	 * @return string
 	 */
 	public function noChildrenFamiliesList($params = array()) {
 		global $TEXT_DIRECTION;
@@ -4920,7 +4919,6 @@ class WT_Stats {
 			}
 			$per = round(100 * $count_per / $tot_indi, 0);
 			$chd .= $this->arrayToExtendedEncoding(array($per));
-			//ToDo: RTL names are often printed LTR when also LTR names are present
 			$chl[] = $top_name . ' - ' . WT_I18N::number($count_per);
 
 		}
@@ -5294,7 +5292,6 @@ class WT_Stats {
 				$per = round(100 * $count / $tot_indi, 0);
 			}
 			$chd .= $this->arrayToExtendedEncoding(array($per));
-			//ToDo: RTL names are often printed LTR when also LTR names are present
 			$chl[] = $givn . ' - ' . WT_I18N::number($count);
 		}
 		$per = round(100 * ($tot_indi - $tot) / $tot_indi, 0);

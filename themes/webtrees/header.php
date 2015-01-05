@@ -42,22 +42,21 @@ $this
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php echo header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL); ?>
 	<title><?php echo WT_Filter::escapeHtml($title); ?></title>
 	<link rel="icon" href="<?php echo WT_CSS_URL; ?>favicon.png" type="image/png">
-	<link rel="stylesheet" type="text/css" href="<?php echo WT_THEME_URL; ?>jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_THEME_URL; ?>jquery-ui-1.11.2/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>style.css">
-	<!--[if IE]>
-	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>msie.css">
+	<!--[if IE 8]>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 	<![endif]-->
 </head>
-<body id="body">
-	<?php if ($view!='simple') { ?>
-	<div id="header">
-		<div class="header_img">
-			<img src="<?php echo WT_CSS_URL; ?>images/webtrees.png" width="242" height="50" alt="<?php echo WT_WEBTREES; ?>">
-		</div>
-		<ul id="extra-menu" class="makeMenu">
+<body>
+	<?php if ($view !== 'simple') { ?>
+	<header>
+		<div class="header-logo"></div>
+		<ul class="secondary-menu" role="menubar">
 			<li>
 				<?php
 				if (Auth::check()) {
@@ -70,21 +69,17 @@ $this
 			<?php echo WT_MenuBar::getFavoritesMenu(); ?>
 			<?php echo WT_MenuBar::getThemeMenu(); ?>
 			<?php echo WT_MenuBar::getLanguageMenu(); ?>
-		</ul>
-		<div class="title" dir="auto">
-			<?php echo  WT_TREE_TITLE; ?>
-		</div>
-		<div class="header_search">
-			<form action="search.php" method="post">
-				<input type="hidden" name="action" value="general">
-				<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
-				<input type="hidden" name="topsearch" value="yes">
-				<input type="search" name="query" size="25" placeholder="<?php echo WT_I18N::translate('Search'); ?>">
-				<input type="image" class="image" src="<?php echo $WT_IMAGES['search']; ?>" alt="<?php echo WT_I18N::translate('Search'); ?>" title="<?php echo WT_I18N::translate('Search'); ?>">
-			</form>
-		</div>
-		<div id="topMenu">
-			<ul id="main-menu">
+			</ul>
+		<h1><?php echo WT_TREE_TITLE; ?></h1>
+		<form class="header-search" action="search.php" method="post" role="search">
+			<input type="hidden" name="action" value="general">
+			<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
+			<input type="hidden" name="topsearch" value="yes">
+			<input type="search" name="query" size="25" placeholder="<?php echo WT_I18N::translate('Search'); ?>">
+			<input type="image" class="image" src="<?php echo $WT_IMAGES['search']; ?>" alt="<?php echo WT_I18N::translate('Search'); ?>" title="<?php echo WT_I18N::translate('Search'); ?>">
+		</form>
+		<nav>
+			<ul class="primary-menu" role="menubar">
 				<?php echo WT_MenuBar::getGedcomMenu();   ?>
 				<?php echo WT_MenuBar::getMyPageMenu();   ?>
 				<?php echo WT_MenuBar::getChartsMenu();   ?>
@@ -94,9 +89,8 @@ $this
 				<?php echo WT_MenuBar::getSearchMenu();   ?>
 				<?php echo implode('', WT_MenuBar::getModuleMenus()); ?>
 			</ul>
-		</div>
-	</div>
+		</nav>
+	</header>
 	<?php } ?>
-	<?php echo $javascript; ?>
 	<?php echo WT_FlashMessages::getHtmlMessages(); ?>
-	<div id="content">
+	<main id="content">

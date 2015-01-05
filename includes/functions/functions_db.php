@@ -858,14 +858,28 @@ function get_top_surnames($ged_id, $min, $max) {
 	$max=(int)$max;
 	if ($max==0) {
 		return
-			WT_DB::prepare("SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name` WHERE n_file=? AND n_type!=? AND n_surn NOT IN (?, ?, ?, ?) GROUP BY n_surn HAVING COUNT(n_surn)>=? ORDER BY 2 DESC")
-			->execute(array($ged_id, '_MARNM', '@N.N.', '', '?', 'UNKNOWN', $min))
-			->fetchAssoc();
+			WT_DB::prepare(
+				"SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name`" .
+				" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '', '?', 'UNKNOWN')" .
+				" GROUP BY n_surn HAVING COUNT(n_surn) >= :min" .
+				" ORDER BY 2 DESC"
+			)->execute(array(
+				'tree_id' => $ged_id,
+				'min'     => $min,
+			))->fetchAssoc();
 	} else {
 		return
-			WT_DB::prepare("SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name` WHERE n_file=? AND n_type!=? AND n_surn NOT IN (?, ?, ?, ?) GROUP BY n_surn HAVING COUNT(n_surn)>=? ORDER BY 2 DESC LIMIT ".$max)
-			->execute(array($ged_id, '_MARNM', '@N.N.', '', '?', 'UNKNOWN', $min))
-			->fetchAssoc();
+			WT_DB::prepare(
+				"SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name`" .
+				" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '', '?', 'UNKNOWN')" .
+				" GROUP BY n_surn HAVING COUNT(n_surn) >= :min" .
+				" ORDER BY 2 DESC" .
+				" LIMIT :limit"
+			)->execute(array(
+				'tree_id' => $ged_id,
+				'min'     => $min,
+				'limit'   => $max,
+			))->fetchAssoc();
 	}
 }
 
@@ -1006,8 +1020,8 @@ function get_anniversary_events($jd, $facts='', $ged_id=WT_GED_ID) {
 				}
 				$anniv_date = new WT_Date($row->d_type . ' ' . $row->d_day . ' ' . $row->d_month . ' ' . $row->d_year);
 				foreach ($record->getFacts(str_replace(' ', '|', $facts)) as $fact) {
-					if ($fact->getDate() == $anniv_date && $fact->getTag()==$row->d_fact) {
-						$fact->anniv = $row->d_year == 0 ? 0 : $anniv->y - $row->d_year;
+					if (($fact->getDate()->MinDate() == $anniv_date->MinDate() || $fact->getDate()->MaxDate() == $anniv_date->MinDate()) && $fact->getTag() === $row->d_fact) {
+						$fact->anniv = $row->d_year === 0 ? 0 : $anniv->y - $row->d_year;
 						$found_facts[] = $fact;
 					}
 				}

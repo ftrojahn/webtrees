@@ -140,7 +140,6 @@ echo '</script>';
 <div id="search-page">
 <h2 class="center"><?php echo $controller->getPageTitle(); ?></h2>
 <div id="search-notice"><?php echo WT_I18N::translate('The search result is displayed at the end of the page.') ?><br><br></div>
-<!-- /*************************************************** Search Form Outer Table **************************************************/ -->
 <form method="post" name="searchform" onsubmit="return checknames(this);" action="search_advanced.php">
 <input type="hidden" name="action" value="<?php echo $controller->action; ?>">
 <input type="hidden" name="isPostBack" value="true">
@@ -250,7 +249,7 @@ echo '</script>';
 					</tr>
 					<!--  mother -->
 					<?php $j++; ?>
-					<tr><td colspan="2">&nbsp;</td></tr>
+					<tr><td colspan="2"></td></tr>
 					<tr>
 						<td colspan="2" class="facts_label03" style="text-align:center;">
 							<?php echo WT_I18N::translate('Mother'); ?>

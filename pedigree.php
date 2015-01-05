@@ -245,15 +245,15 @@ if ($talloffset < 2) {
 } else {
 	$canvaswidth = pow(2, $PEDIGREE_GENERATIONS - 1) * ($controller->pbwidth + 20);
 }
-echo '<canvas id="pedigree_canvas" width="' . (int)($canvaswidth) . '" height="' . (int)($maxyoffset) . '"><p>No lines between boxes? Unfortunately your browser does not support he HTML5 canvas feature.</p></canvas>';
+echo '<canvas id="pedigree_canvas" width="' . (int)($canvaswidth) . '" height="' . (int)($maxyoffset) . '"><p>No lines between boxes? Unfortunately your browser does not support the HTML5 canvas feature.</p></canvas>';
 echo '</div>'; //close #pedigree_chart
 echo '</div>'; //close #pedigree-page
 
-// Expand <div id="content"> to include the absolutely-positioned elements.
+// Expand <div id="pedigree-page"> to include the absolutely-positioned elements.
 $controller->addInlineJavascript('
 	var WT_PEDIGREE_CHART = (function() {
 	jQuery("html").css("overflow","visible"); // workaround for chrome v37 canvas bugs
-	jQuery("#content").css("height", "' . ($maxyoffset + 30) . '");
+	jQuery("#pedigree-page").css("height", "' . ($maxyoffset + 30) . '");
 
 	// Draw joining lines in <canvas>
 	// Set variables
