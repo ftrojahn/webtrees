@@ -666,9 +666,9 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 				}
 				if ($datalist) {
 					$somethingPrinted = true;
-					usort($datalist, array('WT_GedcomRecord', 'compare'));
 					$GEDCOM=$gedcom;
 					load_gedcom_settings($ged_id);
+					usort($datalist, array('WT_GedcomRecord', 'compare'));
 					echo '<h3 class="indi-acc-header" style="text-align:center;"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
 						<div class="indi-acc_content">',
 						format_indi_table($datalist);

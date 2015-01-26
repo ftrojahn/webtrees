@@ -612,9 +612,9 @@ class WT_Controller_Search extends WT_Controller_Page {
 						}
 					}
 					if ($datalist) {
-						usort($datalist, array('WT_GedcomRecord', 'compare'));
 						$GEDCOM = $search_tree->tree_name;
 						load_gedcom_settings($search_tree->tree_id);
+						usort($datalist, array('WT_GedcomRecord', 'compare'));
 						echo '<h3 class="indi-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $search_tree->tree_title_html, '</span></a></h3>
 							<div class="indi-acc_content">',
 						format_indi_table($datalist);
