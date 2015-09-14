@@ -325,8 +325,8 @@ class WT_Tree {
 
 		// Update the list of trees - to include this new one
 		self::$trees = null;
-		$tree        = self::get($tree_id);
 		self::$trees_ignore_access=null;
+		$tree        = self::get($tree_id);
 
 		// Module privacy
 		WT_Module::setDefaultAccess($tree_id);
