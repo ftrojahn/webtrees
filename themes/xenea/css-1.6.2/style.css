@@ -175,12 +175,27 @@ textarea {
 	padding: 0 10px 1px 5px;
 }
 
- #menu-tree:hover > ul > li:hover > ul {
+#menu-tree ul {
 	max-height:400px;
 	padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 	overflow-y:auto;
 	overflow-x:hidden;
 }
+
+.primary-menu #menu-tree li:hover > ul {
+	display: none; /* overrite default behavior; hide the original submenus */
+}
+
+.primary-menu #menu-tree > ul { /* position even when not hover */
+	display: none;
+	position: absolute;
+	margin-top: 0;
+	left: 0;
+	right: auto;
+	top: 42px;
+}
+
+.hoverMenu {position:absolute;}
 
 fieldset {
 	margin: 8px 8px 4px;

@@ -229,7 +229,7 @@ class WT_Menu {
 	 *
 	 * @return string
 	 */
-	function getMenuAsList() {
+	function getMenuAsList($level = 0) {
 		if ($this->iconclass) {
 			$class = ' class="' . $this->iconclass . '"';
 		} else {
@@ -254,12 +254,12 @@ class WT_Menu {
 		if ($this->submenus) {
 			$html .= '<ul>';
 			foreach ($this->submenus as $submenu) {
-				$html .= $submenu->getMenuAsList();
+				$html .= $submenu->getMenuAsList($level+1);
 			}
 			$html .= '</ul>';
 		}
 
-		return '<li' . $id . '>' . $html . '</li>';
+		return '<li' . $id . ' class="level'.$level.'">' . $html . '</li>';
 	}
 
 	/**

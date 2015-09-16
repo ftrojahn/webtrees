@@ -24,6 +24,50 @@ use WT\Auth;
 /**
  * Class WT_MenuBar - System for generating menus.
  */
+function addtoGroup(&$group, $str, $tree) {
+	if (strpos($str, ':') !== false) {
+		$groupname = trim(substr($str, 0, strpos($str, ':')));
+		$str = trim(substr($str, strpos($str, ':') + 1));
+		addtoGroup($group[$groupname], $str, $tree);
+	}
+	else {
+		$group[] = $tree;
+	}
+}
+
+function createMenu($groups, &$menu, &$groupindex, $level) {
+	$hassubmenu = false;
+	foreach ($groups as $groupname=>$group) {
+		if (gettype($group)=='array') {
+			$submenu = new WT_Menu(
+				$groupname,
+				'#',
+				'menu-tree-group'.$groupindex // Cannot use name - it must be a CSS identifier
+			);
+			$groupindex++;
+			$menu->addSubmenu($submenu);
+			$hassubmenu = true;
+			createMenu($group, $submenu, $groupindex, $level+1);
+		}
+	}
+	foreach ($groups as $groupname=>$group) {
+		if (gettype($group)!='array') {
+			if (strpos($group->tree_title_html, ':') !== false) {
+				$tree_title = trim(substr($group->tree_title_html, strrpos($group->tree_title_html, ':') + 1));
+			}
+			else {
+				$tree_title = $group->tree_title_html;
+			}
+			$submenu = new WT_Menu(
+				$tree_title,
+				'index.php?ctype=gedcom&amp;ged='.$group->tree_name_url,
+				'menu-tree-'.$group->tree_id // Cannot use name - it must be a CSS identifier
+			);
+			$menu->addSubmenu($submenu);
+		}
+	}
+}
+
 class WT_MenuBar {
 	/**
 	 * @return WT_Menu
@@ -36,20 +80,13 @@ class WT_MenuBar {
 		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
 			if (!in_array($tree->tree_name,$search_excluded_trees)){
 				if (strpos($tree->tree_title, ':') !== false){
-					$group = substr($tree->tree_title, 0, strpos($tree->tree_title, ':'));
-					$groups[$group][] = $tree;
+					addtoGroup($groups, $tree->tree_title, $tree);
 				}
 				else{
 					$groups[WT_I18N::translate('Miscellaneous')][] = $tree;
 				}
 			}
 		}
-		//Sort Groups
-		$groups_sort = array();
-		foreach ($groups as $groupname => $group) {
-			$groups_sort[] = $groupname;
-		}
-		sort($groups_sort, SORT_STRING);
 		//Print Special Groups
 		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
 			if (in_array($tree->tree_name,$search_excluded_trees)){
@@ -61,31 +98,8 @@ class WT_MenuBar {
 				$menu->addSubmenu($submenu);
 			}
 		}
-		//Print Groups
 		$groupindex = 1;
-		foreach ($groups_sort as $groupname) {
-			$submenu = new WT_Menu(
-				$groupname,
-				'#',
-				'menu-tree-group'.$groupindex // Cannot use name - it must be a CSS identifier
-			);
-			$menu->addSubmenu($submenu);
-			foreach ($groups[$groupname] as $tree) {
-				if (strpos($tree->tree_title_html, ':') !== false) {
-					$new_tree_title = trim(substr($tree->tree_title_html, strpos($tree->tree_title_html, ':') + 1));
-				}
-				else {
-					$new_tree_title = $tree->tree_title_html;
-				}
-				$subsubmenu = new WT_Menu(
-					$new_tree_title,
-					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
-					'menu-tree-'.$tree->tree_id // Cannot use name - it must be a CSS identifier
-				);
-				$submenu->addSubmenu($subsubmenu);
-			}
-			$groupindex++;
-		}
+		createMenu($groups, $menu, $groupindex, 0);
 		return $menu;
 	}
 

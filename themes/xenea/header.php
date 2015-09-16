@@ -90,6 +90,111 @@ $this
 				<?php echo WT_MenuBar::getLanguageMenu(); ?>
 			</ul>
 		</div>
+		<script src="js/jquery-1.11.2.js"></script>
+		<script language="javascript" type="text/javascript">
+		<!--
+			/*
+			jQuery(document).ready(function() {
+				var level = 1;
+				while (jQuery("#menu-tree li.level"+level).length) {
+					if (level == 1) {	jQuery('#menu-tree').append('<div id="hoverMenu'+level+'"></div>'); }
+					else { jQuery('#hoverMenu'+(level-1)).append('<div id="hoverMenu'+level+'"></div>'); }
+					jQuery('#hoverMenu'+level).hide().addClass('hoverMenu');
+					jQuery("#menu-tree li.level"+level).bind('mouseenter', function() {
+						var level = 0;
+						while (!jQuery(this).hasClass('level'+level)) { level++; }
+						jQuery('#hoverMenu'+level+' ul').remove();
+						if (jQuery(this).children('ul').length) {
+							var subPos = jQuery(this).position();
+							var Pos = jQuery(this).parent().position();
+							var subMouseX = Pos.left + subPos.left + jQuery(this).parent().outerWidth();
+							var subMouseY = Pos.top + subPos.top;
+							var subMenu = jQuery(this).children('ul:first')
+							subMenu.clone(true, true).show().appendTo('#hoverMenu'+level);
+							jQuery('#hoverMenu'+level).css({'top':subMouseY,'left':subMouseX});
+							jQuery('#hoverMenu'+level).show();
+						}
+					})
+					jQuery('#hoverMenu'+level).mouseleave(function(){
+						jQuery(this).find('ul').remove();
+					})
+					level++;
+				}
+
+				jQuery('#menu-tree').mouseleave(function() {
+					jQuery('#hoverMenu1 ul').remove();
+					jQuery('#hoverMenu1').hide();
+				})
+			})
+			*/
+			var DELAY_SUB = 400;
+			var DELAY = 800;
+			var timeoutID;
+			var timeoutType;
+			var jQueryObj;
+
+			function SubMenuEnter() {
+				var level = 1;
+				while (!jQueryObj.hasClass('level'+level)) { level++; }
+				jQuery('#hoverMenu'+level+' ul').remove();
+				if (jQueryObj.children('ul').length) {
+					var subPos = jQueryObj.position();
+					var Pos = jQueryObj.parent().position();
+					var subMouseX = Pos.left + subPos.left + jQueryObj.parent().outerWidth();
+					var subMouseY = Pos.top + subPos.top;
+					var subMenu = jQueryObj.children('ul:first')
+					subMenu.clone(true, true).show().appendTo('#hoverMenu'+level);
+					jQuery('#hoverMenu'+level).css({'top':subMouseY,'left':subMouseX});
+					jQuery('#hoverMenu'+level).show();
+				}
+			}
+			function SubMenuLeave() {
+				jQueryObj.find('ul').remove();
+			}
+			function MenuLeave() {
+				jQuery('#menu-tree').children('ul').hide();
+				jQuery('#hoverMenu1 ul').remove();
+			}
+
+			jQuery(document).ready(function() {
+				var level = 1;
+				while (jQuery("#menu-tree li.level"+level).length) {
+					if (level == 1) {	jQuery('#menu-tree').append('<div id="hoverMenu'+level+'"></div>'); }
+					else { jQuery('#hoverMenu'+(level-1)).append('<div id="hoverMenu'+level+'"></div>'); }
+					jQuery('#hoverMenu'+level).hide().addClass('hoverMenu');
+					jQuery("#menu-tree li.level"+level).bind('mouseenter', function() {
+						window.clearTimeout(timeoutID); //cancel not yet executed hide or show commmand
+						jQueryObj = jQuery(this);
+						timeoutID = window.setTimeout(SubMenuEnter, DELAY_SUB); //show submenu after delay
+						timeoutType = 'enter';
+					})
+					jQuery('#hoverMenu'+level).bind('mouseenter', function() {
+						if (timeoutType=='leave') {
+							window.clearTimeout(timeoutID); //cancel not yet executed hide or show commmand
+						}
+					})
+					jQuery('#hoverMenu'+level).mouseleave(function(){
+						window.clearTimeout(timeoutID); //cancel not yet executed hide or show commmand
+						jQueryObj = jQuery(this);
+						timeoutID = window.setTimeout(SubMenuLeave, DELAY_SUB); //hide submenu after delay
+						timeoutType = 'leave';
+					})
+					level++;
+				}
+				jQuery('.primary-menu > li:not(#menu-tree)').mouseenter(function() {
+					MenuLeave(); //hide instantly
+				})
+				jQuery('#menu-tree').mouseenter(function() {
+					jQuery(this).children('ul').show(); //show instantly
+				})
+				jQuery('#menu-tree').mouseleave(function() {
+					window.clearTimeout(timeoutID); //cancel not yet executed hide or show commmand
+					timeoutID = window.setTimeout(MenuLeave, DELAY); //hide after delay
+					timeoutType = 'leave';
+				})
+			})
+		-->
+		</script>
 		<nav>
 			<ul class="primary-menu" role="menubar">
 				<?php echo WT_MenuBar::getGedcomMenu();   ?>
