@@ -676,7 +676,7 @@ if ($WT_TREE && $WT_TREE->getPreference('SHOW_COUNTER') && !$SEARCH_SPIDER) {
 
 // Search engines are only allowed to see certain pages.
 if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME, array(
-	'index.php', 'indilist.php', 'module.php', 'mediafirewall.php',
+	'index.php', 'indilist.php', 'module.php', 'mediafirewall.php', 'mediafirewall2.php',
 	'individual.php', 'family.php', 'mediaviewer.php', 'note.php', 'repo.php', 'source.php',
 ))) {
 	header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');

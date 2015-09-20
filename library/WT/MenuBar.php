@@ -20,6 +20,22 @@
 // // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 use WT\Auth;
+if (file_exists(WT_ROOT.'data/menu_config.ini.php')) {
+	require WT_ROOT.'data/menu_config.ini.php';
+}
+else {
+	global $menu_special_trees;
+	global $menu_abbreviations;
+	$menu_special_trees = array();
+	$menu_abbreviations = array();
+}
+if (file_exists(WT_ROOT.'data/media/media_config.ini.php')) {
+	require WT_ROOT.'data/media/media_config.ini.php';
+}
+else {
+	global $media_special_trees;
+	$media_special_trees = array();
+}
 
 /**
  * Class WT_MenuBar - System for generating menus.
@@ -36,6 +52,7 @@ function addtoGroup(&$group, $str, $tree) {
 }
 
 function createMenu($groups, &$menu, &$groupindex, $level) {
+	global $menu_abbreviations;
 	$hassubmenu = false;
 	foreach ($groups as $groupname=>$group) {
 		if (gettype($group)=='array') {
@@ -51,19 +68,50 @@ function createMenu($groups, &$menu, &$groupindex, $level) {
 		}
 	}
 	foreach ($groups as $groupname=>$group) {
-		if (gettype($group)!='array') {
-			if (strpos($group->tree_title_html, ':') !== false) {
-				$tree_title = trim(substr($group->tree_title_html, strrpos($group->tree_title_html, ':') + 1));
+		if (gettype($group)=='object') {
+			if (get_class($group)=='WT_Tree') {
+				if (strpos($group->tree_title_html, ':') !== false) {
+					$tree_title = trim(substr($group->tree_title_html, strrpos($group->tree_title_html, ':') + 1));
+				}
+				else {
+					$tree_title = $group->tree_title_html;
+				}
+				foreach ($menu_abbreviations as $abbreviation) {
+					$tree_title = str_replace($abbreviation['full'],'<font title="'.$abbreviation['full'].'" style="border-bottom: 1px dotted #000;">'.$abbreviation['short'].'</font>',$tree_title);				
+				}
+				$submenu = new WT_Menu(
+					$tree_title,
+					'index.php?ctype=gedcom&amp;ged='.$group->tree_name_url,
+					'menu-tree-'.$group->tree_id // Cannot use name - it must be a CSS identifier
+				);
+				$menu->addSubmenu($submenu);
 			}
-			else {
-				$tree_title = $group->tree_title_html;
+			elseif (get_class($group)=='stdClass') {
+				if (strpos($group->Name, ':') !== false) {
+					$tree_title = trim(substr($group->Name, strrpos($group->Name, ':') + 1));
+				}
+				else {
+					$tree_title = $group->Name;
+				}
+				$tree_title = '<span dir="auto">' . WT_Filter::escapeHtml($tree_title) . '</span>';
+				foreach ($menu_abbreviations as $abbreviation) {
+					$tree_title = str_replace($abbreviation['full'],'<font title="'.$abbreviation['full'].'" style="border-bottom: 1px dotted #000;">'.$abbreviation['short'].'</font>',$tree_title);				
+				}
+				if (!Auth::isMember()) {
+					$submenu = new WT_Menu(
+						$tree_title,
+						WT_LOGIN_URL
+					);
+				}
+				else {
+					$submenu = new WT_Menu(
+						$tree_title,
+						'mediafirewall2.php?file='.$group->Filename
+					);
+				}
+				$submenu->addClass('', '', 'menu-tree-file');
+				$menu->addSubmenu($submenu);
 			}
-			$submenu = new WT_Menu(
-				$tree_title,
-				'index.php?ctype=gedcom&amp;ged='.$group->tree_name_url,
-				'menu-tree-'.$group->tree_id // Cannot use name - it must be a CSS identifier
-			);
-			$menu->addSubmenu($submenu);
 		}
 	}
 }
@@ -73,12 +121,14 @@ class WT_MenuBar {
 	 * @return WT_Menu
 	 */
 	public static function getGedcomMenu() {
+		global $media_special_trees;
+		global $menu_special_trees;
+
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
-		require WT_ROOT.'data/search_config.ini.php';
 		//Create Groups
 		$groups = array();
 		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
-			if (!in_array($tree->tree_name,$search_excluded_trees)){
+			if (!in_array($tree->tree_name,$menu_special_trees)){
 				if (strpos($tree->tree_title, ':') !== false){
 					addtoGroup($groups, $tree->tree_title, $tree);
 				}
@@ -87,9 +137,17 @@ class WT_MenuBar {
 				}
 			}
 		}
+		foreach ($media_special_trees as $tree) {
+			if (strpos($tree->Name, ':') !== false){
+				addtoGroup($groups, $tree->Name, $tree);
+			}
+			else{
+				$groups[WT_I18N::translate('Miscellaneous')][] = $tree;
+			}
+		}
 		//Print Special Groups
 		foreach (WT_Tree::getAllIgnoreAccess() as $tree) {
-			if (in_array($tree->tree_name,$search_excluded_trees)){
+			if (in_array($tree->tree_name,$menu_special_trees)){
 				$submenu = new WT_Menu(
 					$tree->tree_title_html,
 					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
