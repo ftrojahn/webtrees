@@ -106,7 +106,7 @@ case 'login':
 		if (strpos($url, WT_SCRIPT_NAME) === 0) {
 			$url = '';
 		}
-
+		/*
 		// We're logging in as an administrator
 		if (Auth::isAdmin()) {
 			// Check for updates
@@ -121,7 +121,7 @@ case 'login':
 				// Cannot determine the latest version
 			}
 		}
-
+		*/
 		// Redirect to the target URL
 		header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . $url);
 		// Explicitly write the session data before we exit,
