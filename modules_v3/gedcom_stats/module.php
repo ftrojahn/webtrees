@@ -21,6 +21,14 @@
 
 use WT\Auth;
 
+function compare_place_name($a, $b) {
+	return strcmp($a->getPlaceName(), $b->getPlaceName());
+}
+
+function compare_place_fullname($a, $b) {
+	return strcmp($a->getFullName(), $b->getFullName());
+}
+
 /**
  * Class gedcom_stats_WT_Module
  */
@@ -41,6 +49,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$show_last_update    =get_block_setting($block_id, 'show_last_update',     true);
 		$show_common_surnames=get_block_setting($block_id, 'show_common_surnames', true);
+		$show_places_list    =get_block_setting($block_id, 'show_places_list',     true);
 		$stat_indi           =get_block_setting($block_id, 'stat_indi',            true);
 		$stat_fam            =get_block_setting($block_id, 'stat_fam',             true);
 		$stat_sour           =get_block_setting($block_id, 'stat_sour',            true);
@@ -60,7 +69,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		$stat_link           =get_block_setting($block_id, 'stat_link',            true);
 		$block               =get_block_setting($block_id, 'block',                false);
 		if ($cfg) {
-			foreach (array('show_common_surnames', 'stat_indi', 'stat_fam', 'stat_sour', 'stat_media', 'stat_surname', 'stat_events', 'stat_users', 'stat_first_birth', 'stat_last_birth', 'stat_first_death', 'stat_last_death', 'stat_long_life', 'stat_avg_life', 'stat_most_chil', 'stat_avg_chil', 'stat_link', 'block') as $name) {
+			foreach (array('show_common_surnames', 'show_places_list', 'stat_indi', 'stat_fam', 'stat_sour', 'stat_media', 'stat_surname', 'stat_events', 'stat_users', 'stat_first_birth', 'stat_last_birth', 'stat_first_death', 'stat_last_death', 'stat_long_life', 'stat_avg_life', 'stat_most_chil', 'stat_avg_chil', 'stat_link', 'block') as $name) {
 				if (array_key_exists($name, $cfg)) {
 					$$name=$cfg[$name];
 				}
@@ -203,6 +212,76 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 			}
 		}
 
+		//List places
+		if ($show_places_list) {
+			$list_places=WT_Place::allPlaces(WT_GED_ID);
+			if (count($list_places)>0) {
+				uasort($list_places, 'compare_place_name');
+
+				$content .= '<p><b>'.WT_I18N::translate('Place list').'</b></p>';
+				$content .= '<div class="common_surnames">';
+				$i=0;
+				$placename = '';
+				$places = array();
+				foreach ($list_places as $indexval => $list_place) {
+					if ($list_place->getPlaceName() != $placename) {
+						if (sizeof($places)>0) {
+							if ($i>0) {
+								$content .= ', ';
+							}
+							$i++;
+							if (sizeof($places)>1) {
+								uasort($places, 'compare_place_fullname');
+								$links = '';
+								foreach ($places as $place) {
+									$links .= '<a href="'.$place->getURL().'">'.$place->getFullName().'</a><br>';
+								}
+								$content .= '<a href="#" onclick="modalNotes(\''.htmlspecialchars($links).'\',\''.strip_tags($placename).'\'); return false">'.$placename.'</a>';
+							}
+							else {
+								if ($placename != $places[0]->getFullName()) {
+									$title = ' title="'.strip_tags($places[0]->getFullName()).'"';
+								}
+								else {
+									$title = '';
+								}
+								$content .= '<a href="'.$places[0]->getURL().'"'.$title.'>'.$placename.'</a>';
+							}
+						}
+						$placename = $list_place->getPlaceName();
+						$places = array($list_place);
+					}
+					else {
+						$places[] = $list_place;
+					}
+				}
+				if (sizeof($places)>0) {
+					if ($i>0) {
+						$content .= ', ';
+					}
+					$i++;
+					if (sizeof($places)>1) {
+						uasort($places, 'compare_place_fullname');
+						$links = '';
+						foreach ($places as $place) {
+							$links .= '<a href="'.$place->getURL().'">'.$place->getFullName().'</a><br>';
+						}
+						$content .= '<a href="#" onclick="modalNotes(\''.htmlspecialchars($links).'\',\''.strip_tags($placename).'\'); return false">'.$placename.'</a>';
+					}
+					else {
+						if ($placename != $places[0]->getFullName()) {
+							$title = ' title="'.strip_tags($places[0]->getFullName()).'"';
+						}
+						else {
+							$title = '';
+						}
+						$content .= '<a href="'.$places[0]->getURL().'"'.$title.'>'.$placename.'</a>';
+					}
+				}
+				$content .= '</div>';
+			}
+		}
+
 		if ($template) {
 			require WT_THEME_DIR.'templates/block_main_temp.php';
 		} else {
@@ -230,6 +309,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
 			set_block_setting($block_id, 'show_last_update',     WT_Filter::postBool('show_last_update'));
 			set_block_setting($block_id, 'show_common_surnames', WT_Filter::postBool('show_common_surnames'));
+			set_block_setting($block_id, 'show_places_list',     WT_Filter::postBool('show_places_list'));
 			set_block_setting($block_id, 'stat_indi',            WT_Filter::postBool('stat_indi'));
 			set_block_setting($block_id, 'stat_fam',             WT_Filter::postBool('stat_fam'));
 			set_block_setting($block_id, 'stat_sour',            WT_Filter::postBool('stat_sour'));
@@ -264,6 +344,13 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		echo WT_I18N::translate('Show common surnames?');
 		echo '</td><td class="optionbox">';
 		echo edit_field_yes_no('show_common_surnames', $show_common_surnames);
+		echo '</td></tr>';
+
+		$show_places_list=get_block_setting($block_id, 'show_places_list', true);
+		echo '<tr><td class="descriptionbox wrap width33">';
+		echo WT_I18N::translate('Show places list?');
+		echo '</td><td class="optionbox">';
+		echo edit_field_yes_no('show_places_list', $show_places_list);
 		echo '</td></tr>';
 
 		$stat_indi           =get_block_setting($block_id, 'stat_indi',            true);
