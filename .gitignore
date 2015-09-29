@@ -8,3 +8,9 @@ data/media
 
 .idea/
 vendor/.git
+
+#files on testserver
+apcclear.php
+awstats-icon
+awstatsicons
+modules_v3/openstreetmap
