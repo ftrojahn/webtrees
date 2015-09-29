@@ -231,7 +231,7 @@ class WT_Menu {
 	 */
 	function getMenuAsList($level = 0) {
 		if ($this->iconclass) {
-			$class = ' class="' . $this->iconclass . '"';
+			$class = $this->iconclass.' ';
 		} else {
 			$class = '';
 		}
@@ -250,7 +250,13 @@ class WT_Menu {
 		} else {
 			$id = '';
 		}
-		$html = '<a' . $link . $class . $onclick . '>' . $this->label . '</a>';
+		if (strpos($this->link,'mediafirewall2.php') === 0) {
+			$target = ' target="_blank"';
+		}
+		else {
+			$target = '';
+		}
+		$html = '<a' . $link . $onclick . $target . '>' . $this->label . '</a>';
 		if ($this->submenus) {
 			$html .= '<ul>';
 			foreach ($this->submenus as $submenu) {
@@ -259,7 +265,7 @@ class WT_Menu {
 			$html .= '</ul>';
 		}
 
-		return '<li' . $id . ' class="level'.$level.'">' . $html . '</li>';
+		return '<li' . $id . ' class="' . $class . 'level' . $level . '">' . $html . '</li>';
 	}
 
 	/**

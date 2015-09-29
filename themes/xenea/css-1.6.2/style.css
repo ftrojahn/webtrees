@@ -4335,7 +4335,7 @@ header nav {
 
 .primary-menu {
 	margin: 0 auto;
-	display: table;
+/*	display: table; */
 }
 
 .primary-menu li {
@@ -4399,6 +4399,11 @@ header nav {
 	height: 28px;
 	line-height: 28px;
 	text-indent: 0;
+}
+
+.primary-menu .menu-tree-file {
+	background-image: url(images/sprite-file.png);
+	background-repeat: no-repeat;
 }
 
 .primary-menu li li {
