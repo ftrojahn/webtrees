@@ -553,6 +553,7 @@ if ($WT_TREE) {
 		define('WT_GEDURL',            $WT_TREE->tree_name_url);
 		define('WT_TREE_TITLE',        $WT_TREE->tree_title_html);
 		define('WT_GED_ID',            $WT_TREE->tree_id);
+		load_gedcom_settings(WT_GED_ID);
 	}
 	define('WT_IMPORTED',          false);
 	define('WT_USER_GEDCOM_ADMIN', false);
