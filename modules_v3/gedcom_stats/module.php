@@ -1,12 +1,4 @@
 <?php
-function compare_place_name($a, $b) {
-	return strcmp($a->getPlaceName(), $b->getPlaceName());
-}
-
-function compare_place_fullname($a, $b) {
-	return strcmp($a->getFullName(), $b->getFullName());
-}
-
 /**
  * webtrees: online genealogy
  * Copyright (C) 2015 webtrees development team

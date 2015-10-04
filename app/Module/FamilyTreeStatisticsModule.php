@@ -20,8 +20,17 @@ use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Functions\FunctionsDb;
 use Fisharebest\Webtrees\Functions\FunctionsEdit;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\Stats;
 use Fisharebest\Webtrees\Theme;
+
+function compare_place_name($a, $b) {
+	return strcmp(strip_tags($a->getPlaceName()), strip_tags($b->getPlaceName()));
+}
+
+function compare_place_fullname($a, $b) {
+	return strcmp(strip_tags($a->getFullName()), strip_tags($b->getFullName()));
+}
 
 /**
  * Class FamilyTreeStatisticsModule
@@ -51,6 +60,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 
 		$show_last_update     = $this->getBlockSetting($block_id, 'show_last_update', '1');
 		$show_common_surnames = $this->getBlockSetting($block_id, 'show_common_surnames', '1');
+		$show_places_list     = $this->getBlockSetting($block_id, 'show_places_list', '1');
 		$stat_indi            = $this->getBlockSetting($block_id, 'stat_indi', '1');
 		$stat_fam             = $this->getBlockSetting($block_id, 'stat_fam', '1');
 		$stat_sour            = $this->getBlockSetting($block_id, 'stat_sour', '1');
@@ -212,6 +222,78 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 			}
 		}
 
+		//List places
+		if ($show_places_list) {
+			$list_places=Place::allPlaces($WT_TREE);
+			if (count($list_places)>0) {
+				uasort($list_places, 'Fisharebest\Webtrees\Module\compare_place_name');
+
+				$content .= '<p><b>'.I18N::translate('Place list').'</b></p>';
+				$content .= '<div class="common_surnames">';
+				$i=0;
+				$placename = '';
+				$places = array();
+
+				foreach ($list_places as $indexval => $list_place) {
+					if ($list_place->getPlaceName() != $placename) {
+						if (sizeof($places)>0) {
+							if ($i>0) {
+								$content .= ', ';
+							}
+							$i++;
+							if (sizeof($places)>1) {
+								uasort($places, 'Fisharebest\Webtrees\Module\compare_place_fullname');
+								$links = '';
+								foreach ($places as $place) {
+									$links .= '<a href="'.$place->getURL().'">'.$place->getFullName().'</a><br>';
+								}
+								$content .= '<a href="#" onclick="modalNotes(\''.htmlspecialchars($links).'\',\''.strip_tags($placename).'\'); return false">'.$placename.'</a>';								
+							}
+							else {
+								if ($placename != $places[0]->getFullName()) {
+									$placetitle = ' title="'.strip_tags($places[0]->getFullName()).'"';
+								}
+								else {
+									$placetitle = '';
+								}
+								$content .= '<a href="'.$places[0]->getURL().'"'.$placetitle.'>'.$placename.'</a>';
+							}
+						}
+						$placename = $list_place->getPlaceName();
+						$places = array($list_place);
+					}
+					else {
+						$places[] = $list_place;
+					}
+				}
+				if (sizeof($places)>0) {
+					if ($i>0) {
+						$content .= ', ';
+					}
+					$i++;
+					if (sizeof($places)>1) {
+						uasort($places, 'Fisharebest\Webtrees\Module\compare_place_fullname');
+						$links = '';
+						foreach ($places as $place) {
+							$links .= '<a href="'.$place->getURL().'">'.$place->getFullName().'</a><br>';
+						}
+						$content .= '<a href="#" onclick="modalNotes(\''.htmlspecialchars($links).'\',\''.strip_tags($placename).'\'); return false">'.$placename.'</a>';
+					}
+					else {
+						if ($placename != $places[0]->getFullName()) {
+							$placetitle = ' title="'.strip_tags($places[0]->getFullName()).'"';
+						}
+						else {
+							$placetitle = '';
+						}
+						$content .= '<a href="'.$places[0]->getURL().'"'.$placetitle.'>'.$placename.'</a>';
+					}
+				}
+
+				$content .= '</div>';
+			}
+		}
+
 		if ($template) {
 			return Theme::theme()->formatBlock($id, $title, $class, $content);
 		} else {
@@ -243,6 +325,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		if (Filter::postBool('save') && Filter::checkCsrf()) {
 			$this->setBlockSetting($block_id, 'show_last_update', Filter::postBool('show_last_update'));
 			$this->setBlockSetting($block_id, 'show_common_surnames', Filter::postBool('show_common_surnames'));
+			$this->setBlockSetting($block_id, 'show_places_list', Filter::postBool('show_places_list'));
 			$this->setBlockSetting($block_id, 'stat_indi', Filter::postBool('stat_indi'));
 			$this->setBlockSetting($block_id, 'stat_fam', Filter::postBool('stat_fam'));
 			$this->setBlockSetting($block_id, 'stat_sour', Filter::postBool('stat_sour'));
@@ -264,6 +347,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 
 		$show_last_update     = $this->getBlockSetting($block_id, 'show_last_update', '1');
 		$show_common_surnames = $this->getBlockSetting($block_id, 'show_common_surnames', '1');
+		$show_places_list     = $this->getBlockSetting($block_id, 'show_places_list', '1');
 		$stat_indi            = $this->getBlockSetting($block_id, 'stat_indi', '1');
 		$stat_fam             = $this->getBlockSetting($block_id, 'stat_fam', '1');
 		$stat_sour            = $this->getBlockSetting($block_id, 'stat_sour', '1');
@@ -291,6 +375,12 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		echo I18N::translate('Show common surnames?');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('show_common_surnames', $show_common_surnames);
+		echo '</td></tr>';
+
+		echo '<tr><td class="descriptionbox wrap width33">';
+		echo I18N::translate('Show places list?');
+		echo '</td><td class="optionbox">';
+		echo FunctionsEdit::editFieldYesNo('show_places_list', $show_places_list);
 		echo '</td></tr>';
 
 ?>
