@@ -36,6 +36,106 @@ use Fisharebest\Webtrees\Theme;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\User;
 
+if (file_exists(WT_DATA_DIR.'/menu_config.ini.php')) {
+	require WT_DATA_DIR.'/menu_config.ini.php';
+}
+else {
+	global $menu_special_trees;
+	global $menu_abbreviations;
+	$menu_special_trees = array();
+	$menu_abbreviations = array();
+}
+
+$MEDIA_DIRECTORY = Tree::findByName(Site::getPreference('DEFAULT_GEDCOM'))->getPreference('MEDIA_DIRECTORY');
+if (file_exists(WT_DATA_DIR . $MEDIA_DIRECTORY . 'media_config.ini.php')) {
+	require WT_DATA_DIR . $MEDIA_DIRECTORY . 'media_config.ini.php';
+}
+else {
+	global $media_special_trees;
+	$media_special_trees = array();
+}
+
+function addtoGroup(&$group, $str, $tree) {
+	if (strpos($str, ':') !== false) {
+		$groupname = trim(substr($str, 0, strpos($str, ':')));
+		$str = trim(substr($str, strpos($str, ':') + 1));
+		addtoGroup($group[$groupname], $str, $tree);
+	}
+	else {
+		$group[] = $tree;
+	}
+}
+
+function createMenu($groups, &$menu, &$groupindex, $level) {
+	global $menu_abbreviations;
+	global $WT_TREE;
+
+	$hassubmenu = false;
+	foreach ($groups as $groupname=>$group) {
+		if (gettype($group)=='array') {
+			$submenu = new Menu(
+				$groupname,
+				'#',
+				'menu-tree-group'.$groupindex.' level'.$level
+			);
+			$submenu->setAttrs(array('onclick'=>'return false;'));
+			$groupindex++;
+			$menu->addSubmenu($submenu);
+			$hassubmenu = true;
+			createMenu($group, $submenu, $groupindex, $level+1);
+		}
+	}
+	foreach ($groups as $groupname=>$group) {
+		if (gettype($group)=='object') {
+			if (get_class($group)=='Fisharebest\Webtrees\Tree') {
+				if (strpos($group->getTitle(), ':') !== false) {
+					$tree_title = trim(substr($group->getTitle(), strrpos($group->getTitle(), ':') + 1));
+				}
+				else {
+					$tree_title = $group->getTitle();
+				}
+				foreach ($menu_abbreviations as $abbreviation) {
+					$tree_title = str_replace($abbreviation['full'],'<font title="'.$abbreviation['full'].'" style="border-bottom: 1px dotted #000;">'.$abbreviation['short'].'</font>',$tree_title);				
+				}
+				$submenu = new Menu(
+					$tree_title,
+					'index.php?ctype=gedcom&amp;ged='.$group->getNameUrl(),
+					'menu-tree-'.$group->getTreeId().' level'.$level
+				);
+				$menu->addSubmenu($submenu);
+			}
+			elseif (get_class($group)=='stdClass') {
+				if (strpos($group->Name, ':') !== false) {
+					$tree_title = trim(substr($group->Name, strrpos($group->Name, ':') + 1));
+				}
+				else {
+					$tree_title = $group->Name;
+				}
+				$tree_title = '<span dir="auto">' . Filter::escapeHtml($tree_title) . '</span>';
+				foreach ($menu_abbreviations as $abbreviation) {
+					$tree_title = str_replace($abbreviation['full'],'<font title="'.$abbreviation['full'].'" style="border-bottom: 1px dotted #000;">'.$abbreviation['short'].'</font>',$tree_title);				
+				}
+				if (!Auth::check()) {
+					$submenu = new Menu(
+						$tree_title,
+						WT_LOGIN_URL,
+						'level'.$level.' menu-tree-file'
+					);
+				}
+				else {
+					$submenu = new Menu(
+						$tree_title,
+						'mediafirewall2.php?file='.$group->Filename,
+						'level'.$level.' menu-tree-file',
+						array('target'=>'_blank')
+					);
+				}
+				$menu->addSubmenu($submenu);
+			}
+		}
+	}
+}
+
 /**
  * Common functions for all themes.
  */
@@ -1301,21 +1401,45 @@ abstract class AbstractTheme {
 	 * @return Menu
 	 */
 	protected function menuHomePage() {
-		if (count(Tree::getAll()) === 1 || Site::getPreference('ALLOW_CHANGE_GEDCOM') === '0') {
-			return new Menu(I18N::translate('Family tree'), 'index.php?ctype=gedcom&amp;' . $this->tree_url, 'menu-tree');
-		} else {
-			$submenus = array();
-			foreach (Tree::getAll() as $tree) {
-				if ($tree == $this->tree) {
-					$active = 'active ';
-				} else {
-					$active = '';
-				}
-				$submenus[] = new Menu($tree->getTitleHtml(), 'index.php?ctype=gedcom&amp;ged=' . $tree->getNameUrl(), $active . 'menu-tree-' . $tree->getTreeId());
-			}
+		global $menu_special_trees;
+		global $media_special_trees;
 
-			return new Menu(I18N::translate('Family trees'), 'index.php?ctype=gedcom&amp;' . $this->tree_url, 'menu-tree', array(), $submenus);
+		$menu = new Menu(I18N::translate('Family trees'), 'index.php?ctype=gedcom&amp;' . $this->tree_url, 'menu-tree level0');
+
+		//Create Groups
+		$groups = array();
+		foreach (Tree::getAllIgnoreAccess() as $tree) {
+			if (!in_array($tree->getName(),$menu_special_trees)){
+				if (strpos($tree->getTitle(), ':') !== false){
+					addtoGroup($groups, $tree->getTitle(), $tree);
+				}
+				else{
+					$groups[I18N::translate('Miscellaneous')][] = $tree;
+				}
+			}
 		}
+		foreach ($media_special_trees as $tree) {
+			if (strpos($tree->Name, ':') !== false){
+				addtoGroup($groups, $tree->Name, $tree);
+			}
+			else{
+				$groups[I18N::translate('Miscellaneous')][] = $tree;
+			}
+		}
+		//Non-sorted trees
+		foreach (Tree::getAllIgnoreAccess() as $tree) {
+			if (in_array($tree->getName(),$menu_special_trees)){
+				$submenu = new Menu(
+					$tree->getTitleHtml(),
+					'index.php?ctype=gedcom&amp;ged='.$tree->getNameUrl(),
+					'menu-tree-'.$tree->getTreeId().' level1' // Cannot use name - it must be a CSS identifier
+				);
+				$menu->addSubmenu($submenu);
+			}
+		}
+		$groupindex = 1;
+		createMenu($groups, $menu, $groupindex, 1);
+		return $menu;
 	}
 
 	/**

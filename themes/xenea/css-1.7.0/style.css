@@ -4279,7 +4279,28 @@ header nav {
 
 .primary-menu {
 	margin: 0 auto;
-	display: table;
+	/*display: table;*/
+}
+
+.menu-tree ul {
+	max-height:400px;
+	padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+.primary-menu .menu-tree li:hover > ul,
+.primary-menu .menu-tree:hover > ul {
+	display: none; /* overrite default behavior; hide the original submenus */
+}
+
+.primary-menu .menu-tree > ul { /* position even when not hover */
+	display: none;
+	position: absolute;
+	margin-top: 0;
+	left: 0;
+	right: auto;
+	top: 42px;
 }
 
 .primary-menu li {
@@ -4346,6 +4367,12 @@ header nav {
 	text-indent: 0;
 }
 
+.primary-menu .menu-tree-file {
+	background-image: url(images/sprite-file.png);
+	background-repeat: no-repeat;
+	background-position: left 0px;
+}
+
 .primary-menu li li {
 	background-image: url(images/sprites-sub-menu.png);
 	background-repeat: no-repeat;
@@ -4357,6 +4384,8 @@ header nav {
 	margin-top:  2px;
 	width: 100%;
 }
+
+.hoverMenu {position:absolute;}
 
 /* Reverse left and right on RTL pages */
 [dir=rtl] .primary-menu li {
