@@ -7,7 +7,7 @@ data/config*.php
 data/media
 
 .idea/
-vendor/.git
+apidocs/
 
 #files on testserver
 apcclear.php
