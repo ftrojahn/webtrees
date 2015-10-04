@@ -472,6 +472,22 @@ if (WT_SCRIPT_NAME != 'admin_trees_manage.php' && WT_SCRIPT_NAME != 'admin_pgv_t
 	}
 }
 
+if ($WT_TREE) {
+	if (WT_SCRIPT_NAME != 'login.php' && WT_SCRIPT_NAME != 'logout.php' && WT_SCRIPT_NAME != 'help_text.php' && WT_SCRIPT_NAME != 'message.php' && WT_SCRIPT_NAME != 'search.php' && WT_SCRIPT_NAME != 'search_advanced.php' && WT_SCRIPT_NAME != 'index.php') {
+		$canaccess = false;
+		foreach (Tree::getAll() as $tree) {
+			if ($WT_TREE->getTreeId() == $tree->getTreeId()) {
+				$canaccess = true;
+				break;
+			}
+		}
+		if (!$canaccess) {
+			header('Location: ' . WT_LOGIN_URL . '?url=' . rawurlencode(WT_SCRIPT_NAME . (isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')), true, 301);
+			exit;
+		}
+	}
+}
+
 // Update the last-login time no more than once a minute
 if (WT_TIMESTAMP - Session::get('activity_time') >= 60) {
 	Auth::user()->setPreference('sessiontime', WT_TIMESTAMP);

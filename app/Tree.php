@@ -44,6 +44,9 @@ class Tree {
 	/** @var Tree[] All trees that we have permission to see. */
 	private static $trees;
 
+	// List of all trees (ignoring access rules)
+	private static $trees_ignore_access;
+
 	/** @var string[] Cached copy of the wt_gedcom_setting table. */
 	private $preferences;
 
@@ -341,6 +344,29 @@ class Tree {
 		return self::$trees;
 	}
 
+	// Fetch all the trees (even those without access).
+	public static function getAllIgnoreAccess() {
+		if (self::$trees_ignore_access===null) {
+			self::$trees_ignore_access = array();
+			$rows        = Database::prepare(
+				"SELECT SQL_CACHE g.gedcom_id AS tree_id, g.gedcom_name AS tree_name, gs1.setting_value AS tree_title" .
+				" FROM `##gedcom` g" .
+				" LEFT JOIN `##gedcom_setting`      gs1 ON (g.gedcom_id=gs1.gedcom_id AND gs1.setting_name='title')" .
+				" LEFT JOIN `##gedcom_setting`      gs2 ON (g.gedcom_id=gs2.gedcom_id AND gs2.setting_name='imported')" .
+				" WHERE " .
+				"  g.gedcom_id>0 AND (" . // exclude the "template" tree
+				"    EXISTS (SELECT 1 FROM `##user_setting` WHERE user_id=? AND setting_name='canadmin' AND setting_value=1)" . // Admin sees all
+				"   ) OR (gs2.setting_value = 1)" .
+				" ORDER BY g.sort_order, 3"
+			)->execute(array(Auth::id()))->fetchAll();
+			foreach ($rows as $row) {
+				self::$trees_ignore_access[] = new self((int) $row->tree_id, $row->tree_name, $row->tree_title);
+			}
+		}
+
+		return self::$trees_ignore_access;
+	}
+
 	/**
 	 * Find the tree with a specific ID.
 	 *
@@ -351,7 +377,7 @@ class Tree {
 	 * @return Tree
 	 */
 	public static function findById($tree_id) {
-		foreach (self::getAll() as $tree) {
+		foreach (self::getAllIgnoreAccess() as $tree) {
 			if ($tree->tree_id == $tree_id) {
 				return $tree;
 			}
@@ -367,7 +393,7 @@ class Tree {
 	 * @return Tree|null
 	 */
 	public static function findByName($tree_name) {
-		foreach (self::getAll() as $tree) {
+		foreach (self::getAllIgnoreAccess() as $tree) {
 			if ($tree->name === $tree_name) {
 				return $tree;
 			}
@@ -428,6 +454,7 @@ class Tree {
 
 		// Update the list of trees - to include this new one
 		self::$trees = null;
+		self::$trees_ignore_access = null;
 		$tree        = self::findById($tree_id);
 
 		$tree->setPreference('imported', '0');
