@@ -74,25 +74,19 @@ class FunctionsPrintLists {
 						/*  5 SOSA      */ { type: "num", visible: false },
 						/*  6 birt date */ { dataSort: 7 },
 						/*  7 BIRT:DATE */ { visible: false },
-						/*  8 anniv     */ { dataSort: 7, class: "center" },
-						/*  9 birt plac */ { type: "unicode" },
-						/* 10 children  */ { dataSort: 11, class: "center" },
-						/* 11 children  */ { type: "num", visible: false },
-						/* 12 deat date */ { dataSort: 13 },
-						/* 13 DEAT:DATE */ { visible: false },
-						/* 14 anniv     */ { dataSort: 13, class: "center" },
-						/* 15 age       */ { dataSort: 16, class: "center" },
-						/* 16 AGE       */ { type: "num", visible: false },
-						/* 17 deat plac */ { type: "unicode" },
-						/* 18 CHAN      */ { dataSort: 19, visible: ' . ($WT_TREE->getPreference('SHOW_LAST_CHANGE') ? 'true' : 'false') . ' },
-						/* 19 CHAN_sort */ { visible: false },
-						/* 20 SEX       */ { visible: false },
-						/* 21 BIRT      */ { visible: false },
-						/* 22 DEAT      */ { visible: false },
-						/* 23 TREE      */ { visible: false }
+						/*  8 birt plac */ { type: "unicode" },
+						/*  9 deat date */ { dataSort: 10 },
+						/* 10 DEAT:DATE */ { visible: false },
+						/* 11 deat plac */ { type: "unicode" },
+						/* 12 CHAN      */ { dataSort: 13, visible: ' . ($WT_TREE->getPreference('SHOW_LAST_CHANGE') ? 'true' : 'false') . ' },
+						/* 13 CHAN_sort */ { visible: false },
+						/* 14 SEX       */ { visible: false },
+						/* 15 BIRT      */ { visible: false },
+						/* 16 DEAT      */ { visible: false },
+						/* 17 TREE      */ { visible: false }
 					],
 					sorting: [[' . ($option == 'sosa' ? '4, "asc"' : '1, "asc"') . ']],
-					displayLength: 20,
+					displayLength: 14,
 					pagingType: "full_numbers"
 				});
 
@@ -150,12 +144,12 @@ class FunctionsPrintLists {
 				<table id="' . $table_id . '">
 					<thead>
 						<tr>
-							<th colspan="24">
+							<th colspan="18">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="14"
 											data-filter-value="M"
 											title="' . I18N::translate('Show only males.') . '"
 											type="button"
@@ -164,7 +158,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="14"
 											data-filter-value="F"
 											title="' . I18N::translate('Show only females.') . '"
 											type="button"
@@ -173,90 +167,12 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="14"
 											data-filter-value="U"
 											title="' . I18N::translate('Show only individuals for whom the gender is not known.') . '"
 											type="button"
 										>
 											' . Individual::sexImage('U', 'large') . '
-										</button>
-									</div>
-									<div class="btn-group">
-										<button
-											class="ui-state-default"
-											data-filter-column="22"
-											data-filter-value="N"
-											title="' . I18N::translate('Show individuals who are alive or couples where both partners are alive.') . '"
-											type="button"
-										>
-											' . I18N::translate('Alive') . '
-										</button>
-										<button
-											class="ui-state-default"
-											data-filter-column="22"
-											data-filter-value="Y"
-											title="' . I18N::translate('Show individuals who are dead or couples where both partners are deceased.') . '"
-											type="button"
-										>
-											' . I18N::translate('Dead') . '
-										</button>
-										<button
-											class="ui-state-default"
-											data-filter-column="22"
-											data-filter-value="YES"
-											title="' . I18N::translate('Show individuals who died more than 100 years ago.') . '"
-											type="button"
-										>
-											' . GedcomTag::getLabel('DEAT') . '&gt;100
-										</button>
-										<button
-											class="ui-state-default"
-											data-filter-column="22"
-											data-filter-value="Y100"
-											title="' . I18N::translate('Show individuals who died within the last 100 years.') . '"
-											type="button"
-										>
-											' . GedcomTag::getLabel('DEAT') . '&lt;=100
-										</button>
-									</div>
-									<div class="btn-group">
-										<button
-											class="ui-state-default"
-											data-filter-column="21"
-											data-filter-value="YES"
-											title="' . I18N::translate('Show individuals born more than 100 years ago.') . '"
-											type="button"
-										>
-											' . GedcomTag::getLabel('BIRT') . '&gt;100
-										</button>
-										<button
-											class="ui-state-default"
-											data-filter-column="21"
-											data-filter-value="Y100"
-											title="' . I18N::translate('Show individuals born within the last 100 years.') . '"
-											type="button"
-										>
-											' . GedcomTag::getLabel('BIRT') . '&lt;=100
-										</button>
-									</div>
-									<div class="btn-group">
-										<button
-											class="ui-state-default"
-											data-filter-column="23"
-											data-filter-value="R"
-											title="' . I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.') . '"
-											type="button"
-										>
-											' . I18N::translate('Roots') . '
-										</button>
-										<button
-											class="ui-state-default"
-											data-filter-column="23"
-											data-filter-value="L"
-											title="' . I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.') . '"
-											type="button"
-										>
-											' . I18N::translate('Leaves') . '
 										</button>
 									</div>
 								</div>
@@ -272,15 +188,9 @@ class FunctionsPrintLists {
 							<th>SOSA</th>
 							<th>' . GedcomTag::getLabel('BIRT') . '</th>
 							<th>SORT_BIRT</th>
-							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>
-							<th><i class="icon-children" title="' . I18N::translate('Children') . '"></i></th>
-							<th>NCHI</th>
 							<th>' . GedcomTag::getLabel('DEAT') . '</th>
 							<th>SORT_DEAT</th>
-							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
-							<th>' . GedcomTag::getLabel('AGE') . '</th>
-							<th>AGE</th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>
 							<th>' . GedcomTag::getLabel('CHAN') . '</th>
 							<th>CHAN</th>
@@ -292,7 +202,7 @@ class FunctionsPrintLists {
 					</thead>
 					<tfoot>
 						<tr>
-							<th colspan="24">
+							<th colspan="18">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button type="button" class="ui-state-default btn-toggle-parents">
@@ -381,8 +291,6 @@ class FunctionsPrintLists {
 			$html .= '</td>';
 			//-- Event date (sortable)hidden by datatables code
 			$html .= '<td>' . $birth_date->julianDay() . '</td>';
-			//-- Birth anniversary
-			$html .= '<td>' . Date::getAge($birth_dates[0], null, 2) . '</td>';
 			//-- Birth place
 			$html .= '<td>';
 			foreach ($person->getAllBirthPlaces() as $n => $birth_place) {
@@ -394,9 +302,6 @@ class FunctionsPrintLists {
 				$html .= FunctionsPrint::highlightSearchHits($tmp->getShortName()) . '</a>';
 			}
 			$html .= '</td>';
-			//-- Number of children
-			$nchi = $person->getNumberOfChildren();
-			$html .= '<td>' . I18N::number($nchi) . '</td><td>' . $nchi . '</td>';
 			//-- Death date
 			$html .= '<td>';
 			if ($death_dates = $person->getAllDeathDates()) {
@@ -425,15 +330,6 @@ class FunctionsPrintLists {
 			$html .= '</td>';
 			//-- Event date (sortable)hidden by datatables code
 			$html .= '<td>' . $death_date->julianDay() . '</td>';
-			//-- Death anniversary
-			$html .= '<td>' . Date::getAge($death_dates[0], null, 2) . '</td>';
-			//-- Age at death
-			$age = Date::getAge($birth_dates[0], $death_dates[0], 0);
-			if (!isset($unique_indis[$person->getXref()]) && $age >= 0 && $age <= $max_age) {
-				$deat_by_age[$age] .= $person->getSex();
-			}
-			// Need both display and sortable age
-			$html .= '<td>' . Date::getAge($birth_dates[0], $death_dates[0], 2) . '</td><td>' . Date::getAge($birth_dates[0], $death_dates[0], 1) . '</td>';
 			//-- Death place
 			$html .= '<td>';
 			foreach ($person->getAllDeathPlaces() as $n => $death_place) {
