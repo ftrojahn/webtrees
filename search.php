@@ -20,7 +20,7 @@ use Fisharebest\Webtrees\Functions\FunctionsPrint;
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
-require_once WT_ROOT.'data/search_config.ini.php';
+require WT_DATA_DIR.'search_config.ini.php';
 
 $controller = new SearchController;
 $controller
@@ -79,7 +79,7 @@ function checknames(frm) {
 			<div class="value">
 				<input id="query" type="text" name="query" value="<?php echo Filter::escapeHtml($controller->query); ?>" size="40" autofocus>
 				<?php echo FunctionsPrint::printSpecialCharacterLink('query'); ?>
- 			</div>
+			</div>
 			<div class="label">
 				<?php echo I18N::translate('Records'); ?>
 			</div>
@@ -113,31 +113,89 @@ function checknames(frm) {
 					<?php echo I18N::translate('Show related individuals/families'); ?>
 				</label>
 			</div>
-			<?php if (count(Tree::getAll()) > 1 && Site::getPreference('ALLOW_CHANGE_GEDCOM')): ?>
-			<?php if (count(Tree::getAll()) > 3): ?>
 			<div class="label"></div>
 			<div class="value">
-				<input type="button" value="<?php echo /* I18N: select all (of the family trees) */ I18N::translate('select all'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', true);});return false;">
-				<input type="button" value="<?php echo /* I18N: select none (of the family trees) */ I18N::translate('select none'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', false);});return false;">
-				<?php if (count(Tree::getAll()) > 10): ?>
-				<input type="button" value="<?php echo I18N::translate('invert selection'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', !jQuery(this).attr('checked'));});return false;">
-				<?php endif; ?>
+				<input type="button" value="<?php echo /* I18N: select all (of the family trees) */ I18N::translate('select all'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).prop('checked', true);});return false;">
+				<input type="button" value="<?php echo /* I18N: select none (of the family trees) */ I18N::translate('select none'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).prop('checked', false);});return false;">
+				<input type="button" value="<?php echo I18N::translate('invert selection'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).prop('checked', !jQuery(this).prop('checked'));});return false;">
 				</div>
-			<?php endif; ?>
 			<div class="label">
 				<?php echo I18N::translate('Family trees'); ?>
 			</div>
 			<div id="search_trees" class="value">
-				<?php foreach (Tree::getAll() as $tree): ?>
-				<p>
-					<input type="checkbox" <?php echo in_array($tree, $controller->search_trees) ? 'checked' : ''; ?> value="yes" id="tree_<?php echo $tree->getTreeId(); ?>" name="tree_<?php echo $tree->getTreeId(); ?>">
-					<label for="tree_'<?php echo $tree->getTreeId(); ?>">
-						<?php echo $tree->getTitleHtml(); ?>
-					</label>
-				</p>
-				<?php endforeach; ?>
+				<?php
+				function addtoGroup(&$group, $str, $tree) {
+					if (strpos($str, ':') !== false) {
+						$groupname = trim(substr($str, 0, strpos($str, ':')));
+						$str = trim(substr($str, strpos($str, ':') + 1));
+						addtoGroup($group[$groupname], $str, $tree);
+					}
+					else {
+						$group[] = $tree;
+					}
+				}
+				function allChecked($groups, $controller) {
+					foreach ($groups as $group) {
+						if (gettype($group)=='array') {
+							if (!allChecked($group, $controller)) return false;
+						}
+						else {
+							$found = false;
+							foreach ($controller->search_trees as $tree) {
+								if ($tree->getTreeId() == $group->getTreeId())
+								{
+									$found = true;
+									break;
+								}
+							}
+							if (!$found) return false;
+						}
+					}
+					return true;
+				}
+				function createMenu($groups, $controller, &$groupindex, $level) {
+					foreach ($groups as $groupname=>$group) {
+						if (gettype($group)=='array') {
+							echo '<p><input type="checkbox" id="grp_' . $groupindex . '" value="yes" onclick="jQuery(\'#search_group_' . $groupindex . ' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])"' . (allChecked($group, $controller) ? ' checked' : '') . '>';
+							echo '<a href="#" onclick="jQuery(\'#search_group_' . $groupindex . '\').is(\':hidden\')?jQuery(\'#search_group_' . $groupindex . '\').show():jQuery(\'#search_group_' . $groupindex . '\').hide(); return false;">' . $groupname . '</a>';							
+							echo '<div id="search_group_' . $groupindex . '" style="margin-left:18px;display:none">';
+							$groupindex++;
+							createMenu($group, $controller, $groupindex, $level+1);
+							echo '</div><p>';
+						}
+					}
+					foreach ($groups as $groupname=>$group) {
+						if (gettype($group)=='object') {
+							echo '<p>';
+							echo '<input type="checkbox" value="yes" id="tree_' . $group->getTreeId() . '" name="tree_' . $group->getTreeId() . '"';
+							foreach ($controller->search_trees as $tree) {
+								if ($tree->getTreeId() == $group->getTreeId()) {
+									echo ' checked';
+									break;
+								}
+							}
+							echo '>';
+							echo '<label for="tree_' . $group->getTreeId() . '">' . $group->getTitleHtml() . '</label>';
+							echo '</p>';
+						}
+					}
+				}
+				//Create Groups
+				$groups = array();
+				foreach (Tree::getAllIgnoreAccess() as $tree) {
+					if (!in_array($tree->getName(),$search_excluded_trees)){
+						if (strpos($tree->getTitle(), ':') !== false){
+							addtoGroup($groups, $tree->getTitle(), $tree);
+						}
+						else{
+							$groups[I18N::translate('Miscellaneous')][] = $tree;
+						}
+					}
+				}
+				$groupindex = 0;
+				createMenu($groups, $controller, $groupindex,0);
+				?>
 			</div>
-			<?php endif; ?>
 
 			<div class="label"></div>
 			<div class="value">
@@ -270,31 +328,89 @@ function checknames(frm) {
 				<input type="checkbox" name="showasso" value="on" <?php echo $controller->showasso === 'on' ? 'checked' : ''; ?>>
 				<?php echo I18N::translate('Show related individuals/families'); ?>
 			</div>
-			<?php if (count(Tree::getAll()) > 1 && Site::getPreference('ALLOW_CHANGE_GEDCOM')): ?>
-				<?php if (count(Tree::getAll()) > 3): ?>
-					<div class="label"></div>
-					<div class="value">
-						<input type="button" value="<?php echo /* I18N: select all (of the family trees) */ I18N::translate('select all'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', true);});return false;">
-						<input type="button" value="<?php echo /* I18N: select none (of the family trees) */ I18N::translate('select none'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', false);});return false;">
-						<?php if (count(Tree::getAll()) > 10): ?>
-							<input type="button" value="<?php echo I18N::translate('invert selection'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', !jQuery(this).attr('checked'));});return false;">
-						<?php endif; ?>
-					</div>
-				<?php endif; ?>
-				<div class="label">
-					<?php echo I18N::translate('Family trees'); ?>
-				</div>
-				<div id="search_trees" class="value">
-					<?php foreach (Tree::getAll() as $tree): ?>
-						<p>
-							<input type="checkbox" <?php echo in_array($tree, $controller->search_trees) ? 'checked' : ''; ?> value="yes" id="tree_<?php echo $tree->getTreeId(); ?>" name="tree_<?php echo $tree->getTreeId(); ?>">
-							<label for="tree_'<?php echo $tree->getTreeId(); ?>">
-								<?php echo $tree->getTitleHtml(); ?>
-							</label>
-						</p>
-					<?php endforeach; ?>
-				</div>
-			<?php endif; ?>
+			<div class="label"></div>
+			<div class="value">
+				<input type="button" value="<?php echo /* I18N: select all (of the family trees) */ I18N::translate('select all'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', true);});return false;">
+				<input type="button" value="<?php echo /* I18N: select none (of the family trees) */ I18N::translate('select none'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', false);});return false;">
+				<input type="button" value="<?php echo I18N::translate('invert selection'); ?>" onclick="jQuery('#search_trees :checkbox').each(function(){jQuery(this).attr('checked', !jQuery(this).attr('checked'));});return false;">
+			</div>
+			<div class="label">
+				<?php echo I18N::translate('Family trees'); ?>
+			</div>
+			<div id="search_trees" class="value">
+			<?php
+			function addtoGroup(&$group, $str, $tree) {
+				if (strpos($str, ':') !== false) {
+					$groupname = trim(substr($str, 0, strpos($str, ':')));
+					$str = trim(substr($str, strpos($str, ':') + 1));
+					addtoGroup($group[$groupname], $str, $tree);
+				}
+				else {
+					$group[] = $tree;
+				}
+			}
+			function allChecked($groups, $controller) {
+				foreach ($groups as $group) {
+					if (gettype($group)=='array') {
+						if (!allChecked($group, $controller)) return false;
+					}
+					else {
+						$found = false;
+						foreach ($controller->search_trees as $tree) {
+							if ($tree->getTreeId() == $group->getTreeId())
+							{
+								$found = true;
+								break;
+							}
+						}
+						if (!$found) return false;
+					}
+				}
+				return true;
+			}
+			function createMenu($groups, $controller, &$groupindex, $level) {
+				foreach ($groups as $groupname=>$group) {
+					if (gettype($group)=='array') {
+						echo '<p><input type="checkbox" id="grp_' . $groupindex . '" value="yes" onclick="jQuery(\'#search_group_' . $groupindex . ' :checkbox\').each(function(value){jQuery(this).prop(\'checked\', value)},[jQuery(this).prop(\'checked\')])"' . (allChecked($group, $controller) ? ' checked' : '') . '>';
+						echo '<a href="#" onclick="jQuery(\'#search_group_' . $groupindex . '\').is(\':hidden\')?jQuery(\'#search_group_' . $groupindex . '\').show():jQuery(\'#search_group_' . $groupindex . '\').hide(); return false;">' . $groupname . '</a>';							
+						echo '<div id="search_group_' . $groupindex . '" style="margin-left:18px;display:none">';
+						$groupindex++;
+						createMenu($group, $controller, $groupindex, $level+1);
+						echo '</div><p>';
+					}
+				}
+				foreach ($groups as $groupname=>$group) {
+					if (gettype($group)=='object') {
+						echo '<p>';
+						echo '<input type="checkbox" value="yes" id="tree_' . $group->getTreeId() . '" name="tree_' . $group->getTreeId() . '"';
+						foreach ($controller->search_trees as $tree) {
+							if ($tree->getTreeId() == $group->getTreeId()) {
+								echo ' checked';
+								break;
+							}
+						}
+						echo '>';
+						echo '<label for="tree_' . $group->getTreeId() . '">' . $group->getTitleHtml() . '</label>';
+						echo '</p>';
+					}
+				}
+			}
+			//Create Groups
+			$groups = array();
+			foreach (Tree::getAllIgnoreAccess() as $tree) {
+				if (!in_array($tree->getName(),$search_excluded_trees)){
+					if (strpos($tree->getTitle(), ':') !== false){
+						addtoGroup($groups, $tree->getTitle(), $tree);
+					}
+					else{
+						$groups[I18N::translate('Miscellaneous')][] = $tree;
+					}
+				}
+			}
+			$groupindex = 0;
+			createMenu($groups, $controller, $groupindex,0);
+			?>
+			</div>
 
 			<div class="label"></div>
 			<div class="value">

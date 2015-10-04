@@ -17,11 +17,14 @@ namespace Fisharebest\Webtrees\Controller;
 
 use Fisharebest\Webtrees\Database;
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Soundex;
+use Fisharebest\Webtrees\Tree;
 
 /**
  * Controller for the advanced search page
@@ -269,7 +272,7 @@ class AdvancedSearchController extends SearchController {
 		}
 
 		// Dynamic SQL query, plus bind variables
-		$sql  = 'SELECT DISTINCT ind.i_id AS xref, ind.i_gedcom AS gedcom FROM `##individuals` ind';
+		$sql  = 'SELECT DISTINCT ind.i_id AS xref, ind.i_file AS gedcom_id, ind.i_gedcom AS gedcom FROM `##individuals` ind';
 		$bind = array();
 
 		// Join the following tables
@@ -364,8 +367,16 @@ class AdvancedSearchController extends SearchController {
 					") AS f_p ON (f_p.file  =ind.i_file AND f_pl.pl_p_id= f_p.id)";
 		}
 		// Add the where clause
-		$sql .= " WHERE ind.i_file=?";
-		$bind[] = $WT_TREE->getTreeId();
+		$sql .= " WHERE ind.i_file IN (";
+		$i = 0;
+		foreach ($this->search_trees as $tree) {
+			if ($i > 0) $sql .= ",";
+			$i++;
+			$sql .= "?";
+			$bind[] = $tree->getTreeId();
+		}
+		$sql .= ")";
+
 		for ($i = 0; $i < $fct; $i++) {
 			$field = $this->fields[$i];
 			$value = $this->values[$i];
@@ -634,7 +645,7 @@ class AdvancedSearchController extends SearchController {
 		}
 		$rows = Database::prepare($sql)->execute($bind)->fetchAll();
 		foreach ($rows as $row) {
-			$person = Individual::getInstance($row->xref, $WT_TREE, $row->gedcom);
+			$person = Individual::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Check for XXXX:PLAC fields, which were only partially matched by SQL
 			foreach ($this->fields as $n => $field) {
 				if ($this->values[$n] && preg_match('/^(' . WT_REGEX_TAG . '):PLAC$/', $field, $match)) {
@@ -653,7 +664,34 @@ class AdvancedSearchController extends SearchController {
 	public function printResults() {
 		if ($this->myindilist) {
 			uasort($this->myindilist, '\Fisharebest\Webtrees\GedcomRecord::compare');
-			echo FunctionsPrintLists::individualTable($this->myindilist);
+			$this->addInlineJavascript('jQuery("#search-result-tabs").tabs();');
+			$this->addInlineJavascript('jQuery("#search-result-tabs").css("visibility", "visible");');
+			$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
+			echo '<div class="loading-image"></div>';
+			echo '<div id="search-result-tabs"><ul>';
+			if (!empty($this->myindilist)) {
+				echo '<li><a href="#individual-results-tab">', I18N::translate('Individuals'), '</a></li>';
+			}
+			echo '</ul>';
+			// Split individuals by tree
+			echo '<div id="individual-results-tab">';
+			foreach ($this->search_trees as $search_tree) {
+				$datalist = array();
+				foreach ($this->myindilist as $individual) {
+					if (($individual->getTree()->getTreeId() === $search_tree->getTreeId()) && ($individual->canShow())) {
+						$datalist[] = $individual;
+					}
+				}
+				if (sizeof($datalist)>0) {
+					echo '<h3 class="indi-acc-header"><a href="#">', $search_tree->getTitleHtml(), '</span></a></h3>
+						 <div class="indi-acc_content">',
+						 FunctionsPrintLists::individualTable($datalist);
+					echo '</div>';
+				}
+			}
+			echo '</div>';
+			$this->addInlineJavascript('jQuery("#individual-results-tab").accordion({heightStyle: "content", collapsible: true});');
+			echo '</div>';
 		} elseif (array_filter($this->values)) {
 			echo '<p class="ui-state-highlight">', I18N::translate('No results found.'), '</p>';
 		}

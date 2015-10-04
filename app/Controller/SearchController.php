@@ -156,7 +156,7 @@ class SearchController extends PageController {
 
 		// Trees to search
 		if (Site::getPreference('ALLOW_CHANGE_GEDCOM')) {
-			foreach (Tree::getAll() as $search_tree) {
+			foreach (Tree::getAllIgnoreAccess() as $search_tree) {
 				if (Filter::get('tree_' . $search_tree->getTreeId())) {
 					$this->search_trees[] = $search_tree;
 				}
@@ -525,16 +525,84 @@ class SearchController extends PageController {
 				}
 				echo '</ul>';
 				if (!empty($this->myindilist)) {
-					echo '<div id="individual-results-tab">', FunctionsPrintLists::individualTable($this->myindilist), '</div>';
+					// Split individuals by tree
+					echo '<div id="individual-results-tab">';
+					foreach ($this->search_trees as $search_tree) {
+						$datalist = array();
+						foreach ($this->myindilist as $individual) {
+							if (($individual->getTree()->getTreeId() === $search_tree->getTreeId()) && ($individual->canShow())) {
+								$datalist[] = $individual;
+							}
+						}
+						if (sizeof($datalist)>0) {
+							echo '<h3 class="indi-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->query, '</span> @ <span>', $search_tree->getTitleHtml(), '</span></a></h3>
+								<div class="indi-acc_content">',
+							FunctionsPrintLists::individualTable($datalist);
+							echo '</div>';
+						}
+					}
+					echo '</div>';
+					$this->addInlineJavascript('jQuery("#individual-results-tab").accordion({heightStyle: "content", collapsible: true});');
 				}
 				if (!empty($this->myfamlist)) {
-					echo '<div id="families-results-tab">', FunctionsPrintLists::familyTable($this->myfamlist), '</div>';
+					// Split families by tree
+					echo '<div id="families-results-tab">';
+					foreach ($this->search_trees as $search_tree) {
+						$datalist = array();
+						foreach ($this->myfamlist as $family) {
+							if (($family->getTree()->getTreeId() === $search_tree->getTreeId()) && ($family->canShow())) {
+								$datalist[] = $family;
+							}
+						}
+						if (sizeof($datalist)>0) {
+							echo '<h3 class="fam-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->query, '</span> @ <span>', $search_tree->getTitleHtml(), '</span></a></h3>
+								<div class="fam-acc_content">',
+							FunctionsPrintLists::familyTable($datalist);
+							echo '</div>';
+						}
+					}
+					echo '</div>';
+					$this->addInlineJavascript('jQuery("#families-results-tab").accordion({heightStyle: "content", collapsible: true});');
 				}
 				if (!empty($this->mysourcelist)) {
-					echo '<div id="sources-results-tab">', FunctionsPrintLists::sourceTable($this->mysourcelist), '</div>';
+					// Split sources by tree
+					echo '<div id="sources-results-tab">';
+					foreach ($this->search_trees as $search_tree) {
+						$datalist = array();
+						foreach ($this->mysourcelist as $source) {
+							if (($source->getTree()->getTreeId() === $search_tree->getTreeId()) && ($source->canShow())) {
+								$datalist[] = $source;
+							}
+						}
+						if (sizeof($datalist)>0) {
+							echo '<h3 class="source-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->query, '</span> @ <span>', $search_tree->getTitleHtml(), '</span></a></h3>
+								<div class="source-acc_content">',
+							FunctionsPrintLists::sourceTable($datalist);
+							echo '</div>';
+						}
+					}
+					echo '</div>';
+					$this->addInlineJavascript('jQuery("#sources-results-tab").accordion({heightStyle: "content", collapsible: true});');
 				}
 				if (!empty($this->mynotelist)) {
-					echo '<div id="notes-results-tab">', FunctionsPrintLists::noteTable($this->mynotelist), '</div>';
+					// Split notes by tree
+					echo '<div id="notes-results-tab">';
+					foreach ($this->search_trees as $search_tree) {
+						$datalist = array();
+						foreach ($this->mynotelist as $note) {
+							if (($note->getTree()->getTreeId() === $search_tree->getTreeId()) && ($note->canShow())) {
+								$datalist[] = $note;
+							}
+						}
+						if (sizeof($datalist)>0) {
+							echo '<h3 class="note-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->query, '</span> @ <span>', $search_tree->getTitleHtml(), '</span></a></h3>
+								<div class="note-acc_content">',
+							FunctionsPrintLists::noteTable($datalist);
+							echo '</div>';
+						}
+					}
+					echo '</div>';
+					$this->addInlineJavascript('jQuery("#notes-results-tab").accordion({heightStyle: "content", collapsible: true});');
 				}
 				echo '</div>';
 			} else {

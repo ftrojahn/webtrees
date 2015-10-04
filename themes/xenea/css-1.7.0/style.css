@@ -2729,8 +2729,13 @@ dd .deletelink {
 	white-space: nowrap;
 }
 
-#search-page-table p {
+#search-page-table p,
+#search_trees p {
 	margin: 0;
+}
+
+#search-notice {
+	text-align: center;
 }
 
 [dir=rtl] #search-page-table .label {
