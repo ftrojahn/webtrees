@@ -199,21 +199,7 @@ default:
 			</div>';
 			if (Site::getPreference('USE_REGISTRATION_MODULE')) {
 				echo '<div><a href="' . WT_LOGIN_URL . '?action=register">', I18N::translate('Request new user account'), '</a></div>';
-				echo '<div><a href="'.WT_LOGIN_URL.'?action=delete">', WT_I18N::translate('Delete user account'), '</a></div>';
-			}
-		}
-		else {
-			$trees = WT_Tree::getAll();
-			$first_tree = reset($trees);
-			if ($first_tree!=null) {
-				echo '
-				<div>
-					<a href="#" id="passwd_click">', WT_I18N::translate('Request new password'), '</a>
-				</div>';
-				if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
-					echo '<div><a href="'.WT_LOGIN_URL.'?action=register&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Request new user account'), '</a></div>';
-					echo '<div><a href="'.WT_LOGIN_URL.'?action=delete&ctype=gedcom&ged='.$first_tree->tree_name.'">', WT_I18N::translate('Delete user account'), '</a></div>';
-				}
+				echo '<div><a href="'.WT_LOGIN_URL.'?action=delete">', I18N::translate('Delete user account'), '</a></div>';
 			}
 		}
 	echo '</form>';
@@ -290,7 +276,7 @@ case 'register':
 			FlashMessages::addMessage(I18N::translate('Duplicate user name.  A user with that user name already exists.  Please choose another user name.'));
 		} elseif (User::findByIdentifier($user_email)) {
 			FlashMessages::addMessage(I18N::translate('Duplicate email address.  A user with that email already exists.'));
-		} elsif ($user_email != $user_email2) {
+		} elseif ($user_email != $user_email2) {
 			FlashMessages::addMessage(I18N::translate('Emails do not match.'));
 		} elseif (preg_match('/(?!' . preg_quote(WT_BASE_URL, '/') . ')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $user_comments, $match)) {
 			FlashMessages::addMessage(
@@ -500,9 +486,7 @@ case 'register':
 							cols="50" rows="5"
 							id="user_comments" name="user_comments"
 							placeholder="<?php /* I18N: placeholder text for registration-comments field */ I18N::translate('Explain why you are requesting an account.'); ?>"
-						>
-							<?php echo Filter::escapeHtml($user_comments); ?>
-						</textarea>
+						><?php echo Filter::escapeHtml($user_comments); ?></textarea>
 					</label>
 					<p class="small text-muted">
 						<?php echo I18N::translate('Use this field to tell the site administrator why you are requesting an account and how you are related to the genealogy displayed on this site.  You can also use this to enter any other comments you may have for the site administrator.'); ?>
@@ -635,114 +619,114 @@ case 'verify_hash':
 	echo '</div>';
 	break;
 case 'delete':
-	if (!WT_Site::getPreference('USE_REGISTRATION_MODULE')) {
+	if (!Site::getPreference('USE_REGISTRATION_MODULE')) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 		exit;
 	}
 	if ((isset($username)) && (isset($password))) {
 		$user = User::findByIdentifier($username);
 		if (!$user) {
-			$message = WT_I18N::translate('The username or password is incorrect.');
+			$message = I18N::translate('The username or password is incorrect.');
 		}
 		else if (!$user->checkPassword($password)) {
-			$message = WT_I18N::translate('The username or password is incorrect.');
+			$message = I18N::translate('The username or password is incorrect.');
 		}
 		else if ($user->getRealName() != $user_realname) {
-			$message = WT_I18N::translate('The real name does not match the one for this account.');
+			$message = I18N::translate('The real name does not match the one for this account.');
 		}
 		else if ($user->getEmail() != $user_email) {
-			$message = WT_I18N::translate('The email address does not match the one for this account.');
+			$message = I18N::translate('The email address does not match the one for this account.');
 		}
 		else {
 			Log::addAuthenticationLog('User ' . $user->getUserName() . ' deleted his accunt.');
 
 			// Generate an email in the admin’s language
 			$webmaster = User::find($WT_TREE->getPreference('WEBMASTER_USER_ID'));
-			WT_I18N::init($webmaster->getPreference('language'));
+			I18N::init($webmaster->getPreference('language'));
 
 			$mail1_body =
-				WT_I18N::translate('Hello administrator…') . WT_Mail::EOL . WT_Mail::EOL .
+				I18N::translate('Hello administrator…') . Mail::EOL . Mail::EOL .
 				/* I18N: %s is a server name/URL */
-				WT_I18N::translate('A user has deleted his account at %s.', WT_SERVER_NAME . WT_SCRIPT_PATH . ' ' . $WT_TREE->tree_title_html) . WT_Mail::EOL . WT_Mail::EOL .
-				WT_I18N::translate('Username')      .' '.$username     . WT_Mail::EOL .
-				WT_I18N::translate('Real name')     .' '.$user_realname . WT_Mail::EOL .
-				WT_I18N::translate('Email address:').' '.$user_email    . WT_Mail::EOL;
-			$mail1_body .= WT_Mail::auditFooter();
+				I18N::translate('A user has deleted his account at %s.', WT_BASE_URL . ' ' . $WT_TREE->getTitleHtml()) . Mail::EOL . Mail::EOL .
+				I18N::translate('Username')      .' '.$username     . Mail::EOL .
+				I18N::translate('Real name')     .' '.$user_realname . Mail::EOL .
+				I18N::translate('Email address:').' '.$user_email    . Mail::EOL;
+			$mail1_body .= Mail::auditFooter();
 
-			$mail1_subject = /* I18N: %s is a server name/URL */ WT_I18N::translate('Account deletion at %s', WT_SERVER_NAME . WT_SCRIPT_PATH . ' ' . $WT_TREE->tree_title);
-			WT_I18N::init(WT_LOCALE);
+			$mail1_subject = /* I18N: %s is a server name/URL */ I18N::translate('Account deletion at %s', WT_BASE_URL . ' ' . $WT_TREE->getTitleHtml());
+			I18N::init(WT_LOCALE);
 
 			$user->delete();
 
 			// Send admin message by email and/or internal messaging
-			WT_Mail::send(
+			Mail::send(
 				// “From:” header
 				$WT_TREE,
 				// “To:” header
 				$webmaster->getEmail(),
 				$webmaster->getRealName(),
 				// “Reply-To:” header
-				$WEBTREES_EMAIL,
-				$WEBTREES_EMAIL,
+				$WT_TREE->getPreference('WEBTREES_EMAIL'),
+				$WT_TREE->getPreference('WEBTREES_EMAIL'),
 				// Message body
 				$mail1_subject,
 				$mail1_body
 			);
 			$mail1_method  = $webmaster->getPreference('CONTACT_METHOD');
-			if ($mail1_method!='messaging3' && $mail1_method!='mailto' && $mail1_method!='none') {
-				WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
-					->execute(array($user_email, $WT_REQUEST->getClientIp(), $webmaster->getUserId(), $mail1_subject, WT_Filter::unescapeHtml($mail1_body)));
+			if ($mail1_method != 'messaging3' && $mail1_method != 'mailto' && $mail1_method != 'none') {
+				Database::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
+					->execute(array($username, WT_CLIENT_IP, $webmaster->getUserId(), $mail1_subject, Filter::unescapeHtml($mail1_body)));
 			}
 
 			$controller
-				->setPageTitle(WT_I18N::translate('Delete user account'))
+				->setPageTitle(I18N::translate('Delete user account'))
 				->pageHeader();
 			echo '<div id="deletion-text">';
-			echo WT_I18N::translate('<center><h2>Delete user account</h2></center><br>You were successfully signed-out as a user. We wish you continued success with your genealogical research.');
+			echo I18N::translate('<center><h2>Delete user account</h2></center><br>You were successfully signed-out as a user. We wish you continued success with your genealogical research.');
 			echo '</div>';
 			exit;
 		}
 	}
 
 	$controller
-		->setPageTitle(WT_I18N::translate('Delete user account'))
+		->setPageTitle(I18N::translate('Delete user account'))
 		->pageHeader();
 
 	echo '<div id="deletion-page">';
 	echo '<div id="deletion-text">';
-        echo '<center><h2>'.WT_I18N::translate('Delete user account').'</h2></center><br>';
-        echo '<div class="largeError">'.WT_I18N::translate('Notice:').'</div>';
-	echo '<div class="error">'.WT_I18N::translate('user-deletion-message').'</div>';
+        echo '<center><h2>'.I18N::translate('Delete user account').'</h2></center><br>';
+        echo '<div class="largeError">'.I18N::translate('Notice:').'</div>';
+	echo '<div class="error">'.I18N::translate('user-deletion-message').'</div>';
 	echo '</div>';
 
 	echo '<div id="deletion-box">';
 	if (!empty($message)) echo '<span class="error"><br><b>', $message, '</b><br><br></span>';
 	echo '<form id="deletion-form" name="deletion-form" method="post" action="'.WT_LOGIN_URL.'" autocomplete="off" onsubmit="return confirm(\'Dauerhaft abmelden?\')">
 			<input type="hidden" name="action" value="delete">
-			<h4>', WT_I18N::translate('All fields must be completed.'), '</h4><hr>
+			<h4>', I18N::translate('All fields must be completed.'), '</h4><hr>
 			<div>
-				<label for="user_realname">', WT_I18N::translate('Real name'),
-					'<input type="text" id="user_realname" name="user_realname" required maxlength="64" value="', WT_Filter::escapeHtml($user_realname), '" autofocus>
+				<label for="user_realname">', I18N::translate('Real name'),
+					'<input type="text" id="user_realname" name="user_realname" required maxlength="64" value="', Filter::escapeHtml($user_realname), '" autofocus>
 				</label>
 			</div>
 			<div>
-				<label for="user_email">', WT_I18N::translate('Email address'),
-					'<input type="email" id="user_email" name="user_email" required maxlength="64" value="', WT_Filter::escapeHtml($user_email), '">
+				<label for="user_email">', I18N::translate('Email address'),
+					'<input type="email" id="user_email" name="user_email" required maxlength="64" value="', Filter::escapeHtml($user_email), '">
 				</label>
 			</div>
 			<div>
-				<label for="username">', WT_I18N::translate('Username'),
-					'<input type="text" id="username" name="username" required maxlength="32" value="', WT_Filter::escapeHtml($username), '">
+				<label for="username">', I18N::translate('Username'),
+					'<input type="text" id="username" name="username" required maxlength="32" value="', Filter::escapeHtml($username), '">
 				</label>
 			</div>
 			<div>
-				<label for="password">', WT_I18N::translate('Password'),
-					'<input type="password" id="password" name="password" value="', WT_Filter::escapeHtml($password), '" required pattern="'. WT_REGEX_PASSWORD .'">
+				<label for="password">', I18N::translate('Password'),
+					'<input type="password" id="password" name="password" value="', Filter::escapeHtml($password), '" required pattern="'. WT_REGEX_PASSWORD .'">
 				</label>
 			</div>
 			<hr>
 			<div id="deletion-submit">
-				<input type="submit" value="', WT_I18N::translate('Sign-Out'), '">
+				<input type="submit" value="', I18N::translate('Sign-Out'), '">
 			</div>
 		</form>
 	</div>';

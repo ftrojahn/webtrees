@@ -87,6 +87,7 @@ class LoginBlockModule extends AbstractModule implements ModuleBlockInterface {
 				</div>';
 			if (Site::getPreference('USE_REGISTRATION_MODULE')) {
 				$content .= '<div><a href="' . WT_LOGIN_URL . '?action=register">' . I18N::translate('Request new user account') . '</a></div>';
+				$content .= '<div><a href="' . WT_LOGIN_URL . '?action=delete">' . I18N::translate('Delete user account') . '</a></div>';
 			}
 		$content .= '</form>'; // close "login-form"
 
