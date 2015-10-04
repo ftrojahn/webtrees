@@ -21,10 +21,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use Fisharebest\Webtrees\Auth;
+//use Fisharebest\Webtrees\Filter;
+//use Fisharebest\Webtrees\Functions\FunctionsDb;
+//use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Place;
+//use Fisharebest\Webtrees\Stats;
+//use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Module\AbstractModule;
+use Fisharebest\Webtrees\Module\ModuleTabInterface;
+use Fisharebest\Webtrees\Soundex;
+use Fisharebest\Webtrees\Database;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\GedcomTag;
 
 function date_different($a, $b) {
 	if (($a==0) || ($b==0)) return false;
@@ -39,33 +50,33 @@ function date_same($a, $b) {
 function date_range($date,&$min, &$max) {
 	switch ($date->qual1) {
 	case 'BEF':
-		$min = $date->date1->y - 10;
-		$max = $date->date1->y;
+		$min = $date->minimumDate()->y - 10;
+		$max = $date->minimumDate()->y;
 		break;
 	case 'AFT':
-		$min = $date->date1->y;
-		$max = $date->date1->y + 10;
+		$min = $date->minimumDate()->y;
+		$max = $date->minimumDate()->y + 10;
 		break;
 	case 'ABT':
 	case 'EST':
-		$min = $date->date1->y - 5;
-		$max = $date->date1->y + 5;
+		$min = $date->minimumDate()->y - 5;
+		$max = $date->minimumDate()->y + 5;
 		break;
 	case 'FROM':
 	case 'BET':
-		$min = $date->date1->y;
-		$max = $date->date2->y;
+		$min = $date->minimumDate()->y;
+		$max = $date->maximumDate()->y;
 		break;
 	default:
-		$min = $date->date1->y;
-		$max = $date->date1->y;
+		$min = $date->minimumDate()->y;
+		$max = $date->minimumDate()->y;
 	}	
 }
 
 function check_date($a, $b) {
 	if ((($a->qual1!=NULL) && (in_array($a->qual1,array('FROM','BET','BEF','AFT','EST','ABT')))) || (($b->qual1!=NULL) && (in_array($b->qual1,array('FROM','BET','BEF','AFT','EST','ABT')))))
 	{
-		if (($a->date1->y==0) || ($b->date1->y==0)) return 1.0;
+		if (($a->minimumDate()->y==0) || ($b->minimumDate()->y==0)) return 1.0;
 		date_range($a,$amin,$amax);
 		date_range($b,$bmin,$bmax);
 		if (($bmax<$amin) || ($bmin>$amax)) return 0.0;
@@ -73,22 +84,22 @@ function check_date($a, $b) {
 	}
 	else
 	{
-		if ((date_different($a->date1->y,$b->date1->y)) ||
-			(date_different($a->date1->m,$b->date1->m)) ||
-			(date_different($a->date1->d,$b->date1->d)))
+		if ((date_different($a->minimumDate()->y,$b->minimumDate()->y)) ||
+			(date_different($a->minimumDate()->m,$b->minimumDate()->m)) ||
+			(date_different($a->minimumDate()->d,$b->minimumDate()->d)))
 		{
 			return 0.0;
 		}
 		else
 		{
 			$newvalue=1.0;
-			if (date_same($a->date1->y,$b->date1->y))
+			if (date_same($a->minimumDate()->y,$b->minimumDate()->y))
 			{
 				$newvalue++;
-				if (date_same($a->date1->m,$b->date1->m))
+				if (date_same($a->minimumDate()->m,$b->minimumDate()->m))
 				{
 					$newvalue++;
-					if (date_same($a->date1->d,$b->date1->d))
+					if (date_same($a->minimumDate()->d,$b->minimumDate()->d))
 					{
 						$newvalue++;
 					}
@@ -110,38 +121,39 @@ function check_dates($dates1, $dates2) {
 	return $value;
 }
 
-class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
+class DuplicatesTabModule extends AbstractModule implements ModuleTabInterface {
 	private $duplicates;
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getTitle() {
-		return /* I18N: Name of a module */ WT_I18N::translate('Duplicates');
+		return /* I18N: Name of a module */ I18N::translate('Duplicates');
 	}
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
-		return /* I18N: Description of the “Sources” module */ WT_I18N::translate('A list showing possible duplicates of an individual.');
+		return /* I18N: Description of the “Sources” module */ I18N::translate('A list showing possible duplicates of an individual.');
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function defaultTabOrder() {
 		return 1000;
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function hasTabContent() {
 		return ($this->get_duplicates()) && (count($this->get_duplicates())>1);
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function isGrayedOut() {
 		return !$this->get_duplicates();
 	}
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $SEARCH_SPIDER,$controller;
+		global $controller;
+		global $WT_TREE;
 
-		ob_start();
+		ob_start();		
 		echo '<style type="text/css">';
 		echo '<!--';
 		echo '.duplicates_table:hover {background-color:#efefef;}';
@@ -149,14 +161,15 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 		echo '</style>';
 		echo '<table class="facts_table">';
 		echo '<thead><tr class="descriptionbox">';
-		echo '<th>'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
-		echo '<th>'.WT_Gedcom_Tag::getLabel('BIRT').'</th>';
-		echo '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
-		echo '<th>'.WT_Gedcom_Tag::getLabel('DEAT').'</th>';
-		echo '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
-		echo '<th>'.WT_I18N::translate('Source').'</th>';
+		echo '<th>'.GedcomTag::getLabel('NAME').'</th>';
+		echo '<th>'.GedcomTag::getLabel('BIRT').'</th>';
+		echo '<th>'.GedcomTag::getLabel('PLAC').'</th>';
+		echo '<th>'.GedcomTag::getLabel('DEAT').'</th>';
+		echo '<th>'.GedcomTag::getLabel('PLAC').'</th>';
+		echo '<th>'.I18N::translate('Source').'</th>';
 		echo '</tr></thead>';
 		echo '<tbody>';
+		
 		foreach ($this->get_duplicates() as $person) {
 			echo '<tr class="optionbox duplicates_table">';
 			if ($person->isPendingAddtion()) {
@@ -172,7 +185,7 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 				if ($name['type']=='NAME') {
 					$title='';
 				} else {
-					$title='title="'.strip_tags(WT_Gedcom_Tag::getLabel($name['type'], $person)).'"';
+					$title='title="'.strip_tags(GedcomTag::getLabel($name['type'], $person)).'"';
 				}
 				if ($num==$person->getPrimaryName()) {
 					$class=' class="name2"';
@@ -192,7 +205,7 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 					if ($num) {
 						echo '<br>';
 					}
-					echo $date->Display(!$SEARCH_SPIDER);
+					echo $date->Display(!Auth::isSearchEngine());
 				}				
 			} else {
 				echo '&nbsp;';				
@@ -201,11 +214,11 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			//Birth place
 			echo '<td>';
 			foreach ($person->getAllBirthPlaces() as $n=>$place) {
-				$tmp=new WT_Place($place, WT_GED_ID);
+				$tmp=new Place($place, $person->getTree());
 				if ($n) {
 					echo '<br>';
 				}
-				if ($SEARCH_SPIDER) {
+				if (Auth::isSearchEngine()) {
 					echo $tmp->getShortName();
 				} else {
 					echo '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getFullName()) . '">';
@@ -220,7 +233,7 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 					if ($num) {
 						echo '<br>';
 					}
-					echo $date->Display(!$SEARCH_SPIDER);
+					echo $date->Display(!Auth::isSearchEngine());
 				}				
 			} else {
 				echo '&nbsp;';				
@@ -229,11 +242,11 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			//Death place
 			echo '<td>';
 			foreach ($person->getAllDeathPlaces() as $n=>$place) {
-				$tmp=new WT_Place($place, WT_GED_ID);
+				$tmp=new Place($place, $person->getTree());
 				if ($n) {
 					echo '<br>';
 				}
-				if ($SEARCH_SPIDER) {
+				if (Auth::isSearchEngine()) {
 					echo $tmp->getShortName();
 				} else {
 					echo '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getFullName()) . '">';
@@ -242,11 +255,11 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			}
 			echo '</td>';
 			echo '<td>';
-			echo '<a href="index.php?ctype=gedcom&amp;ged='.WT_TREE::get($person->getGedcomId())->tree_name_url.'">'.WT_TREE::get($person->getGedcomId())->tree_title_html.'</a>';
+			echo '<a href="index.php?ctype=gedcom&amp;ged='.$person->getTree()->getNameUrl().'">'.$person->getTree()->getTitleHtml().'</a>';
 			echo '</td>';
 			
 			echo '</tr>';
-			if ($person==$controller->record){			 
+			if ($person==$controller->record){
 				echo '<tr class="descriptionbox">';
 				echo '<td colspan="6">';				
 				echo '</td>';				
@@ -254,7 +267,7 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			}
 		}
 		echo '</tbody>';
-		echo '</table>';
+		echo '</table>';		
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}
 	
@@ -270,7 +283,7 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 	
 	function get_duplicates() {
 		global $controller;
-
+		
 		if ($this->duplicates === null) {
 			$this->duplicates=array($controller->record);
 			if (($controller->record->getAllEventDates('BIRT')) ||
@@ -287,8 +300,8 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 				$sdx_g = array();
 				foreach($names as $name)
 				{
-					$sdx_s = array_merge($sdx_s,explode(':',WT_Soundex::daitchMokotoff($name['surn'])));
-					$sdx_g = array_merge($sdx_g,explode(':',WT_Soundex::daitchMokotoff($name['givn'])));
+					$sdx_s = array_merge($sdx_s,explode(':',Soundex::daitchMokotoff($name['surn'])));
+					$sdx_g = array_merge($sdx_g,explode(':',Soundex::daitchMokotoff($name['givn'])));
 				}
 				$sdx_s = array_unique($sdx_s);
 				$sdx_g = array_unique($sdx_g);
@@ -311,18 +324,18 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 					$sql.=" WHERE 0";
 				}
 			
-				$rows=WT_DB::prepare($sql)->execute(array_merge($sdx_s,$sdx_g))->fetchAll();
+				$rows=Database::prepare($sql)->execute(array_merge($sdx_s,$sdx_g))->fetchAll();
 				foreach ($rows as $row) {
-					$person=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+					$person=Individual::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 				
 					if (!$person->canShowName()) continue;
-					if (($person->getXref()==$controller->record->getXref()) && ($person->getGedcomId()==$controller->record->getGedcomId())) continue;
+					if (($person->getXref()==$controller->record->getXref()) && ($person->getTree()->getTreeId()==$controller->record->getTree()->getTreeId())) continue;
 					
 					$c_birt =	check_dates($person->getAllEventDates('BIRT'),$controller->record->getAllEventDates('BIRT'));
 					$c_chr  =	check_dates($person->getAllEventDates('CHR'),$controller->record->getAllEventDates('CHR'));
 					$c_deat	=	check_dates($person->getAllEventDates('DEAT'),$controller->record->getAllEventDates('DEAT'));
 					$c_buri	=	check_dates($person->getAllEventDates('BURI'),$controller->record->getAllEventDates('BURI'));
-					if ($c_birt*$c_chr*$c_deat*$c_buri>=2){ 
+					if ($c_birt*$c_chr*$c_deat*$c_buri>=2){
 						$this->duplicates[]=$person;					
 					}				
 				}
@@ -331,15 +344,15 @@ class duplicates_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 		return $this->duplicates;
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function canLoadAjax() {
-		global $SEARCH_SPIDER;
-
-		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
+		return !Auth::isSearchEngine(); // Search engines cannot use AJAX
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function getPreLoadContent() {
 		return '';
 	}
 }
+
+return new DuplicatesTabModule(__DIR__);
