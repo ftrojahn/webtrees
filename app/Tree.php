@@ -488,6 +488,15 @@ class Tree {
 			'tree_id' => $tree_id,
 		));
 
+		//Set role to "Member" for all users
+		Database::prepare(
+			"INSERT INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".
+			" SELECT user_id, :tree_id, 'canedit', 'access'".
+			"FROM `##user` WHERE user_id > 0"
+		)->execute(array(
+			'tree_id' => $tree_id,
+		));
+
 		// Gedcom and privacy settings
 		$tree->setPreference('CONTACT_USER_ID', Auth::id());
 		$tree->setPreference('WEBMASTER_USER_ID', Auth::id());

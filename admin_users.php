@@ -622,7 +622,7 @@ case 'edit':
 						<select name="canedit<?php echo $tree->getTreeId(); ?>">
 							<?php foreach ($ALL_EDIT_OPTIONS as $EDIT_OPTION => $desc): ?>
 								<option value="<?php echo $EDIT_OPTION; ?>"
-									<?php echo $EDIT_OPTION === $tree->getUserPreference($user, 'canedit') ? 'selected' : ''; ?>
+									<?php echo (($EDIT_OPTION === $tree->getUserPreference($user, 'canedit')) || (($user->getUserId()==='') && ($EDIT_OPTION === 'access'))) ? 'selected' : ''; ?>
 									>
 									<?php echo $desc; ?>
 								</option>

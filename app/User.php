@@ -140,6 +140,12 @@ class User {
 			" SELECT :user_id , `location`, `block_order`, `module_name` FROM `##block` WHERE `user_id` = -1"
 		)->execute(array('user_id' => $user->getUserId()));
 
+		// Set user role to "Member" for all gedcoms
+		Database::prepare(
+			"INSERT INTO `##user_gedcom_setting` (`user_id`, `gedcom_id`, `setting_name`, `setting_value`)".
+			" SELECT :user_id , `gedcom_id`, 'canedit', 'access' FROM `##gedcom` WHERE `gedcom_id` > 0"
+		)->execute(array('user_id' => $user->getUserId()));
+
 		return $user;
 	}
 
