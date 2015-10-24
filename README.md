@@ -11,6 +11,7 @@
 The project’s website is [www.webtrees.net](http://www.webtrees.net).
 Further documentation is available at [wiki.webtrees.net](http://wiki.webtrees.net).
 
+This Fork is used to track changes for the [www.webgenealogie.de](http://wt.webgenealogie.de) installation.
 
 ## Contents
 
