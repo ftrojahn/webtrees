@@ -175,7 +175,13 @@ function checknames(frm) {
 								}
 							}
 							echo '>';
-							echo '<label for="tree_' . $group->getTreeId() . '">' . $group->getTitleHtml() . '</label>';
+							if (strrpos($group->getTitle(), ':')>0) {
+								$title_short = trim(substr($group->getTitle(), strrpos($group->getTitle(), ':')+1));
+							}
+							else {
+								$title_short = $group->getTitle();
+							}
+							echo '<label for="tree_' . $group->getTreeId() . '"><span dir="auto">' . Filter::escapeHtml($title_short) . '</span></label>';
 							echo '</p>';
 						}
 					}
