@@ -154,6 +154,7 @@ class XeneaTheme extends AbstractTheme implements ThemeInterface {
 			'	});' .
 			'	jQuery(\'.menu-tree\').mouseenter(function() {' .
 			'		jQuery(this).children(\'ul\').show();' . //show instantly
+			'		window.clearTimeout(timeoutID);' . //cancel not yet executed hide or show commmand
 			'	});' .
 			'	jQuery(\'.menu-tree\').mouseleave(function() {' .
 			'		window.clearTimeout(timeoutID);' . //cancel not yet executed hide or show commmand

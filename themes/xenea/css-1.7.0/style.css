@@ -4282,7 +4282,7 @@ header nav {
 	/*display: table;*/
 }
 
-.menu-tree ul {
+.primary-menu .menu-tree ul {
 	max-height:400px;
 	padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
 	overflow-y:auto;

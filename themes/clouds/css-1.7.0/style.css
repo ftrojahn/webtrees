@@ -1182,6 +1182,7 @@ a:hover .nameZoom {
 
 #login-text,
 #register-text,
+#deletion-text,
 #user-verify {
 	margin: 20px auto;
 	width: 610px;
@@ -1189,13 +1190,15 @@ a:hover .nameZoom {
 }
 
 #login-box,
-#register-box {
+#register-box,
+#deletion-box {
 	text-align: center;
 }
 
 #login-form,
 #new_passwd_form,
 #register-form,
+#deletion-form,
 #verify-form {
 	background-color: #95b8e0;
 	border: 1px solid #999;
@@ -1213,6 +1216,7 @@ a:hover .nameZoom {
 #login-form div a,
 #new_passwd_form div,
 #register-form div,
+#deletion-form div,
 #verify-form div {
 	margin: auto;
 	padding: 5px;
@@ -1239,12 +1243,14 @@ a:hover .nameZoom {
 }
 
 #new_passwd_form h4,
-#register-form h4 {
+#register-form h4,
+#deletion-form h4 {
 	font-weight: normal;
 	text-align: center;
 }
 
 #register-form div,
+#deletion-form div,
 #verify-form div {
 	text-align: right;
 }
@@ -1252,7 +1258,7 @@ a:hover .nameZoom {
 #register-form label input,
 #register-form label select,
 #register-form textarea {
-background-color: #fff;
+	background-color: #fff;
 	width: 220px;
 	margin: 0 10px;
 	padding: 3px;
@@ -1269,6 +1275,28 @@ background-color: #fff;
 
 #register-form div#registration-submit {
 	text-align: center;
+}
+
+#deletion-form label input,
+#deletion-form label select,
+#deletion-form textarea {
+	background-color: #fff;
+	width:220px;
+	margin:0 10px;
+}
+
+#deletion-form label select {
+	margin:0 9px;
+	width:223px;
+}
+
+#deletion-form textarea {
+	margin:0 3px;
+	vertical-align:top;
+}
+
+#deletion-form div#deletion-submit {
+	text-align:center;
 }
 
 .login_block_block #login-form,
@@ -2771,7 +2799,7 @@ dd .deletelink {
 	border: 1px outset #ccc;
 	border-top: 0;
 	margin: 20px auto 0;
-	width: 580px;
+	width: 680px;
 }
 
 #search-page-table .label {
@@ -2791,7 +2819,7 @@ dd .deletelink {
 	white-space: nowrap;
 }
 
-#search-page-table p {
+#search-page-table p, #search_trees p {
 	margin: 0;
 }
 
@@ -4399,6 +4427,12 @@ header h1 {
 	opacity: 1;
 }
 
+.primary-menu .menu-tree > ul {
+    visibility: visible;
+	opacity: 1;
+	display: none;
+}
+
 .primary-menu > li > ul > li:first-child {
 	text-indent: 0;
 	min-width: 100px;
@@ -4422,8 +4456,6 @@ header h1 {
 	height: 22px;
 }
 
-
-
 .primary-menu li ul li {
 	background-image: url(images/sprites-sub-menu.png);
 	background-repeat: no-repeat;
@@ -4434,6 +4466,12 @@ header h1 {
 	margin: 2px 0;
 	text-indent: 22px;
 	width: 100%;
+}
+
+.primary-menu .menu-tree-file {
+	background-image: url(images/sprite-file.png);
+	background-repeat: no-repeat;
+	background-position: left 0px;
 }
 
 /* Reverse left and right on RTL pages */
@@ -4466,6 +4504,21 @@ header h1 {
 [dir=rtl] .primary-menu > li > ul > li:first-child {
 	text-align: center;
 }
+
+.menu-tree ul {
+	max-height:400px;
+	padding-right:16px; /* add padding-right because in Firefox (version 26.0) the scrollbar width isn't added to the total width and so the scrollbar would cover part of the text */
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+.primary-menu .menu-tree ul {
+	display: none;
+	visibility: visible;
+	opacity: 1;
+}
+
+.hoverMenu {position:absolute;}
 
 /* ====== End Theme Header ===== */
 
