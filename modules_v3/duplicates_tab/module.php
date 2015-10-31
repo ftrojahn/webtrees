@@ -318,6 +318,16 @@ class DuplicatesTabModule extends AbstractModule implements ModuleTabInterface {
 						$sql.=" OR (i_n.n_soundex_givn_dm LIKE CONCAT('%', ?, '%'))";
 					}
 					$sql .= ")";
+
+					if ($controller->record->getSex() == 'M') {
+						$sql.=" AND (ind.i_sex IN ('U', 'M'))";
+					}
+					elseif ($controller->record->getSex() == 'F') {
+						$sql.=" AND (ind.i_sex IN ('U', 'F'))";
+					}
+					else {
+						$sql.=" AND (ind.i_sex IN ('U', 'M', 'F'))";
+					}
 				}
 				else
 				{
