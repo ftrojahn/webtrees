@@ -25,6 +25,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\I18N;
 
 define('WT_SCRIPT_NAME', 'mediafirewall2.php');
 require './includes/session.php';
@@ -36,7 +37,7 @@ function send404AndExit() {
 	header('HTTP/1.0 404 Not Found');
 	header('Status: 404 Not Found');
 	header('Content-Type: text/html');
-	echo WT_I18N::translate('The file was not found');
+	echo I18N::translate('The file was not found');
 	exit;
 }
 
@@ -75,7 +76,7 @@ if (!Auth::check()) {
 $MEDIA_DIRECTORY = Tree::findByName(Site::getPreference('DEFAULT_GEDCOM'))->getPreference('MEDIA_DIRECTORY');
 
 //only published files should be accessible 
-require WT_DATA_DIR . $MEDIA_DIRECTORY . 'media_config.ini.php';
+require WT_DATA_DIR.'/media_config.ini.php';
 $exists = false;
 foreach ($media_special_trees as $file) {
 	if ($file->Filename == $murl) {

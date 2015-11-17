@@ -46,14 +46,7 @@ else {
 	$menu_abbreviations = array();
 }
 
-$MEDIA_DIRECTORY = Tree::findByName(Site::getPreference('DEFAULT_GEDCOM'))->getPreference('MEDIA_DIRECTORY');
-if (file_exists(WT_DATA_DIR . $MEDIA_DIRECTORY . 'media_config.ini.php')) {
-	require WT_DATA_DIR . $MEDIA_DIRECTORY . 'media_config.ini.php';
-}
-else {
-	global $media_special_trees;
-	$media_special_trees = array();
-}
+require WT_DATA_DIR.'/media_config.ini.php';
 
 function addtoGroup(&$group, $str, $tree) {
 	if (strpos($str, ':') !== false) {
