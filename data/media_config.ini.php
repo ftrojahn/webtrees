@@ -7,12 +7,13 @@ $media_special_trees = array();
 
 $MEDIA_DIRECTORY = Tree::findByName(Site::getPreference('DEFAULT_GEDCOM'))->getPreference('MEDIA_DIRECTORY');
 $filename = WT_DATA_DIR . $MEDIA_DIRECTORY . 'files.csv';
-$fp = fopen($filename, 'r');
-if ($fp) {
-	while (($data = fgetcsv($fp, 0, ';')) !== false) {
-		$media_special_trees[] = (object) array('Name' => $data[0],	'Filename' => $data[1]);
+if (file_exists($filename)) {
+	$fp = fopen($filename, 'r');
+	if ($fp) {
+		while (($data = fgetcsv($fp, 0, ';')) !== false) {
+			$media_special_trees[] = (object) array('Name' => $data[0],	'Filename' => $data[1]);
+		}
+		fclose($fp);
 	}
-	fclose($fp);
-}	
-
+}
 ?>
