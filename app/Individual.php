@@ -130,8 +130,8 @@ class Individual extends GedcomRecord {
 			return self::isRelated($this, $user_path_length);
 		}
 
-		// No restriction found - show living people to members only:
-		return Auth::PRIV_USER >= $access_level;
+		// No restriction found - use gedcom settings:
+		return $this->tree->getPreference('SHOW_LIVING_NAMES') >= $access_level;
 	}
 
 	/**
