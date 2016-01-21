@@ -115,6 +115,7 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 			$this->menuAdminTreesManage(),
 			$this->menuAdminTreesSetDefault(),
 			$this->menuAdminTreesMerge(),
+			$this->menuAdminTreesManagerOverview()
 		)));
 	}
 
@@ -148,6 +149,14 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 	protected function menuAdminTreesSetDefault() {
 		if (Auth::isAdmin() && count(Tree::getAll()) > 1) {
 			return new Menu(/* I18N: Menu entry */ I18N::translate('Set the default blocks for new family trees'), 'index_edit.php?gedcom_id=-1');
+		} else {
+			return null;
+		}
+	}
+
+	protected function menuAdminTreesManagerOverview() {
+		if (Auth::isAdmin()) {
+			return new Menu(/* I18N: Menu entry */ I18N::translate('Tree Manager Overview'), 'admin_trees_manager_overview.php');
 		} else {
 			return null;
 		}
