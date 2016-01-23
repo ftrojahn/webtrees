@@ -104,7 +104,7 @@ $controller->pageHeader();
 					$users = Database::prepare("SELECT tu.user_id, tugs.setting_value FROM `##user` AS tu JOIN `##user_gedcom_setting` AS tugs ON tu.user_id = tugs.user_id WHERE gedcom_id = ? AND tugs.setting_name = 'canedit' AND tugs.setting_value IN ('admin','accept','edit')")->execute(array($tree->getTreeId()))->fetchAll();
 
 					echo '<tr>';
-					echo '<td rowspan="'.max(1,sizeof($users)).'"><a href="admin_trees_config.php?action=general&ged=' . $tree->getName() . '">' . $tree->getTitleHtml() . '</a></td>';
+					echo '<td rowspan="'.max(1,sizeof($users)).'"><a href="index.php?ctype=gedcom&ged=' . $tree->getName() . '">' . $tree->getTitleHtml() . '</a></td>';
 					echo '<td rowspan="'.max(1,sizeof($users)).'"><a href="admin_trees_config.php?action=general&ged=' . $tree->getName() . '">' . $tree->getNameHtml() . '</a></td>';
 					if (sizeof($users) == 0) {
 						echo '<td></td><td></td><td></td><td></td><td></td></tr>';
