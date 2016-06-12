@@ -477,8 +477,10 @@ $unverified = Database::prepare(
 
 // Number of users whose accounts are not approved by an administrator
 $unapproved = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id)" .
-	" WHERE setting_name = 'verified_by_admin' AND setting_value = '0'" .
+	"SELECT SQL_CACHE t1.user_id, t1.real_name FROM `##user` AS t1 JOIN `##user_setting` AS t2 ON t1.user_id = t2.user_id " .
+	" JOIN `##user_setting` AS t3 ON t1.user_id = t3.user_id" .
+	" WHERE t2.setting_name = 'verified_by_admin' AND t2.setting_value = '0'" .
+	" AND t3.setting_name = 'verified' AND t3.setting_value = '1'" .
 	" ORDER BY real_name"
 )->fetchAll();
 
