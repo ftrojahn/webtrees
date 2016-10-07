@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -227,7 +227,7 @@ class Media extends GedcomRecord {
 								Log::addMediaLog('Thumbnail created for ' . $main_file);
 							}
 						} catch (\ErrorException $ex) {
-							Log::addMediaLog('Failed to create thumbnail for ' . $main_file);
+							Log::addMediaLog('Failed to create thumbnail for ' . $main_file . ' (' . $ex . ')');
 						}
 					} else {
 						Log::addMediaLog('Not enough memory to create thumbnail for ' . $main_file);

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -64,7 +64,7 @@ class GedcomCodeStat {
 		case 'CANCELED':
 			return
 				/* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
-				I18N::translate('Sealing cancelled (divorce)');
+				I18N::translate('Sealing canceled (divorce)');
 		case 'CHILD':
 			return
 				/* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
@@ -85,7 +85,7 @@ class GedcomCodeStat {
 		case 'DNS/CAN':
 			return
 				/* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
-				I18N::translate('Do not seal, previous sealing cancelled');
+				I18N::translate('Do not seal, previous sealing canceled');
 		case 'EXCLUDED':
 			return
 				/* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */

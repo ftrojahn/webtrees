@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -75,7 +75,7 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
@@ -84,11 +84,11 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
 		$content = '';
 		switch ($infoStyle) {
 		case 'list':
-			// Output style 1:  Old format, no visible tables, much smaller text.  Better suited to right side of page.
+			// Output style 1:  Old format, no visible tables, much smaller text. Better suited to right side of page.
 			$content .= FunctionsPrintLists::eventsList($startjd, $endjd, $onlyBDM ? 'BIRT MARR DEAT' : '', $filter, $sortStyle);
 			break;
 		case 'table':
-			// Style 2: New format, tables, big text, etc.  Not too good on right side of page
+			// Style 2: New format, tables, big text, etc. Not too good on right side of page
 			ob_start();
 			$content .= FunctionsPrintLists::eventsTable($startjd, $endjd, $onlyBDM ? 'BIRT MARR DEAT' : '', $filter, $sortStyle);
 			$content .= ob_get_clean();
@@ -151,13 +151,13 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show only events of living individuals?');
+		echo I18N::translate('Show only events of living individuals');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('filter', $filter);
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show only births, deaths, and marriages?');
+		echo I18N::translate('Show only births, deaths, and marriages');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('onlyBDM', $onlyBDM);
 		echo '</td></tr>';

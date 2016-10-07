@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,13 +20,14 @@ use Fisharebest\Webtrees\Controller\ChartController;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Menu;
 use Fisharebest\Webtrees\Module\InteractiveTree\TreeView;
 
 /**
  * Class InteractiveTreeModule
  * Tip : you could change the number of generations loaded before ajax calls both in individual page and in treeview page to optimize speed and server load
  */
-class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface {
+class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface, ModuleChartInterface {
 	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module */ I18N::translate('Interactive tree');
@@ -71,6 +72,29 @@ class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface
 		return true;
 	}
 
+	/**
+	 * Return a menu item for this chart.
+	 *
+	 * @return Menu|null
+	 */
+	public function getChartMenu(Individual $individual) {
+		return new Menu(
+			$this->getTitle(),
+			'module.php?mod=tree&amp;mod_action=treeview&amp;rootid=' . $individual->getXref() . '&amp;ged=' . $individual->getTree()->getNameUrl(),
+			'menu-chart-tree',
+			array('rel' => 'nofollow')
+		);
+	}
+
+	/**
+	 * Return a menu item for this chart - for use in individual boxes.
+	 *
+	 * @return Menu|null
+	 */
+	public function getBoxChartMenu(Individual $individual) {
+		return $this->getChartMenu($individual);
+	}
+
 	/** {@inheritdoc} */
 	public function getPreLoadContent() {
 		// We cannot use jQuery("head").append(<link rel="stylesheet" ...as jQuery is not loaded at this time
@@ -80,10 +104,10 @@ class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface
 				document.createStyleSheet("' . $this->css() . '"); // For Internet Explorer
 			} else {
 				var newSheet=document.createElement("link");
-    		newSheet.setAttribute("rel","stylesheet");
-    		newSheet.setAttribute("type","text/css");
-   			newSheet.setAttribute("href","' . $this->css() . '");
-		    document.getElementsByTagName("head")[0].appendChild(newSheet);
+				newSheet.setAttribute("rel","stylesheet");
+				newSheet.setAttribute("type","text/css");
+				newSheet.setAttribute("href","' . $this->css() . '");
+				document.getElementsByTagName("head")[0].appendChild(newSheet);
 			}
 			</script>';
 	}

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,7 +37,7 @@ class GedcomTag {
 		'DESC', 'DESI', 'DEST', 'DIV', 'DIVF', 'DSCR', 'EDUC', 'EDUC:AGNC', 'EMAI',
 		'EMAIL', 'EMAL', 'EMIG', 'EMIG:DATE', 'EMIG:PLAC', 'ENDL', 'ENDL:DATE',
 		'ENDL:PLAC', 'ENGA', 'ENGA:DATE', 'ENGA:PLAC', 'EVEN', 'EVEN:DATE',
-		'EVEN:PLAC', 'FACT', 'FAM', 'FAMC', 'FAMF', 'FAMS', 'FAMS:CENS:DATE', 'FAMS:CENS:PLAC',
+		'EVEN:PLAC', 'EVEN:TYPE', 'FACT', 'FACT:TYPE', 'FAM', 'FAMC', 'FAMF', 'FAMS', 'FAMS:CENS:DATE', 'FAMS:CENS:PLAC',
 		'FAMS:DIV:DATE', 'FAMS:MARR:DATE', 'FAMS:MARR:PLAC', 'FAMS:NOTE',
 		'FAX', 'FCOM', 'FCOM:DATE',
 		'FCOM:PLAC', 'FILE', 'FONE', 'FORM', 'GEDC', 'GIVN', 'GRAD',
@@ -63,7 +63,7 @@ class GedcomTag {
 		'_CHR_CHIL', '_CHR_GCHI', '_CHR_GCH1', '_CHR_GCH2', '_CHR_HSIB', '_CHR_SIBL', '_COML',
 		'_CREM_CHIL', '_CREM_GCHI', '_CREM_GCH1', '_CREM_GCH2', '_CREM_GPAR', '_CREM_HSIB', '_CREM_SIBL', '_CREM_SPOU',
 		'_DBID', '_DEAT_CHIL', '_DEAT_GCHI', '_DEAT_GCH1', '_DEAT_GCH2', '_DEAT_GPAR', '_DEAT_GPA1', '_DEAT_GPA2',
-		'_DEAT_HSIB', '_DEAT_PARE', '_DEAT_SIBL', '_DEAT_SPOU', '_DEG', '_DETS',
+		'_DEAT_HSIB', '_DEAT_PARE', '_DEAT_SIBL', '_DEAT_SPOU', '_DEG', '_DETS', '_DNA',
 		'_EMAIL', '_EYEC', '_FA1', '_FA2', '_FA3', '_FA4', '_FA5', '_FA6', '_FA7', '_FA8',
 		'_FA9', '_FA10', '_FA11', '_FA12', '_FA13', '_FNRL', '_FREL', '_GEDF', '_GODP', '_HAIR',
 		'_HEB', '_HEIG', '_HNM', '_HOL', '_INTE', '_LOC', '_MARB_CHIL', '_MARB_FAMC', '_MARB_GCHI',
@@ -170,12 +170,12 @@ class GedcomTag {
 				I18N::translate('Author');
 		case 'BAPL':
 			return
-				/* I18N: gedcom tag BAPL */
+				/* I18N: gedcom tag BAPL. LDS = Church of Latter Day Saints. */
 				I18N::translate('LDS baptism');
 		case 'BAPL:DATE':
-			return I18N::translate('Date of LDS baptism');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Date of LDS baptism');
 		case 'BAPL:PLAC':
-			return I18N::translate('Place of LDS baptism');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Place of LDS baptism');
 		case 'BAPM':
 			return
 				/* I18N: gedcom tag BAPM */
@@ -314,7 +314,7 @@ class GedcomTag {
 			return I18N::translate('Place of confirmation');
 		case 'CONL':
 			return
-				/* I18N: gedcom tag CONL */
+				/* I18N: gedcom tag CONL. LDS = Church of Latter Day Saints. */
 				I18N::translate('LDS confirmation');
 		case 'COPR':
 			return
@@ -408,12 +408,12 @@ class GedcomTag {
 			return I18N::translate('Place of emigration');
 		case 'ENDL':
 			return
-				/* I18N: gedcom tag ENDL */
+				/* I18N: gedcom tag ENDL. LDS = Church of Latter Day Saints. */
 				I18N::translate('LDS endowment');
 		case 'ENDL:DATE':
-			return I18N::translate('Date of LDS endowment');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Date of LDS endowment');
 		case 'ENDL:PLAC':
-			return I18N::translate('Place of LDS endowment');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Place of LDS endowment');
 		case 'ENGA':
 			return
 				/* I18N: gedcom tag ENGA */
@@ -430,10 +430,14 @@ class GedcomTag {
 			return I18N::translate('Date of event');
 		case 'EVEN:PLAC':
 			return I18N::translate('Place of event');
+		case 'EVEN:TYPE':
+			return I18N::translate('Type of event');
 		case 'FACT':
 			return
 				/* I18N: gedcom tag FACT */
 				I18N::translate('Fact');
+		case 'FACT:TYPE':
+			return I18N::translate('Type of fact');
 		case 'FAM':
 			return
 				/* I18N: gedcom tag FAM */
@@ -463,9 +467,9 @@ class GedcomTag {
 		case 'FAMS:NOTE':
 			return I18N::translate('Spouse note');
 		case 'FAMS:SLGS:DATE':
-			return I18N::translate('Date of LDS spouse sealing');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Date of LDS spouse sealing');
 		case 'FAMS:SLGS:PLAC':
-			return I18N::translate('Place of LDS spouse sealing');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Place of LDS spouse sealing');
 		case 'FAX':
 			return
 				/* I18N: gedcom tag FAX */
@@ -768,15 +772,15 @@ class GedcomTag {
 			return I18N::translate('Shared note');
 		case 'SLGC':
 			return
-				/* I18N: gedcom tag SLGC */
+				/* I18N: gedcom tag SLGC. LDS = Church of Latter Day Saints. */
 				I18N::translate('LDS child sealing');
 		case 'SLGC:DATE':
-			return I18N::translate('Date of LDS child sealing');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Date of LDS child sealing');
 		case 'SLGC:PLAC':
-			return I18N::translate('Place of LDS child sealing');
+			return /* I18N: LDS = Church of Latter Day Saints. */ I18N::translate('Place of LDS child sealing');
 		case 'SLGS':
 			return
-				/* I18N: gedcom tag SLGS */
+				/* I18N: gedcom tag SLGS. LDS = Church of Latter Day Saints. */
 				I18N::translate('LDS spouse sealing');
 		case 'SOUR':
 			return
@@ -1635,31 +1639,31 @@ class GedcomTag {
 			}
 		case '_MBON':
 			return
-				/* I18N: gedcom tag _MBON  */
+				/* I18N: gedcom tag _MBON */
 				I18N::translate('Marriage bond');
 		case '_MDCL':
 			return
-				/* I18N: gedcom tag _MDCL  */
+				/* I18N: gedcom tag _MDCL */
 				I18N::translate('Medical');
 		case '_MEDC':
 			return
-				/* I18N: gedcom tag _MEDC  */
+				/* I18N: gedcom tag _MEDC */
 				I18N::translate('Medical condition');
 		case '_MEND':
 			return
-				/* I18N: gedcom tag _MEND  */
+				/* I18N: gedcom tag _MEND */
 				I18N::translate('Marriage ending status');
 		case '_MILI':
 			return
-				/* I18N: gedcom tag _MILI  */
+				/* I18N: gedcom tag _MILI */
 				I18N::translate('Military');
 		case '_MILT':
 			return
-				/* I18N: gedcom tag _MILT  */
+				/* I18N: gedcom tag _MILT */
 				I18N::translate('Military service');
 		case '_MREL':
 			return
-				/* I18N: gedcom tag _MREL  */
+				/* I18N: gedcom tag _MREL */
 				I18N::translate('Relationship to mother');
 		case '_MSTAT':
 			return
@@ -1667,15 +1671,15 @@ class GedcomTag {
 				I18N::translate('Marriage beginning status');
 		case '_NAME':
 			return
-				/* I18N: gedcom tag _NAME  */
+				/* I18N: gedcom tag _NAME */
 				I18N::translate('Mailing name');
 		case '_NAMS':
 			return
-				/* I18N: gedcom tag _NAMS  */
+				/* I18N: gedcom tag _NAMS */
 				I18N::translate('Namesake');
 		case '_NLIV':
 			return
-				/* I18N: gedcom tag _NLIV  */
+				/* I18N: gedcom tag _NLIV */
 				I18N::translate('Not living');
 		case '_NMAR':
 			switch ($sex) {
@@ -1711,15 +1715,15 @@ class GedcomTag {
 			return I18N::translate('by');
 		case '_PRMN':
 			return
-				/* I18N: gedcom tag _PRMN  */
+				/* I18N: gedcom tag _PRMN */
 				I18N::translate('Permanent number');
 		case '_SCBK':
 			return
-				/* I18N: gedcom tag _SCBK  */
+				/* I18N: gedcom tag _SCBK */
 				I18N::translate('Scrapbook');
 		case '_SEPR':
 			return
-				/* I18N: gedcom tag _SEPR  */
+				/* I18N: gedcom tag _SEPR */
 				I18N::translate('Separated');
 		case '_SSHOW':
 			return
@@ -1727,44 +1731,42 @@ class GedcomTag {
 				I18N::translate('Slide show');
 		case '_STAT':
 			return
-				/* I18N: gedcom tag _STAT  */
+				/* I18N: gedcom tag _STAT */
 				I18N::translate('Marriage status');
 		case '_SUBQ':
 			return
-				/* I18N: gedcom tag _SUBQ  */
+				/* I18N: gedcom tag _SUBQ */
 				I18N::translate('Short version');
 		case '_TODO':
 			return
-				/* I18N: gedcom tag _TODO  */
+				/* I18N: gedcom tag _TODO */
 				I18N::translate('Research task');
 		case '_TYPE':
 			return
-				/* I18N: gedcom tag _TYPE  */
+				/* I18N: gedcom tag _TYPE */
 				I18N::translate('Media type');
 		case '_UID':
 			return
-				/* I18N: gedcom tag _UID   */
-				I18N::translate('Globally unique identifier');
+				/* I18N: gedcom tag _UID */
+				I18N::translate('Unique identifier');
 		case '_URL':
 			return
-				/* I18N: gedcom tag _URL   */
+				/* I18N: gedcom tag _URL */
 				I18N::translate('URL');
 		case '_WEIG':
 			return
-				/* I18N: gedcom tag _WEIG  */
+				/* I18N: gedcom tag _WEIG */
 				I18N::translate('Weight');
 		case '_WITN':
 			return
-				/* I18N: gedcom tag _WITN  */
+				/* I18N: gedcom tag _WITN */
 				I18N::translate('Witness');
 		case '_WT_OBJE_SORT':
 			return
-				/* I18N: gedcom tag _WT_OBJE_SORT  */
+				/* I18N: gedcom tag _WT_OBJE_SORT */
 				I18N::translate('Re-order media');
 		case '_YART':
-			return
-				/* I18N: gedcom tag _YART  */
-				I18N::translate('Yahrzeit');
+			return /* I18N: gedcom tag _YART - A yahrzeit is a special anniversary of death in the Hebrew faith/calendar. */ I18N::translate('Yahrzeit');
 			// Brit milah applies only to males, no need for male/female translations
 		case '__BRTM_CHIL':
 			return I18N::translate('Brit milah of a son');
@@ -1809,7 +1811,7 @@ class GedcomTag {
 	public static function getLabelValue($tag, $value, GedcomRecord $record = null, $element = 'div') {
 		return
 			'<' . $element . ' class="fact_' . $tag . '">' .
-			/* I18N: a label/value pair, such as “Occupation: Farmer”.  Some languages may need to change the punctuation. */
+			/* I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation. */
 			I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', self::getLabel($tag, $record), $value) .
 			'</' . $element . '>';
 	}
@@ -1819,20 +1821,73 @@ class GedcomTag {
 	 *
 	 * @return string[]
 	 */
-	public static function getPicklistFacts() {
-		// Just include facts that can be used at level 1 in a record
-		$tags = array(
-			'ABBR', 'ADOP', 'AFN', 'ALIA', 'ANUL', 'ASSO', 'AUTH', 'BAPL', 'BAPM', 'BARM',
-			'BASM', 'BIRT', 'BLES', 'BURI', 'CAST', 'CENS', 'CHAN', 'CHR', 'CHRA', 'CITN',
-			'CONF', 'CONL', 'CREM', 'DEAT', 'DIV', 'DIVF', 'DSCR', 'EDUC', 'EMIG', 'ENDL',
-			'ENGA', 'EVEN', 'FACT', 'FCOM', 'FORM', 'GRAD', 'IDNO', 'IMMI', 'LEGA', 'MARB',
-			'MARC', 'MARL', 'MARR', 'MARS', 'NAME', 'NATI', 'NATU', 'NCHI', 'NICK', 'NMR',
-			'OCCU', 'ORDI', 'ORDN', 'PROB', 'PROP', 'REFN', 'RELI', 'REPO', 'RESI', 'RESN',
-			'RETI', 'RFN', 'RIN', 'SEX', 'SLGC', 'SLGS', 'SSN', 'SUBM', 'TITL', 'WILL', 'WWW',
-			'_BRTM', '_COML', '_DEG', '_EYEC', '_FNRL', '_HAIR', '_HEIG', '_HNM', '_HOL',
-			'_INTE', '_MARI', '_MBON', '_MDCL', '_MEDC', '_MILI', '_MILT', '_NAME', '_NAMS',
-			'_NLIV', '_NMAR', '_NMR', '_PRMN', '_SEPR', '_TODO', '_UID', '_WEIG', '_YART',
-		);
+	public static function getPicklistFacts($fact_type) {
+		switch ($fact_type) {
+		case 'INDI':
+			$tags = array(
+				// Facts, attributes for individuals (no links to FAMs)
+				'RESN', 'NAME', 'SEX', 'BIRT', 'CHR', 'DEAT', 'BURI', 'CREM',
+				'ADOP', 'BAPM', 'BARM', 'BASM', 'BLES', 'CHRA', 'CONF', 'FCOM', 'ORDN',
+				'NATU', 'EMIG', 'IMMI', 'CENS', 'PROB', 'WILL', 'GRAD', 'RETI', 'EVEN',
+				'CAST', 'DSCR', 'EDUC', 'IDNO', 'NATI', 'NCHI', 'NMR',
+				'OCCU', 'PROP', 'RELI', 'RESI', 'SSN', 'TITL', 'FACT',
+				'BAPL', 'CONL', 'ENDL', 'SLGC',
+				'SUBM', 'ASSO', 'ALIA', 'ANCI', 'DESI', 'RFN', 'AFN',
+				'REFN', 'RIN', 'CHAN', 'NOTE', 'SHARED_NOTE', 'SOUR', 'OBJE',
+				// non standard tags
+				'_BRTM', '_DEG', '_DNA', '_EYEC', '_FNRL', '_HAIR', '_HEIG', '_HNM',
+				'_HOL', '_INTE', '_MDCL', '_MEDC', '_MILI', '_MILT', '_NAME', '_NAMS',
+				'_NLIV', '_NMAR', '_PRMN', '_TODO', '_UID', '_WEIG', '_YART',
+			);
+			break;
+		case 'FAM':
+			$tags = array(
+				// Facts for families, left out HUSB, WIFE & CHIL links
+				'RESN', 'ANUL', 'CENS', 'DIV', 'DIVF', 'ENGA', 'MARB', 'MARC',
+				'MARR', 'MARL', 'MARS', 'RESI', 'EVEN', 'NCHI', 'SUBM', 'SLGS',
+				'REFN', 'RIN', 'CHAN', 'NOTE', 'SHARED_NOTE', 'SOUR', 'OBJE',
+				// non standard tags
+				'_NMR', 'MARR_CIVIL', 'MARR_RELIGIOUS', 'MARR_PARTNERS', 'MARR_UNKNOWN',
+				'_COML', '_MBON', '_MARI', '_SEPR', '_TODO',
+			);
+		break;
+		case 'SOUR':
+			$tags = array(
+				// Facts for sources
+				'DATA', 'AUTH', 'TITL', 'ABBR', 'PUBL', 'TEXT', 'REPO', 'REFN', 'RIN',
+				'CHAN', 'NOTE', 'SHARED_NOTE', 'OBJE',
+				'RESN',
+			);
+			break;
+		case 'REPO':
+			$tags = array(
+				// Facts for repositories
+				'NAME', 'ADDR', 'PHON', 'EMAIL', 'FAX', 'WWW',
+				'NOTE', 'SHARED_NOTE', 'REFN', 'RIN', 'CHAN',
+				'RESN',
+			);
+			break;
+		case 'PLAC':
+			$tags = array(
+				// Facts for places
+				'FONE', 'ROMN',
+				// non standard tags
+				'_HEB',
+			);
+			break;
+		case 'NAME':
+			$tags = array(
+				// Facts subordinate to NAME
+				'NICK', 'FONE', 'ROMN',
+				// non standard tags
+				'_HEB', '_AKA',
+			);
+			break;
+		default:
+			$tags = array();
+			break;
+		}
+
 		$facts = array();
 		foreach ($tags as $tag) {
 			$facts[$tag] = self::getLabel($tag, null);
@@ -1852,41 +1907,41 @@ class GedcomTag {
 	public static function getFileFormTypeValue($type) {
 		switch (strtolower($type)) {
 		case 'audio':
-			return I18N::translate('Audio');
+			return /* I18N: Type of media object */ I18N::translate('Audio');
 		case 'book':
-			return I18N::translate('Book');
+			return /* I18N: Type of media object */ I18N::translate('Book');
 		case 'card':
-			return I18N::translate('Card');
+			return /* I18N: Type of media object */ I18N::translate('Card');
 		case 'certificate':
-			return I18N::translate('Certificate');
+			return /* I18N: Type of media object */ I18N::translate('Certificate');
 		case 'coat':
-			return I18N::translate('Coat of arms');
+			return /* I18N: Type of media object */ I18N::translate('Coat of arms');
 		case 'document':
-			return I18N::translate('Document');
+			return /* I18N: Type of media object */ I18N::translate('Document');
 		case 'electronic':
-			return I18N::translate('Electronic');
+			return /* I18N: Type of media object */ I18N::translate('Electronic');
 		case 'fiche':
-			return I18N::translate('Microfiche');
+			return /* I18N: Type of media object */ I18N::translate('Microfiche');
 		case 'film':
-			return I18N::translate('Microfilm');
+			return /* I18N: Type of media object */ I18N::translate('Microfilm');
 		case 'magazine':
-			return I18N::translate('Magazine');
+			return /* I18N: Type of media object */ I18N::translate('Magazine');
 		case 'manuscript':
-			return I18N::translate('Manuscript');
+			return /* I18N: Type of media object */ I18N::translate('Manuscript');
 		case 'map':
-			return I18N::translate('Map');
+			return /* I18N: Type of media object */ I18N::translate('Map');
 		case 'newspaper':
-			return I18N::translate('Newspaper');
+			return /* I18N: Type of media object */ I18N::translate('Newspaper');
 		case 'photo':
-			return I18N::translate('Photo');
+			return /* I18N: Type of media object */ I18N::translate('Photo');
 		case 'tombstone':
-			return I18N::translate('Tombstone');
+			return /* I18N: Type of media object */ I18N::translate('Tombstone');
 		case 'video':
-			return I18N::translate('Video');
+			return /* I18N: Type of media object */ I18N::translate('Video');
 		case 'painting':
-			return I18N::translate('Painting');
+			return /* I18N: Type of media object */ I18N::translate('Painting');
 		default:
-			return I18N::translate('Other');
+			return /* I18N: Type of media object */ I18N::translate('Other');
 		}
 	}
 

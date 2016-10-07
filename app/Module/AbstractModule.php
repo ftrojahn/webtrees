@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,14 +23,17 @@ use Fisharebest\Webtrees\Tree;
  * Class AbstractModule - common functions for blocks
  */
 abstract class AbstractModule {
-	/** @var string A user-friendly, localized name for this module */
-	private $title;
-
 	/** @var string The directory where the module is installed */
 	private $directory;
 
 	/** @var string[] A cached copy of the module settings */
 	private $settings;
+
+	/** @var string For custom modules - optional (recommended) version number */
+	const CUSTOM_VERSION = '';
+
+	/** @var string For custom modules - link for support, upgrades, etc. */
+	const CUSTOM_WEBSITE = '';
 
 	/**
 	 * Create a new module.
@@ -39,7 +42,6 @@ abstract class AbstractModule {
 	 */
 	public function __construct($directory) {
 		$this->directory = $directory;
-		$this->title     = $this->getTitle();
 	}
 
 	/**
@@ -142,7 +144,7 @@ abstract class AbstractModule {
 	}
 
 	/**
-	 * Get a module setting.  Return a default if the setting is not set.
+	 * Get a module setting. Return a default if the setting is not set.
 	 *
 	 * @param string $setting_name
 	 * @param string $default

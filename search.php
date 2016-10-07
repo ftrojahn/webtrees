@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -205,14 +205,14 @@ function checknames(frm) {
 
 			<div class="label"></div>
 			<div class="value">
-				<input type="submit" value="<?php echo /* I18N: button label */ I18N::translate('Search'); ?>">
+				<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('search'); ?>">
 			</div>
 		</div>
 	</form>
 
 <?php endif; ?>
 <?php if ($controller->action === 'replace'): ?>
-	
+
 	<form method="post" name="searchform" onsubmit="return checknames(this);">
 		<input type="hidden" name="action" value="replace">
 		<input type="hidden" name="isPostBack" value="true">
@@ -247,7 +247,7 @@ function checknames(frm) {
 				}
 			</script>
 			<div class="label">
-				<?php echo I18N::translate('Search'); ?>
+				<?php echo /* I18N: A button label. */ I18N::translate('search'); ?>
 			</div>
 			<div class="value">
 				<p>
@@ -279,7 +279,7 @@ function checknames(frm) {
 
 			<div class="label"></div>
 			<div class="value">
-				<input type="submit" value="<?php echo /* I18N: button label */ I18N::translate('Replace'); ?>">
+				<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('replace'); ?>">
 			</div>
 		</div>
 	</form>
@@ -324,8 +324,8 @@ function checknames(frm) {
 				</p>
 				<p>
 					<input type="radio" name="soundex" value="DaitchM" <?php echo $controller->soundex === 'DaitchM' || $controller->soundex === '' ? 'checked' : ''; ?>>
- 					<?php echo I18N::translate('Daitch-Mokotoff'); ?>
- 				</p>
+					<?php echo I18N::translate('Daitch-Mokotoff'); ?>
+				</p>
 			</div>
 			<div class="label">
 				<?php echo I18N::translate('Associates'); ?>
@@ -420,7 +420,7 @@ function checknames(frm) {
 
 			<div class="label"></div>
 			<div class="value">
-				<input type="submit" value="<?php echo  /* I18N: button label */ I18N::translate('Search'); ?>">
+				<input type="submit" value="<?php echo  /* I18N: A button label. */ I18N::translate('search'); ?>">
 			</div>
 		</div>
 	</form>

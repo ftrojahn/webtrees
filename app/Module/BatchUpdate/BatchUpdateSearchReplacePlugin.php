@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -123,7 +123,7 @@ class BatchUpdateSearchReplacePlugin extends BatchUpdateBasePlugin {
 			try {
 				preg_match('/' . $this->search . '/', null);
 			} catch (\ErrorException $ex) {
-				$this->error = '<div class="alert alert-danger">' . I18N::translate('The regex appears to contain an error.  It can’t be used.') . '</div>';
+				$this->error = '<div class="alert alert-danger">' . /* I18N: http://en.wikipedia.org/wiki/Regular_expression */ I18N::translate('The regular expression appears to contain an error. It can’t be used.') . '</div>';
 			}
 			break;
 		}
@@ -170,7 +170,7 @@ class BatchUpdateSearchReplacePlugin extends BatchUpdateBasePlugin {
 			'<label class="control-label col-sm-3">' . I18N::translate('Case insensitive') . '</label>' .
 			'<div class="col-sm-9">' .
 			FunctionsEdit::radioButtons('case', array('I' => I18N::translate('no'), 'i' => I18N::translate('yes')), ($this->case ? 'i' : 'I'), 'class="radio-inline" onchange="this.form.submit();"') .
-			'<p class="small text-muted">' . I18N::translate('Tick this box to match both upper and lower case letters.') . '</p>' .
+			'<p class="small text-muted">' . /* I18N: Help text for "Case insensitive" searches */ I18N::translate('Match both upper and lower case letters.') . '</p>' .
 			'</div></div>' .
 			parent::getOptionsForm();
 	}

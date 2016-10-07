@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -126,7 +126,7 @@ case 'FAM': // Families, whose name contains the search terms
 	return;
 
 case 'GIVN': // Given names, that start with the search term
-	// Do not filter by privacy.  Given names on their own do not identify individuals.
+	// Do not filter by privacy. Given names on their own do not identify individuals.
 	echo json_encode(
 		Database::prepare(
 			"SELECT SQL_CACHE DISTINCT n_givn" .
@@ -199,13 +199,13 @@ case 'OBJE':
 	return;
 
 case 'PLAC': // Place names (with hierarchy), that include the search term
-	// Do not filter by privacy.  Place names on their own do not identify individuals.
+	// Do not filter by privacy. Place names on their own do not identify individuals.
 	$data = array();
 	foreach (Place::findPlaces($term, $WT_TREE) as $place) {
 		$data[] = $place->getGedcomName();
 	}
 	if (!$data && $WT_TREE->getPreference('GEONAMES_ACCOUNT')) {
-		// No place found?  Use an external gazetteer
+		// No place found? Use an external gazetteer
 		$url =
 			"http://api.geonames.org/searchJSON" .
 			"?name_startsWith=" . urlencode($term) .
@@ -226,7 +226,7 @@ case 'PLAC': // Place names (with hierarchy), that include the search term
 			return $data;
 		}
 		$places = json_decode($json, true);
-		if ($places['geonames']) {
+		if (isset($places['geonames']) && is_array($places['geonames'])) {
 			foreach ($places['geonames'] as $k => $place) {
 				$data[] = $place['name'] . ', ' . $place['adminName2'] . ', ' . $place['adminName1'] . ', ' . $place['countryName'];
 			}
@@ -237,7 +237,7 @@ case 'PLAC': // Place names (with hierarchy), that include the search term
 	return;
 
 case 'PLAC2': // Place names (without hierarchy), that include the search term
-	// Do not filter by privacy.  Place names on their own do not identify individuals.
+	// Do not filter by privacy. Place names on their own do not identify individuals.
 	echo json_encode(
 		Database::prepare(
 			"SELECT SQL_CACHE p_place" .
@@ -378,7 +378,7 @@ case 'SOUR_TITL': // Source titles, that include the search terms
 	return;
 
 case 'SURN': // Surnames, that start with the search term
-	// Do not filter by privacy.  Surnames on their own do not identify individuals.
+	// Do not filter by privacy. Surnames on their own do not identify individuals.
 	echo json_encode(
 		Database::prepare(
 			"SELECT SQL_CACHE DISTINCT n_surname" .
@@ -508,7 +508,7 @@ case 'IFS':
  */
 function get_FAM_rows(Tree $tree, $term) {
 	return Database::prepare(
-		"SELECT DISTINCT 'FAM' AS type, f_id AS xref, f_gedcom AS gedcom" .
+		"SELECT DISTINCT 'FAM' AS type, f_id AS xref, f_gedcom AS gedcom, husb_name.n_sort, wife_name.n_sort" .
 		" FROM `##families`" .
 		" JOIN `##name` AS husb_name ON f_husb = husb_name.n_id AND f_file = husb_name.n_file" .
 		" JOIN `##name` AS wife_name ON f_wife = wife_name.n_id AND f_file = wife_name.n_file" .

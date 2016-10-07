@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -119,22 +119,34 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 		Functions::sortFacts($indifacts);
 
 		ob_start();
+		?>
+		<table class="facts_table">
+			<colgroup>
+				<col class="width20">
+				<col class="width80">
+			</colgroup>
+			<tbody>
+				<tr>
+					<td colspan="2" class="descriptionbox noprint">
+						<?php if ($controller->record->getTree()->getPreference('SHOW_RELATIVES_EVENTS')) : ?>
+						<label>
+							<input id="show-relatives-facts" type="checkbox">
+							<?php echo I18N::translate('Events of close relatives'); ?>
+						</label>
+						<?php endif; ?>
+						<?php if (file_exists(Site::getPreference('INDEX_DIRECTORY') . 'histo.' . WT_LOCALE . '.php')) : ?>
+						<label>
+							<input id="show-historical-facts" type="checkbox">
+							<?php echo I18N::translate('Historical facts'); ?>
+						</label>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<?php
 
-		echo '<table class="facts_table">';
-		echo '<tbody>';
 		if (!$indifacts) {
 			echo '<tr><td colspan="2" class="facts_value">', I18N::translate('There are no facts for this individual.'), '</td></tr>';
 		}
-
-		echo '<tr><td colspan="2" class="descriptionbox rela"><form action="?"><input id="checkbox_rela_facts" type="checkbox" ';
-		echo $controller->record->getTree()->getPreference('EXPAND_RELATIVES_EVENTS') ? 'checked' : '';
-		echo ' onclick="jQuery(\'tr.rela\').toggle();"><label for="checkbox_rela_facts">', I18N::translate('Events of close relatives'), '</label>';
-		if (file_exists(Site::getPreference('INDEX_DIRECTORY') . 'histo.' . WT_LOCALE . '.php')) {
-			echo ' <input id="checkbox_histo" type="checkbox" ';
-			echo $EXPAND_HISTO_EVENTS ? 'checked' : '';
-			echo ' onclick="jQuery(\'tr.histo\').toggle();"><label for="checkbox_histo">', I18N::translate('Historical facts'), '</label>';
-		}
-		echo '</form></td></tr>';
 
 		foreach ($indifacts as $fact) {
 			FunctionsPrintFacts::printFact($fact, $controller->record);
@@ -144,15 +156,15 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 		if ($controller->record->canEdit()) {
 			FunctionsPrint::printAddNewFact($controller->record->getXref(), $indifacts, 'INDI');
 		}
-		echo '</tbody>';
-		echo '</table>';
 
-		if (!$controller->record->getTree()->getPreference('EXPAND_RELATIVES_EVENTS')) {
-			echo '<script>jQuery("tr.rela").toggle();</script>';
-		}
-		if (!$EXPAND_HISTO_EVENTS) {
-			echo '<script>jQuery("tr.histo").toggle();</script>';
-		}
+		?>
+			</tbody>
+		</table>
+		<script>
+			persistant_toggle("show-relatives-facts", "tr.rela");
+			persistant_toggle("show-historical-facts", "tr.histo");
+		</script>
+		<?php
 
 		return '<div id="' . $this->getName() . '_content">' . ob_get_clean() . '</div>';
 	}

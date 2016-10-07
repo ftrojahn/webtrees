@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,12 +20,6 @@ use PDOException;
 
 define('WT_SCRIPT_NAME', 'site-unavailable.php');
 
-// We use some PHP5.5 features, but need to run on older servers
-if (version_compare(PHP_VERSION, '5.4', '<')) {
-	require WT_ROOT . 'includes/php_53_compatibility.php';
-}
-require 'vendor/autoload.php';
-
 // This script does not load session.php.
 // session.php won’t run until a configuration file and database connection exist...
 // This next block of code is a minimal version of session.php
@@ -35,25 +29,18 @@ define('WT_ROOT', '');
 define('WT_DATA_DIR', realpath('data') . DIRECTORY_SEPARATOR);
 define('WT_MODULES_DIR', 'modules_v3/');
 
-// No configuration file?  Start the setup wizard
-if (!file_exists(WT_DATA_DIR . 'config.ini.php')) {
-	header('Location: setup.php');
-
-	return;
-}
-
-Session::start();
+require 'vendor/autoload.php';
 
 define('WT_LOCALE', I18N::init());
 
 http_response_code(503);
-header('Content-Type: text/html; charset=UTF-8');
 
+header('Content-Type: text/html; charset=UTF-8');
 // The page which redirected here may have provided an error message.
 $messages = '';
-foreach (FlashMessages::getMessages() as $message) {
+if (Filter::get('message')) {
 	$messages .=
-		'<blockquote>' . Filter::escapeHtml($message->text) . '</blockquote>';
+		'<blockquote>' . Filter::escapeHtml(Filter::get('message')) . '</blockquote>';
 }
 
 // If we can't connect to the database at all, give the reason why
@@ -89,7 +76,7 @@ if (is_array($config_ini_php) && array_key_exists('dbhost', $config_ini_php) && 
 		<h1><?php echo I18N::translate('This website is temporarily unavailable'); ?></h1>
 		<div class="content">
 			<p>
-				<?php echo I18N::translate('Oops!  The webserver is unable to connect to the database server.  It could be busy, undergoing maintenance, or simply broken.  You should <a href="index.php">try again</a> in a few minutes or contact the website administrator.'); ?>
+				<?php echo I18N::translate('Oops! The webserver is unable to connect to the database server. It could be busy, undergoing maintenance, or simply broken. You should <a href="index.php">try again</a> in a few minutes or contact the website administrator.'); ?>
 			</p>
 			<?php echo $messages; ?>
 			<?php echo I18N::translate('If you are the website administrator, you should check that:'); ?>
@@ -105,7 +92,7 @@ if (is_array($config_ini_php) && array_key_exists('dbhost', $config_ini_php) && 
 				</li>
 			</ol>
 			<p class="good">
-				<?php echo I18N::translate('If you cannot resolve the problem yourself, you can ask for help on the forums at <a href="http://webtrees.net">webtrees.net</a>.'); ?>
+				<?php echo I18N::translate('If you cannot resolve the problem yourself, you can ask for help on the forums at <a href="https://webtrees.net">webtrees.net</a>.'); ?>
 			</p>
 		</div>
 	</body>

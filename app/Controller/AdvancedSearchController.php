@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -109,8 +109,8 @@ class AdvancedSearchController extends SearchController {
 			'EMAIL',
 			'EMIG:DATE', 'EMIG:PLAC',
 			'ENDL:DATE', 'ENDL:PLAC',
-			'EVEN',
-			'EVEN:DATE', 'EVEN:PLAC',
+			'EVEN', 'EVEN:TYPE', 'EVEN:DATE', 'EVEN:PLAC',
+			'FACT', 'FACT:TYPE',
 			'FAMS:CENS:DATE', 'FAMS:CENS:PLAC',
 			'FAMS:DIV:DATE',
 			'FAMS:NOTE',
@@ -124,6 +124,7 @@ class AdvancedSearchController extends SearchController {
 			'NOTE',
 			'OCCU',
 			'ORDN:DATE', 'ORDN:PLAC',
+			'REFN',
 			'RELI',
 			'RESI', 'RESI:DATE', 'RESI:PLAC',
 			'SLGC:DATE', 'SLGC:PLAC',
@@ -147,7 +148,7 @@ class AdvancedSearchController extends SearchController {
 		}
 		$fields = array();
 		foreach ($ofields as $field) {
-			$fields[$field] = strip_tags(GedcomTag::GetLabel($field)); // Custom tags have error markup
+			$fields[$field] = strip_tags(GedcomTag::getLabel($field)); // Custom tags have error markup
 		}
 		uksort($fields, '\Fisharebest\Webtrees\Controller\AdvancedSearchController::tagSort');
 
@@ -411,7 +412,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND i_n.n_givn LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -427,7 +428,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND i_n.n_givn LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -458,7 +459,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= " AND (" . implode(' OR ', $sdx) . ")";
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND i_n.n_surn LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -475,7 +476,7 @@ class AdvancedSearchController extends SearchController {
 							$sql .= " AND (" . implode(' OR ', $sdx) . ")";
 							break;
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND i_n.n_surn LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -560,7 +561,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND {$table}.n_givn = LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -577,7 +578,7 @@ class AdvancedSearchController extends SearchController {
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 							break;
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND {$table}.n_givn = LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -607,7 +608,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND {$table}.n_surn = LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -623,7 +624,7 @@ class AdvancedSearchController extends SearchController {
 							}
 							$sql .= ' AND (' . implode(' OR ', $sdx) . ')';
 						} else {
-							// No phonetic content?  Use a substring match
+							// No phonetic content? Use a substring match
 							$sql .= " AND {$table}.n_surn = LIKE CONCAT('%', ?, '%')";
 							$bind[] = $value;
 						}
@@ -631,10 +632,15 @@ class AdvancedSearchController extends SearchController {
 					}
 					break;
 				}
-			} elseif ($parts[0] == 'FAMS') {
+			} elseif ($parts[0] === 'FAMS') {
 				// e.g. searches for occupation, religion, note, etc.
 				$sql .= " AND fam.f_gedcom REGEXP CONCAT('\n[0-9] ', ?, '(.*\n[0-9] CONT)* [^\n]*', ?)";
 				$bind[] = $parts[1];
+				$bind[] = $value;
+			} elseif ($parts[1] === 'TYPE') {
+				// e.g. FACT:TYPE or EVEN:TYPE
+				$sql .= " AND ind.i_gedcom REGEXP CONCAT('\n1 ', ?, '.*(\n[2-9] .*)*\n2 TYPE .*', ?)";
+				$bind[] = $parts[0];
 				$bind[] = $value;
 			} else {
 				// e.g. searches for occupation, religion, note, etc.

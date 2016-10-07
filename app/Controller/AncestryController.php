@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -71,7 +71,7 @@ class AncestryController extends ChartController {
 		if ($sosa === 1) {
 			echo '<img src="', Theme::theme()->parameter('image-spacer'), '" height="3" width="', Theme::theme()->parameter('chart-descendancy-indent'), '"></td><td>';
 		} else {
-			echo '<img src="', Theme::theme()->parameter('image-spacer'), '" height="3" width="2" alt="">';
+			echo '<img src="', Theme::theme()->parameter('image-spacer'), '" height="3" width="2">';
 			echo '<img src="', Theme::theme()->parameter('image-hline'), '" height="3" width="', Theme::theme()->parameter('chart-descendancy-indent') - 2, '"></td><td>';
 		}
 		FunctionsPrint::printPedigreePerson($individual, $this->showFull());
@@ -88,7 +88,7 @@ class AncestryController extends ChartController {
 		if ($family && $depth > 0) {
 			// Marriage details
 			echo '<span class="details1">';
-			echo '<img src="', Theme::theme()->parameter('image-spacer'), '" height="2" width="', Theme::theme()->parameter('chart-descendancy-indent'), '" alt=""><a href="#" onclick="return expand_layer(\'sosa_', $sosa, '\');" class="top"><i id="sosa_', $sosa, '_img" class="icon-minus" title="', I18N::translate('View family'), '"></i></a>';
+			echo '<img src="', Theme::theme()->parameter('image-spacer'), '" height="2" width="', Theme::theme()->parameter('chart-descendancy-indent'), '"><a href="#" onclick="return expand_layer(\'sosa_', $sosa, '\');" class="top"><i id="sosa_', $sosa, '_img" class="icon-minus" title="', I18N::translate('View this family'), '"></i></a>';
 			echo ' <span class="person_box">', I18N::number($sosa * 2), '</span> ', I18N::translate('and');
 			echo ' <span class="person_boxF">', I18N::number($sosa * 2 + 1), '</span>';
 			if ($family->canShow()) {

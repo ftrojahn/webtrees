@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -36,8 +36,8 @@ class Migration2 implements MigrationInterface {
 		try {
 			Database::exec(
 				"ALTER TABLE `##news`" .
-				" ADD FOREIGN KEY news_fk1 (user_id  ) REFERENCES `##user`   (user_id)   ON DELETE CASCADE," .
-				" ADD FOREIGN KEY news_fk2 (gedcom_id) REFERENCES `##gedcom` (gedcom_id) ON DELETE CASCADE"
+				" ADD FOREIGN KEY `##news_fk1` (user_id  ) REFERENCES `##user`   (user_id)   ON DELETE CASCADE," .
+				" ADD FOREIGN KEY `##news_fk2` (gedcom_id) REFERENCES `##gedcom` (gedcom_id) ON DELETE CASCADE"
 			);
 		} catch (PDOException $ex) {
 			// Already updated?

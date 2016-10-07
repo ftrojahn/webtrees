@@ -1,15 +1,15 @@
 [![Latest Stable Version](https://poser.pugx.org/fisharebest/webtrees/v/stable.svg)](https://packagist.org/packages/fisharebest/webtrees)
 [![Build Status](https://travis-ci.org/fisharebest/webtrees.svg?branch=master)](https://travis-ci.org/fisharebest/webtrees)
-[![Coverage Status](https://coveralls.io/repos/fisharebest/webtrees/badge.svg?branch=master&service=github)](https://coveralls.io/github/fisharebest/webtrees?branch=master)
-[![Translation status](http://translate.webtrees.net/widgets/webtrees/-/svg-badge.svg)](http://translate.webtrees.net/engage/webtrees/?utm_source=widget)
+[![Coverage Status](https://coveralls.io/repos/github/fisharebest/webtrees/badge.svg?branch=master)](https://coveralls.io/github/fisharebest/webtrees?branch=master)
+[![Translation status](https://translate.webtrees.net/widgets/webtrees/-/svg-badge.svg)](https://translate.webtrees.net/engage/webtrees/?utm_source=widget)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/78a5ba19-7ddf-4a58-8262-1c8a149f38de/mini.png)](https://insight.sensiolabs.com/projects/78a5ba19-7ddf-4a58-8262-1c8a149f38de)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/fisharebest/webtrees/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/fisharebest/webtrees/?branch=master)
 [![Code Climate](https://codeclimate.com/github/fisharebest/webtrees/badges/gpa.svg)](https://codeclimate.com/github/fisharebest/webtrees)
 
 # webtrees
 
-The project’s website is [www.webtrees.net](http://www.webtrees.net).
-Further documentation is available at [wiki.webtrees.net](http://wiki.webtrees.net).
+The project’s website is [www.webtrees.net](https://www.webtrees.net).
+Further documentation is available at [wiki.webtrees.net](https://wiki.webtrees.net).
 
 This Fork is used to track changes for the [www.webgenealogie.de](http://wt.webgenealogie.de) installation.
 
@@ -29,7 +29,7 @@ This Fork is used to track changes for the [www.webgenealogie.de](http://wt.webg
 ### License
 
 * **webtrees: online genealogy**
-* Copyright (C) 2015 webtrees development team
+* Copyright (C) 2016 webtrees development team
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ participation and good ancestral recording habits, as it simplifies the process
 of collaborating with others working on your family lines. Your latest information
 is always on your web site and available for others to see, defined by viewing
 rules you set. For more information and to see working demos, visit
-[webtrees.net](http://webtrees.net/).
+[webtrees.net](https://webtrees.net/).
 
 **webtrees** is Open Source software that has been produced by people from many
 countries freely donating their time and talents to the project. All service,
@@ -123,7 +123,7 @@ Installing **webtrees** is really easy. All you need is a webserver with PHP and
 MySQL. Almost every web hosting service provides these, but be sure to confirm
 that those supplied meet or exceed the minimum system requirements.
 
-1. Download latest stable version from [webtrees.net](http://webtrees.net/)
+1. Download latest stable version from [webtrees.net](https://webtrees.net/)
 2. Unzip the files and upload them to an empty directory on your web server.
 3. Open your web browser and type the URL for your **webtrees** site (for example,
    [http://www.yourserver.com/webtrees](http://www.yourserver.com/webtrees)) into
@@ -155,7 +155,7 @@ administration page, where you'll need to select one of the following options:
 There are *lots* of configuration options. You'll probably want to review the
 privacy settings first. Don't worry too much about all the other options - the
 defaults are good for most people. If you get stuck, there's lots of built-in
-help and you can get friendly advice from the [help](http://webtrees.net/forums)
+help and you can get friendly advice from the [help](https://webtrees.net/forums)
 forum.
 
 
@@ -170,7 +170,7 @@ new version is available.
 
 1. Now would be a good time to make a [backup](#backup).
 2. Download the latest version of **webtrees** available from
-   [webtrees.net](http://webtrees.net/)
+   [webtrees.net](https://webtrees.net/)
 3. While you are in the middle of uploading the new files,
    a visitor to your site would encounter a mixture of new and old files.  This
    could cause unpredictable behaviour or errors.  To prevent this, create the
@@ -213,7 +213,7 @@ cache can be cleared simply by going to ``Administration`` ->
 ``Cleanup data directory`` and deleting the cache.
 
 If you have any problems or questions, help is available on the
-[webtrees forum](http://webtrees.net/forums).
+[webtrees forum](https://webtrees.net/forums).
 
 
 ### Gedcom (family tree) files
@@ -389,14 +389,14 @@ The requirements are:
   unique email address).
 * The wizard transfer process overwrites the username and password you may have
   entered in setting up the initial admin account. The main administration user
-  name and password in **webtrees** will be identical to the admin user name and
+  name and password in **webtrees** will be identical to the admin username and
   password from PhpGedView after running the wizard. Once done, you can change it back
   if desired.
 
 
 #### Warning
 
-Please read the [http://wiki.webtrees.net/en/Converting_from_PhpGedView](http://wiki.webtrees.net/en/Converting_from_PhpGedView)
+Please read the [https://wiki.webtrees.net/en/Converting_from_PhpGedView](https://wiki.webtrees.net/en/Converting_from_PhpGedView)
 before doing a transfer as important pre-processing steps and known issues may
 be outlined there.
 
@@ -419,7 +419,7 @@ FAQs, and HTML blocks.  We hope to add these to the wizard in a future release.
 #### Custom privacy restrictions, block configuration, FAQs and HTML blocks
 
 We hope to add these to the wizard in a future release. Otherwise, read the
-[http://wiki.webtrees.net/en/Converting_from_PhpGedView](http://wiki.webtrees.net/en/Converting_from_PhpGedView)
+[https://wiki.webtrees.net/en/Converting_from_PhpGedView](https://wiki.webtrees.net/en/Converting_from_PhpGedView)
 before reporting a problem in the forum.
 
 The transfer wizard is accessed in **webtrees** from the bottom of the

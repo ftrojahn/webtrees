@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,10 +15,24 @@
  */
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Menu;
+
 /**
  * Interface ModuleChartInterface - Classes and libraries for module system
- *
- * This class is not currently used.
  */
 interface ModuleChartInterface {
+	/**
+	 * Return a menu item for this chart.
+	 *
+	 * @return Menu|null
+	 */
+	public function getChartMenu(Individual $individual);
+
+	/**
+	 * Return a menu item for this chart (for menu in individual box).
+	 *
+	 * @return Menu|null
+	 */
+	public function getBoxChartMenu(Individual $individual);
 }

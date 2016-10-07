@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -61,7 +61,7 @@ class SpanishSurnameTradition extends DefaultSurnameTradition implements Surname
 	 */
 	public function newParentNames($child_name, $parent_sex) {
 		if (preg_match(self::REGEX_SURNS, $child_name, $match)) {
-			switch($parent_sex) {
+			switch ($parent_sex) {
 			case 'M':
 				return array(
 					'NAME' => '/' . $match['SURN1'] . '/ //',

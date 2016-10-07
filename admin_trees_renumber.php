@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -278,10 +278,10 @@ if ($xrefs) {
 	echo '<form>';
 	echo '<p>', I18N::translate('You can renumber this family tree.'), '</p>';
 	echo '<button type="submit" class="btn btn-primary">';
-	echo '<i class="fa fa-check"></i> ', /* I18N: Button label */ I18N::translate('continue');
+	echo '<i class="fa fa-check"></i> ', /* I18N: A button label. */ I18N::translate('continue');
 	echo '</button>';
 	echo '<input type="hidden" name="action" value="renumber">';
 	echo '<input type="hidden" name="ged" value="', $WT_TREE->getNameHtml(), '">';
 	echo '</form>';
-	echo '<p>', I18N::translate('Caution!  This may take a long time.  Be patient.'), '</p>';
+	echo '<p>', I18N::translate('Caution! This may take a long time. Be patient.'), '</p>';
 }

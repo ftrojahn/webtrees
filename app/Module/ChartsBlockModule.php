@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -74,69 +74,68 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface {
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype == 'gedcom' && Auth::isManager($WT_TREE) || $ctype == 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
 
 		if ($person) {
-			$content = '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+			$content = '';
 			switch ($type) {
 			case 'pedigree':
 				$title .= I18N::translate('Pedigree of %s', $person->getFullName());
 				$chartController = new HourglassController($person->getXref(), $details, false);
 				$controller->addInlineJavascript($chartController->setupJavascript());
-				$content .= '<td valign="middle">';
+				$content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+				$content .= '<td>';
 				ob_start();
 				FunctionsPrint::printPedigreePerson($person, $details);
 				$content .= ob_get_clean();
 				$content .= '</td>';
-				$content .= '<td valign="middle">';
+				$content .= '<td>';
 				ob_start();
 				$chartController->printPersonPedigree($person, 1);
 				$content .= ob_get_clean();
 				$content .= '</td>';
+				$content .= '</tr></table>';
 				break;
 			case 'descendants':
 				$title .= I18N::translate('Descendants of %s', $person->getFullName());
 				$chartController = new HourglassController($person->getXref(), $details, false);
 				$controller->addInlineJavascript($chartController->setupJavascript());
-				$content .= '<td valign="middle">';
 				ob_start();
 				$chartController->printDescendency($person, 1, false);
 				$content .= ob_get_clean();
-				$content .= '</td>';
 				break;
 			case 'hourglass':
 				$title .= I18N::translate('Hourglass chart of %s', $person->getFullName());
 				$chartController = new HourglassController($person->getXref(), $details, false);
 				$controller->addInlineJavascript($chartController->setupJavascript());
-				$content .= '<td valign="middle">';
+				$content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+				$content .= '<td>';
 				ob_start();
 				$chartController->printDescendency($person, 1, false);
 				$content .= ob_get_clean();
 				$content .= '</td>';
-				$content .= '<td valign="middle">';
+				$content .= '<td>';
 				ob_start();
 				$chartController->printPersonPedigree($person, 1);
 				$content .= ob_get_clean();
 				$content .= '</td>';
+				$content .= '</tr></table>';
 				break;
 			case 'treenav':
 				$title .= I18N::translate('Interactive tree of %s', $person->getFullName());
 				$mod = new InteractiveTreeModule(WT_MODULES_DIR . 'tree');
 				$tv  = new TreeView;
-				$content .= '<td>';
 				$content .= '<script>jQuery("head").append(\'<link rel="stylesheet" href="' . $mod->css() . '" type="text/css" />\');</script>';
 				$content .= '<script src="' . $mod->js() . '"></script>';
 				list($html, $js) = $tv->drawViewport($person, 2);
 				$content .= $html . '<script>' . $js . '</script>';
-				$content .= '</td>';
 				break;
 			}
-			$content .= '</tr></table>';
 		} else {
-			$content = I18N::translate('You must select an individual and chart type in the block configuration settings.');
+			$content = I18N::translate('You must select an individual and a chart type in the block preferences');
 		}
 
 		if ($template) {
@@ -182,31 +181,40 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface {
 		$type    = $this->getBlockSetting($block_id, 'type', 'pedigree');
 		$pid     = $this->getBlockSetting($block_id, 'pid', Auth::check() ? ($gedcomid ? $gedcomid : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
 
+		$charts = array(
+			'pedigree'    => I18N::translate('Pedigree'),
+			'descendants' => I18N::translate('Descendants'),
+			'hourglass'   => I18N::translate('Hourglass chart'),
+			'treenav'     => I18N::translate('Interactive tree'),
+		);
+		uasort($charts, 'Fisharebest\Webtrees\I18N::strcasecmp');
+
 		$controller
 			->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 			->addInlineJavascript('autocomplete();');
 	?>
 		<tr>
-			<td class="descriptionbox wrap width33"><?php echo I18N::translate('Chart type'); ?></td>
+			<td class="descriptionbox wrap width33">
+				<?php echo I18N::translate('Chart type'); ?>
+			</td>
 			<td class="optionbox">
-				<?php echo FunctionsEdit::selectEditControl('type',
-				array(
-					'pedigree'    => I18N::translate('Pedigree'),
-					'descendants' => I18N::translate('Descendants'),
-					'hourglass'   => I18N::translate('Hourglass chart'),
-					'treenav'     => I18N::translate('Interactive tree'),
-				),
-				null, $type); ?>
+				<?php echo FunctionsEdit::selectEditControl('type', $charts, null, $type); ?>
 			</td>
 		</tr>
 		<tr>
-			<td class="descriptionbox wrap width33"><?php echo I18N::translate('Show details'); ?></td>
+			<td class="descriptionbox wrap width33">
+				<?php echo I18N::translate('Show details'); ?>
+			</td>
 		<td class="optionbox">
 			<?php echo FunctionsEdit::editFieldYesNo('details', $details); ?>
 			</td>
 		</tr>
 		<tr>
-			<td class="descriptionbox wrap width33"><?php echo I18N::translate('Individual'); ?></td>
+			<td class="descriptionbox wrap width33">
+				<label for="pid">
+					<?php echo I18N::translate('Individual'); ?>
+				</label>
+			</td>
 			<td class="optionbox">
 				<input data-autocomplete-type="INDI" type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5">
 				<?php

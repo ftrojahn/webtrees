@@ -1,7 +1,4 @@
-*.ged
-*.GED
-cache/
-config.ini.php
-histo.*.php
-html_purifier_cache/
-media/
+*
+!.gitignore
+!.htaccess
+!index.php

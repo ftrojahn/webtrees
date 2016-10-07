@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -114,8 +114,8 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 					<i class="icon-cfamily"></i>
 				</td>
 				<td>
-					<span class="subheaders"> <?php echo $label; ?> </span> -
-					<a href="<?php echo $family->getHtmlUrl(); ?>"><?php echo I18N::translate('View family'); ?></a>
+					<span class="subheaders"> <?php echo $label; ?></span>
+					<a class="noprint" href="<?php echo $family->getHtmlUrl(); ?>"> - <?php echo I18N::translate('View this family'); ?></a>
 				</td>
 			</tr>
 		</table>
@@ -193,7 +193,7 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 		///// MARR /////
 		$found = false;
 		$prev  = new Date('');
-		foreach ($family->getFacts(WT_EVENTS_MARR) as $fact) {
+		foreach ($family->getFacts(WT_EVENTS_MARR . '|' . WT_EVENTS_DIV, true) as $fact) {
 			$found |= !$fact->isPendingDeletion();
 			if ($fact->isPendingAddition()) {
 				$class = ' new';
@@ -205,7 +205,6 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 			?>
 			<tr>
 				<td class="facts_label">
-					&nbsp;
 				</td>
 				<td class="facts_value<?php echo $class; ?>">
 					<?php echo GedcomTag::getLabelValue($fact->getTag(), $fact->getDate()->display() . ' — ' . $fact->getPlace()->getFullName()); ?>
@@ -221,7 +220,6 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 			?>
 			<tr>
 				<td class="facts_label">
-					&nbsp;
 				</td>
 				<td class="facts_value">
 					<a href="#" onclick="return add_new_record('<?php echo $family->getXref(); ?>', 'MARR');">
@@ -247,7 +245,7 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 					$class = 'facts_label';
 				}
 				$next = new Date('');
-				foreach ($person->getFacts(WT_EVENTS_BIRT) as $bfact) {
+				foreach ($person->getFacts(WT_EVENTS_BIRT, true) as $bfact) {
 					if ($bfact->getDate()->isOK()) {
 						$next = $bfact->getDate();
 						break;
@@ -270,12 +268,12 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 		// Re-order children / add a new child
 		if ($family->canEdit()) {
 			if ($type == 'FAMS') {
-				$add_child_text = I18N::translate('Add a new son or daughter');
+				$add_child_text = I18N::translate('Add a son or daughter');
 			} else {
-				$add_child_text = I18N::translate('Add a new brother or sister');
+				$add_child_text = I18N::translate('Add a brother or sister');
 			}
 			?>
-			<tr>
+			<tr class="noprint">
 				<td class="facts_label">
 					<?php if (count($family->getChildren()) > 1) { ?>
 					<a href="#" onclick="reorder_children('<?php echo $family->getXref(); ?>');tabswitch(5);"><i class="icon-media-shuffle"></i> <?php echo I18N::translate('Re-order children'); ?></a>
@@ -299,7 +297,7 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 
 	/** {@inheritdoc} */
 	public function getTabContent() {
-		global $WT_TREE, $show_full, $controller;
+		global $show_full, $controller;
 
 		if (isset($show_full)) {
 			$saved_show_full = $show_full;
@@ -309,20 +307,26 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 
 		ob_start();
 		?>
-		<table class="facts_table"><tr><td class="descriptionbox rela">
-		<input id="checkbox_elder" type="checkbox" onclick="jQuery('div.elderdate').toggle();" <?php echo $WT_TREE->getPreference('SHOW_AGE_DIFF') ? 'checked' : ''; ?>>
-		<label for="checkbox_elder"><?php echo I18N::translate('Show date differences'); ?></label>
-		</td></tr></table>
+		<table class="facts_table">
+			<tr class="noprint">
+				<td class="descriptionbox rela">
+					<label>
+						<input id="show-date-differences" type="checkbox" checked>
+						<?php echo I18N::translate('Date differences'); ?>
+					</label>
+				</td>
+			</tr>
+		</table>
 		<?php
 		$families = $controller->record->getChildFamilies();
 		if (!$families && $controller->record->canEdit()) {
 			?>
 			<table class="facts_table">
 				<tr>
-					<td class="facts_value"><a href="#" onclick="return add_parent_to_individual('<?php echo $controller->record->getXref(); ?>', 'M');"><?php echo I18N::translate('Add a new father'); ?></td>
+					<td class="facts_value"><a href="#" onclick="return add_parent_to_individual('<?php echo $controller->record->getXref(); ?>', 'M');"><?php echo I18N::translate('Add a father'); ?></td>
 				</tr>
 				<tr>
-					<td class="facts_value"><a href="#" onclick="return add_parent_to_individual('<?php echo $controller->record->getXref(); ?>', 'F');"><?php echo I18N::translate('Add a new mother'); ?></a></td>
+					<td class="facts_value"><a href="#" onclick="return add_parent_to_individual('<?php echo $controller->record->getXref(); ?>', 'F');"><?php echo I18N::translate('Add a mother'); ?></a></td>
 				</tr>
 			</table>
 			<?php
@@ -349,13 +353,9 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 			$this->printFamily($family, 'FAMS', $family->getFullName());
 		}
 
-		if (!$WT_TREE->getPreference('SHOW_AGE_DIFF')) {
-			echo '<script>jQuery("DIV.elderdate").toggle();</script>';
-		}
-
 		if ($controller->record->canEdit()) {
 		?>
-		<br><table class="facts_table">
+		<br><table class="facts_table noprint">
 		<?php
 			if (count($families) > 1) { ?>
 			<tr>
@@ -372,7 +372,7 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 			<?php if ($controller->record->getSex() != "F") { ?>
 			<tr>
 				<td class="facts_value">
-				<a href="#" onclick="return add_spouse_to_individual('<?php echo $controller->record->getXref(); ?>','WIFE');"><?php echo I18N::translate('Add a new wife'); ?></a>
+				<a href="#" onclick="return add_spouse_to_individual('<?php echo $controller->record->getXref(); ?>','WIFE');"><?php echo I18N::translate('Add a wife'); ?></a>
 				</td>
 			</tr>
 			<tr>
@@ -384,7 +384,7 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 			if ($controller->record->getSex() != "M") { ?>
 			<tr>
 				<td class="facts_value">
-				<a href="#" onclick="return add_spouse_to_individual('<?php echo $controller->record->getXref(); ?>','HUSB');"><?php echo I18N::translate('Add a new husband'); ?></a>
+				<a href="#" onclick="return add_spouse_to_individual('<?php echo $controller->record->getXref(); ?>','HUSB');"><?php echo I18N::translate('Add a husband'); ?></a>
 				</td>
 			</tr>
 			<tr>
@@ -399,6 +399,9 @@ class RelativesTabModule extends AbstractModule implements ModuleTabInterface {
 				</td>
 			</tr>
 		</table>
+		<script>
+			persistant_toggle("show-date-differences", ".elderdate");
+		</script>
 		<?php } ?>
 		<br>
 		<?php

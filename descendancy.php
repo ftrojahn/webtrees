@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,6 +32,7 @@ require './includes/session.php';
 
 $controller = new DescendancyController;
 $controller
+	->restrictAccess(Module::isActiveChart($WT_TREE, 'descendancy_chart'))
 	->pageHeader()
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();');
@@ -44,7 +45,7 @@ $controller
 			<tbody>
 				<tr>
 					<td class="descriptionbox">
-						<?php	echo I18N::translate('Individual'); ?>
+						<?php echo I18N::translate('Individual'); ?>
 					</td>
 					<td class="optionbox">
 						<input class="pedigree_form" data-autocomplete-type="INDI" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->root->getXref(); ?>">
@@ -67,7 +68,7 @@ $controller
 						<?php echo I18N::translate('Families'); ?>
 					</td>
 					<td rowspan="3" class="topbottombar">
-						<input type="submit" value="<?php echo I18N::translate('View'); ?>">
+						<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('view'); ?>">
 					</td>
 				</tr>
 				<tr>

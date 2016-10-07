@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,7 +41,7 @@ class BatchUpdateMarriedNamesPlugin extends BatchUpdateBasePlugin {
 	 * @return string
 	 */
 	public function getDescription() {
-		return I18N::translate('You can make it easier to search for married women by recording their married name.<br>However not all women take their husband’s surname, so beware of introducing incorrect information into your database.');
+		return I18N::translate('You can make it easier to search for married women by recording their married name. However not all women take their husband’s surname, so beware of introducing incorrect information into your database.');
 	}
 
 	/**

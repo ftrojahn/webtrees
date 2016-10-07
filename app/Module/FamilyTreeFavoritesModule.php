@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -167,7 +167,7 @@ class FamilyTreeFavoritesModule extends AbstractModule implements ModuleBlockInt
 					if ($record && $record->canShow()) {
 						if ($record instanceof Individual) {
 							$content .= '<div id="box' . $favorite["gid"] . '.0" class="person_box action_header';
-							switch ($record->getsex()) {
+							switch ($record->getSex()) {
 							case 'M':
 								break;
 							case 'F':
@@ -200,7 +200,7 @@ class FamilyTreeFavoritesModule extends AbstractModule implements ModuleBlockInt
 		if ($ctype == 'user' || Auth::isManager($WT_TREE)) {
 			$uniqueID = Uuid::uuid4(); // This block can theoretically appear multiple times, so use a unique ID.
 			$content .= '<div class="add_fav_head">';
-			$content .= '<a href="#" onclick="return expand_layer(\'add_fav' . $uniqueID . '\');">' . I18N::translate('Add a new favorite') . '<i id="add_fav' . $uniqueID . '_img" class="icon-plus"></i></a>';
+			$content .= '<a href="#" onclick="return expand_layer(\'add_fav' . $uniqueID . '\');">' . I18N::translate('Add a favorite') . '<i id="add_fav' . $uniqueID . '_img" class="icon-plus"></i></a>';
 			$content .= '</div>';
 			$content .= '<div id="add_fav' . $uniqueID . '" style="display: none;">';
 			$content .= '<form name="addfavform" method="get" action="index.php">';
@@ -225,7 +225,7 @@ class FamilyTreeFavoritesModule extends AbstractModule implements ModuleBlockInt
 			$content .= '<p>' . I18N::translate('Enter an optional note about this favorite') . '</p>';
 			$content .= '<textarea name="favnote" rows="6" cols="50"></textarea>';
 			$content .= '</div>';
-			$content .= '<input type="submit" value="' . I18N::translate('Add') . '">';
+			$content .= '<input type="submit" value="' . /* I18N: A button label. */ I18N::translate('add') . '">';
 			$content .= '</form></div>';
 		}
 

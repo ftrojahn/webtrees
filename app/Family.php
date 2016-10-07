@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -101,10 +101,14 @@ class Family extends GedcomRecord {
 	/**
 	 * Get the male (or first female) partner of the family
 	 *
+	 * @param $access_level int|null
+	 *
 	 * @return Individual|null
 	 */
-	public function getHusband() {
-		if ($this->husb && $this->husb->canShowName()) {
+	public function getHusband($access_level = null) {
+		$SHOW_PRIVATE_RELATIONSHIPS = $this->tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS');
+
+		if ($this->husb && ($SHOW_PRIVATE_RELATIONSHIPS || $this->husb->canShowName($access_level))) {
 			return $this->husb;
 		} else {
 			return null;
@@ -114,10 +118,14 @@ class Family extends GedcomRecord {
 	/**
 	 * Get the female (or second male) partner of the family
 	 *
+	 * @param $access_level int|null
+	 *
 	 * @return Individual|null
 	 */
-	public function getWife() {
-		if ($this->wife && $this->wife->canShowName()) {
+	public function getWife($access_level = null) {
+		$SHOW_PRIVATE_RELATIONSHIPS = $this->tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS');
+
+		if ($this->wife && ($SHOW_PRIVATE_RELATIONSHIPS || $this->wife->canShowName($access_level))) {
 			return $this->wife;
 		} else {
 			return null;
@@ -161,14 +169,15 @@ class Family extends GedcomRecord {
 	 * Find the spouse of a person.
 	 *
 	 * @param Individual $person
+	 * @param int|null   $access_level
 	 *
 	 * @return Individual|null
 	 */
-	public function getSpouse(Individual $person) {
+	public function getSpouse(Individual $person, $access_level = null) {
 		if ($person === $this->wife) {
-			return $this->husb;
+			return $this->getHusband($access_level);
 		} else {
-			return $this->wife;
+			return $this->getWife($access_level);
 		}
 	}
 
@@ -180,19 +189,10 @@ class Family extends GedcomRecord {
 	 * @return Individual[]
 	 */
 	public function getSpouses($access_level = null) {
-		if ($access_level === null) {
-			$access_level = Auth::accessLevel($this->tree);
-		}
-
-		$spouses = array();
-		if ($this->husb && $this->husb->canShowName($access_level)) {
-			$spouses[] = $this->husb;
-		}
-		if ($this->wife && $this->wife->canShowName($access_level)) {
-			$spouses[] = $this->wife;
-		}
-
-		return $spouses;
+		return array_filter(array(
+			$this->getHusband($access_level),
+			$this->getWife($access_level),
+		));
 	}
 
 	/**

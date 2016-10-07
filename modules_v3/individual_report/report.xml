@@ -3,9 +3,9 @@
 	<Title><var var="I18N::translate('Individual')" /></Title>
 	<Description><var var="I18N::translate('A report of an individual’s details.')" /></Description>
 	<Input name="pid" lookup="INDI" type="text" default=""><var var="I18N::translate('Individual')" /></Input>
-	<Input name="sources" type="checkbox" default="1"><var var="I18N::translate('Show sources?')" /></Input>
-	<Input name="notes" type="checkbox" default="1"><var var="I18N::translate('Show notes?')" /></Input>
-	<Input name="photos" type="select" default="highlighted" options="none=>I18N::translate('None')|all=>I18N::translate('All')|highlighted=>I18N::translate('Highlighted image')"><var var="I18N::translate('Show photos?')"/></Input>
+	<Input name="sources" type="checkbox" default="1"><var var="I18N::translate('Show sources')" /></Input>
+	<Input name="notes" type="checkbox" default="1"><var var="I18N::translate('Show notes')" /></Input>
+	<Input name="photos" type="select" default="highlighted" options="none=>I18N::translate('None')|all=>I18N::translate('All')|highlighted=>I18N::translate('Highlighted image')"><var var="I18N::translate('Show photos')"/></Input>
 	<Input name="pageSize" type="select" default="A4" options="letter=>I18N::translateContext('paper size','Letter')|A3=>I18N::translateContext('paper size', 'A3')|A4=>I18N::translateContext('paper size','A4')|legal=>I18N::translateContext('paper size','Legal')"><var var="I18N::translate('Page size')" /></Input>
 	<Input name="colors" type="checkbox" default="1"><var var="I18N::translate('Use colors')"/></Input>
 	<!--
@@ -60,7 +60,7 @@
 		<!-- Text color - black -->
 		<SetVar name="tcolor" value="#000000"/>
 	</if>
-	
+
 	<!-- New Page controller -->
 	<SetVar name="newpage" value="0"/>
 	<!-- New Page for Sources controller if SOUR exist -->
@@ -382,8 +382,8 @@
 										<Text color="$tcolor" style="text"> (<var var="I18N::translate('Birth')"/>: <GedcomValue tag="BIRT:DATE"/> <GedcomValue tag="BIRT:PLAC"/><Gedcom id="DEAT"> - <var var="I18N::translate('Death')"/>: <GedcomValue tag="DEAT:DATE"/> <GedcomValue tag="DEAT:PLAC"/></Gedcom>)</Text>
 									</TextBox>
 								</if>
-								<!-- Unknown gender for Sibling -->
-								<if condition="(@SEX=='U') or (@SEX=='')">
+								<!-- Sibling -->
+								<if condition="@SEX=='U'">
 									<TextBox bgcolor="$ugbgcolor" border="1" left="15" newline="1" width="$width1">
 										<Text color="$tcolor" style="text"><var var="I18N::translate('Gender')"/> <var var="I18N::translateContext('unknown gender', 'Unknown')"/>  </Text>
 										<Text color="$tcolor" style="name"><GetPersonName id=""/> </Text>
@@ -597,7 +597,7 @@
 									</TextBox>
 								</if>
 								<!-- Unknown gender for Child -->
-								<if condition="(@SEX=='U') or (@SEX=='')">
+								<if condition="@SEX=='U'">
 									<TextBox bgcolor="$ugbgcolor" border="1" left="15" newline="1" width="$width1">
 										<Text color="$tcolor" style="text"><var var="I18N::translate('Gender')"/> <var var="I18N::translateContext('unknown gender', 'Unknown')"/>  </Text>
 										<Text color="$tcolor" style="name"><GetPersonName id=""/> </Text>

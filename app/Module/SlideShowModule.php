@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -56,7 +56,7 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 		$start    = $this->getBlockSetting($block_id, 'start', '0') || Filter::getBool('start');
 
 		// We can apply the filters using SQL
-		// Do not use "ORDER BY RAND()" - it is very slow on large tables.  Use PHP::array_rand() instead.
+		// Do not use "ORDER BY RAND()" - it is very slow on large tables. Use PHP::array_rand() instead.
 		$all_media = Database::prepare(
 			"SELECT m_id FROM `##media`" .
 			" WHERE m_file = ?" .
@@ -121,7 +121,7 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
@@ -174,13 +174,13 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 			$content .= '<br>';
 			$content .= '<a href="' . $random_media->getHtmlUrl() . '"><b>' . $random_media->getFullName() . '</b></a><br>';
 			foreach ($random_media->linkedIndividuals('OBJE') as $individual) {
-				$content .= '<a href="' . $individual->getHtmlUrl() . '">' . I18N::translate('View individual') . ' — ' . $individual->getFullname() . '</a><br>';
+				$content .= '<a href="' . $individual->getHtmlUrl() . '">' . I18N::translate('View this individual') . ' — ' . $individual->getFullName() . '</a><br>';
 			}
 			foreach ($random_media->linkedFamilies('OBJE') as $family) {
-				$content .= '<a href="' . $family->getHtmlUrl() . '">' . I18N::translate('View family') . ' — ' . $family->getFullname() . '</a><br>';
+				$content .= '<a href="' . $family->getHtmlUrl() . '">' . I18N::translate('View this family') . ' — ' . $family->getFullName() . '</a><br>';
 			}
 			foreach ($random_media->linkedSources('OBJE') as $source) {
-				$content .= '<a href="' . $source->getHtmlUrl() . '">' . I18N::translate('View source') . ' — ' . $source->getFullname() . '</a><br>';
+				$content .= '<a href="' . $source->getHtmlUrl() . '">' . I18N::translate('View this source') . ' — ' . $source->getFullName() . '</a><br>';
 			}
 			$content .= '<br><div class="indent">';
 			$content .= FunctionsPrint::printFactNotes($random_media->getGedcom(), "1", false);
@@ -259,7 +259,7 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 		$start    = $this->getBlockSetting($block_id, 'start', '0') || Filter::getBool('start');
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show only individuals, events, or all?');
+		echo /* I18N: Label for a configuration option */ I18N::translate('Show only individuals, events, or all');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::selectEditControl('filter', array('indi' => I18N::translate('Individuals'), 'event' => I18N::translate('Facts and events'), 'all' => I18N::translate('All')), null, $filter, '');
 		echo '</td></tr>';
@@ -296,9 +296,10 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 			'video'       => $this->getBlockSetting($block_id, 'filter_video', '0'),
 		);
 
-		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Filter');
 		?>
+	<tr>
+	<td class="descriptionbox wrap width33">
+		<?php echo I18N::translate('Filter'); ?>
 	</td>
 	<td class="optionbox">
 		<center><b><?php echo GedcomTag::getLabel('FORM'); ?></b></center>
@@ -405,13 +406,13 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface {
 	<?php
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show slide show controls?');
+		echo /* I18N: Label for a configuration option */ I18N::translate('Show slide show controls');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('controls', $controls);
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Start slide show on page load?');
+		echo /* I18N: Label for a configuration option */ I18N::translate('Start slide show on page load');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('start', $start);
 		echo '</td></tr>';

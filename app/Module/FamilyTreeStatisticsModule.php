@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,9 +18,11 @@ namespace Fisharebest\Webtrees\Module;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Functions\FunctionsDb;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\Module;
+use Fisharebest\Webtrees\Query\QueryName;
 use Fisharebest\Webtrees\Stats;
 use Fisharebest\Webtrees\Theme;
 
@@ -36,6 +38,9 @@ function compare_place_fullname($a, $b) {
  * Class FamilyTreeStatisticsModule
  */
 class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockInterface {
+	/** Show this number of surnames by default */
+	const DEFAULT_NUMBER_OF_SURNAMES = 10;
+
 	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module */ I18N::translate('Statistics');
@@ -61,6 +66,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		$show_last_update     = $this->getBlockSetting($block_id, 'show_last_update', '1');
 		$show_common_surnames = $this->getBlockSetting($block_id, 'show_common_surnames', '1');
 		$show_places_list     = $this->getBlockSetting($block_id, 'show_places_list', '1');
+		$number_of_surnames   = $this->getBlockSetting($block_id, 'number_of_surnames', self::DEFAULT_NUMBER_OF_SURNAMES);
 		$stat_indi            = $this->getBlockSetting($block_id, 'stat_indi', '1');
 		$stat_fam             = $this->getBlockSetting($block_id, 'stat_fam', '1');
 		$stat_sour            = $this->getBlockSetting($block_id, 'stat_sour', '1');
@@ -79,10 +85,9 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		$stat_avg_chil        = $this->getBlockSetting($block_id, 'stat_avg_chil', '1');
 
 		// This can be overriden when embedding in an HTML block
-		$block     = '0';
-		$stat_link = '1';
+		$block = '0';
 
-		foreach (array('show_common_surnames', 'stat_indi', 'stat_fam', 'stat_sour', 'stat_media', 'stat_surname', 'stat_events', 'stat_users', 'stat_first_birth', 'stat_last_birth', 'stat_first_death', 'stat_last_death', 'stat_long_life', 'stat_avg_life', 'stat_most_chil', 'stat_avg_chil', 'stat_link', 'block') as $name) {
+		foreach (array('show_common_surnames', 'number_common_surnames', 'stat_indi', 'stat_fam', 'stat_sour', 'stat_media', 'stat_surname', 'stat_events', 'stat_users', 'stat_first_birth', 'stat_last_birth', 'stat_first_death', 'stat_last_death', 'stat_long_life', 'stat_avg_life', 'stat_most_chil', 'stat_avg_chil', 'block') as $name) {
 			if (array_key_exists($name, $cfg)) {
 				$$name = $cfg[$name];
 			}
@@ -91,26 +96,27 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
-		$title .= $this->getTitle();
+		$title .= $this->getTitle() . ' — ' . $WT_TREE->getTitleHtml();
 
 		$stats = new Stats($WT_TREE);
 
-		$content = '<b>' . $WT_TREE->getTitleHtml() . '</b><br>';
+		$content = '';
 
 		if ($show_last_update) {
-			$content .= '<div>' . /* I18N: %s is a date */ I18N::translate('This family tree was last updated on %s.', strip_tags($stats->gedcomUpdated())) . '</div>';
+			$content .= '<p>' . /* I18N: %s is a date */
+				I18N::translate('This family tree was last updated on %s.', strip_tags($stats->gedcomUpdated())) . '</p>';
 		}
-	/** Responsive Design */
 
-	$content .= '<div class="stat-table1">';
+		/** Responsive Design */
+		$content .= '<div class="stat-table1">';
 		if ($stat_indi) {
 			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Individuals') . '</div><div class="facts_value stats_value stat-cell"><a href="' . "indilist.php?surname_sublist=no&amp;ged=" . $WT_TREE->getNameUrl() . '">' . $stats->totalIndividuals() . '</a></div></div>';
-			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Males') . '</div><div class="facts_value stats_value stat-cell">' . $stats->totalSexMales() . '<br>' . $stats->totalSexMalesPercentage() . '</a></div></div>';
-			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Females') . '</div><div class="facts_value stats_value stat-cell">' . $stats->totalSexFemales() . '<br>' . $stats->totalSexFemalesPercentage() . '</a></div></div>';
+			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Males') . '</div><div class="facts_value stats_value stat-cell">' . $stats->totalSexMales() . '<br>' . $stats->totalSexMalesPercentage() . '</div></div>';
+			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Females') . '</div><div class="facts_value stats_value stat-cell">' . $stats->totalSexFemales() . '<br>' . $stats->totalSexFemalesPercentage() . '</div></div>';
 		}
 		if ($stat_surname) {
 			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Total surnames') . '</div><div class="facts_value stats_value stat-cell"><a href="indilist.php?show_all=yes&amp;surname_sublist=yes&amp;ged=' . $WT_TREE->getNameUrl() . '">' . $stats->totalSurnames() . '</a></div></div>';
@@ -171,9 +177,9 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 			$content .= '</div>';
 		}
 		if ($stat_long_life) {
-			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Individual who lived the longest') . '</div><div class="facts_value stats_value stat-cell">' . $stats->LongestLifeAge() . '</div>';
+			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Individual who lived the longest') . '</div><div class="facts_value stats_value stat-cell">' . $stats->longestLifeAge() . '</div>';
 			if (!$block) {
-				$content .= '<div class="facts_value stat-cell left">' . $stats->LongestLife() . '</div>';
+				$content .= '<div class="facts_value stat-cell left">' . $stats->longestLife() . '</div>';
 			}
 			$content .= '</div>';
 		}
@@ -187,38 +193,38 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		}
 
 		if ($stat_most_chil && !$block) {
-			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Family with the most children') . '</div><div class="facts_value stats_value  stat-cell">' . $stats->largestFamilySize() . '</div>';
+			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Family with the most children') . '</div><div class="facts_value stats_value stat-cell">' . $stats->largestFamilySize() . '</div>';
 			if (!$block) {
 				$content .= '<div class="facts_value stat-cell left">' . $stats->largestFamily() . '</div>';
 			}
 			$content .= '</div>';
 		}
 		if ($stat_avg_chil) {
-			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Average number of children per family') . '</div><div class="facts_value stats_value  stat-cell">' . $stats->averageChildren() . '</div>';
+			$content .= '<div class="stat-row"><div class="facts_label stat-cell">' . I18N::translate('Average number of children per family') . '</div><div class="facts_value stats_value stat-cell">' . $stats->averageChildren() . '</div>';
 			if (!$block) {
 				$content .= '<div class="facts_value stat-cell left"></div>';
 			}
 			$content .= '</div>';
 		}
-		if ($stat_link) {
-			$content .= '</div><div class="clearfloat"><a href="statistics.php?ged=' . $WT_TREE->getNameUrl() . '" rel="nofollow"><b>' . I18N::translate('View statistics as graphs') . '</b></a></div>';
-		}
-		// NOTE: Print the most common surnames
+		$content .= '</div>';
+
 		if ($show_common_surnames) {
-			$surnames = FunctionsDb::getCommonSurnames($WT_TREE->getPreference('COMMON_NAMES_THRESHOLD'), $WT_TREE);
-			if (count($surnames) > 0) {
-				$content .= '<p><b>' . I18N::translate('Most common surnames') . '</b></p>';
-				$content .= '<div class="common_surnames">';
-				$i = 0;
-				foreach ($surnames as $indexval => $surname) {
-					if (stristr($surname['name'], '@N.N') === false) {
-						if ($i > 0) {
-							$content .= ', ';
-						}
-						$content .= '<a href="' . "indilist.php?ged=" . $WT_TREE->getNameUrl() . "&amp;surname=" . rawurlencode($surname['name']) . '">' . $surname['name'] . '</a>';
-						$i++;
-					}
-				}
+			$surnames = FunctionsDb::getTopSurnames($WT_TREE->getTreeId(), 0, (int) $number_of_surnames);
+
+			$all_surnames = array();
+			foreach (array_keys($surnames) as $surname) {
+				$all_surnames = array_merge($all_surnames, QueryName::surnames($WT_TREE, $surname, '', false, false));
+			}
+
+			if (!empty($surnames)) {
+				ksort($all_surnames);
+				$content .= '<div class="clearfloat">';
+				$content .= '<p>';
+				$content .= '<strong>' . I18N::translate('Most common surnames') . '</strong>';
+				$content .= '<br>';
+				$content .= '<span class="common_surnames">' . FunctionsPrintLists::surnameList($all_surnames, 2, false, 'indilist.php', $WT_TREE) . '</span>';
+				$content .= '</p>';
+				$content .= '</div>';
 			}
 		}
 
@@ -326,6 +332,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 			$this->setBlockSetting($block_id, 'show_last_update', Filter::postBool('show_last_update'));
 			$this->setBlockSetting($block_id, 'show_common_surnames', Filter::postBool('show_common_surnames'));
 			$this->setBlockSetting($block_id, 'show_places_list', Filter::postBool('show_places_list'));
+			$this->setBlockSetting($block_id, 'number_of_surnames', Filter::postInteger('number_of_surnames'));
 			$this->setBlockSetting($block_id, 'stat_indi', Filter::postBool('stat_indi'));
 			$this->setBlockSetting($block_id, 'stat_fam', Filter::postBool('stat_fam'));
 			$this->setBlockSetting($block_id, 'stat_sour', Filter::postBool('stat_sour'));
@@ -348,6 +355,7 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 		$show_last_update     = $this->getBlockSetting($block_id, 'show_last_update', '1');
 		$show_common_surnames = $this->getBlockSetting($block_id, 'show_common_surnames', '1');
 		$show_places_list     = $this->getBlockSetting($block_id, 'show_places_list', '1');
+		$number_of_surnames   = $this->getBlockSetting($block_id, 'number_of_surnames', self::DEFAULT_NUMBER_OF_SURNAMES);
 		$stat_indi            = $this->getBlockSetting($block_id, 'stat_indi', '1');
 		$stat_fam             = $this->getBlockSetting($block_id, 'stat_fam', '1');
 		$stat_sour            = $this->getBlockSetting($block_id, 'stat_sour', '1');
@@ -506,5 +514,168 @@ class FamilyTreeStatisticsModule extends AbstractModule implements ModuleBlockIn
 	</td>
 	</tr>
 	<?php
+		?>
+		<tr>
+			<td class="descriptionbox wrap width33">
+				<label for="show-last-update">
+					<?php echo /* I18N: label for yes/no option */ I18N::translate('Show date of last update') ?>
+				</label>
+			</td>
+			<td class="optionbox">
+				<input type="checkbox" value="yes" id="show-last-update" name="show_last_update" <?php echo $show_last_update ? 'checked' : ''; ?>>
+			</td>
+		</tr>
+		<tr>
+			<td class="descriptionbox wrap width33">
+				<?php echo I18N::translate('Statistics'); ?>
+			</td>
+			<td class="optionbox">
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_indi" <?php echo $stat_indi ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Individuals'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_first_birth" <?php echo $stat_first_birth ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Earliest birth year'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_surname" <?php echo $stat_surname ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Total surnames'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_last_birth" <?php echo $stat_last_birth ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Latest birth year'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_fam" <?php echo $stat_fam ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Families'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_first_death" <?php echo $stat_first_death ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Earliest death year'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_sour" <?php echo $stat_sour ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Sources'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_last_death" <?php echo $stat_last_death ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Latest death year'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_media" <?php echo $stat_media ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Media objects'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_long_life" <?php echo $stat_long_life ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Individual who lived the longest'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_repo" <?php echo $stat_repo ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Repositories'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_avg_life" <?php echo $stat_avg_life ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Average age at death'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_events" <?php echo $stat_events ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Total events'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_most_chil" <?php echo $stat_most_chil ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Family with the most children'); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_users" <?php echo $stat_users ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Total users'); ?>
+								</label>
+							</td>
+							<td>
+								<label>
+									<input type="checkbox" value="yes" name="stat_avg_chil" <?php echo $stat_avg_chil ? 'checked' : ''; ?>>
+									<?php echo I18N::translate('Average number of children per family'); ?>
+								</label>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="descriptionbox wrap width33">
+				<label for="show-common-surnames">
+					<?php echo I18N::translate('Most common surnames') ?>
+				</label>
+			</td>
+			<td class="optionbox">
+				<input type="checkbox" value="yes" id="show-common-surnames" name="show_common_surnames" <?php echo $show_common_surnames ? 'checked' : ''; ?>>
+			</td>
+		</tr>
+		<tr>
+			<td class="descriptionbox wrap width33">
+				<label for="number-of-surnames">
+					<?php echo /* I18N: ... to show in a list */ I18N::translate('Number of surnames') ?>
+				</label>
+			</td>
+			<td class="optionbox">
+				<input
+					id="number-of-surnames"
+					maxlength="5"
+					name="number_of_surnames"
+					pattern="[1-9][0-9]*"
+					required
+					type="text"
+					value="<?php echo Filter::escapeHtml($number_of_surnames); ?>"
+				>
+			</td>
+		</tr>
+		<?php
 	}
 }

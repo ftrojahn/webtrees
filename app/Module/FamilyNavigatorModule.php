@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -132,12 +132,16 @@ class FamilyNavigatorModule extends AbstractModule implements ModuleSidebarInter
 					<?php echo $menu->getMenu(); ?>
 				</td>
 				<td class="center <?php echo $controller->getPersonStyle($spouse); ?> nam">
+					<?php if ($spouse->canShow()): ?>
 					<a class="famnav_link" href="<?php echo $spouse->getHtmlUrl(); ?>">
 						<?php echo $spouse->getFullName(); ?>
 					</a>
 					<div class="font9">
 						<?php echo $spouse->getLifeSpan(); ?>
 					</div>
+					<?php else: ?>
+						<?php echo $spouse->getFullName(); ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 		<?php
@@ -153,12 +157,16 @@ class FamilyNavigatorModule extends AbstractModule implements ModuleSidebarInter
 					<?php echo $menu->getMenu(); ?>
 				</td>
 				<td class="center <?php echo $controller->getPersonStyle($child); ?> nam">
+					<?php if ($child->canShow()): ?>
 					<a class="famnav_link" href="<?php echo $child->getHtmlUrl(); ?>">
 						<?php echo $child->getFullName(); ?>
 					</a>
 					<div class="font9">
 						<?php echo $child->getLifeSpan(); ?>
 					</div>
+					<?php else: ?>
+						<?php echo $child->getFullName(); ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 		<?php

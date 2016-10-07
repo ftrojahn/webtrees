@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -112,6 +112,6 @@ sort($entries);
 	</fieldset>
 	<button class="btn btn-danger" type="submit">
 		<i class="fa fa-trash-o"></i>
-		<?php echo /* I18N: Button label */ I18N::translate('delete'); ?>
+		<?php echo /* I18N: A button label. */ I18N::translate('delete'); ?>
 	</button>
 </form>

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -149,7 +149,7 @@ if ($linkto == 'manage' && Module::getModuleByName('GEDFact_assistant')) {
 		}
 
 		echo '</td></tr>';
-		echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', I18N::translate('Set link'), '"></td></tr>';
+		echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', /* I18N: A button label (a verb). */ I18N::translate('link'), '"></td></tr>';
 		echo '</table>';
 		echo '</form>';
 	} elseif ($action == "update" && $paramok) {

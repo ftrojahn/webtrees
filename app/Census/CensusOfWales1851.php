@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,8 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Fisharebest\Webtrees\Census;
-
-use Fisharebest\Webtrees\Date;
 
 /**
  * Definitions for a census
@@ -39,7 +37,7 @@ class CensusOfWales1851 extends CensusOfWales implements CensusInterface {
 		return array(
 			new CensusColumnFullName($this, 'Name', 'Name and surname'),
 			new CensusColumnRelationToHead($this, 'Relation', 'Relation to head of household'),
-			new CensusColumnCondition($this, 'Condition', 'Condition'),
+			new CensusColumnConditionEnglish($this, 'Condition', 'Condition'),
 			new CensusColumnAgeMale($this, 'AgeM', 'Age (males)'),
 			new CensusColumnAgeFemale($this, 'AgeF', 'Age (females)'),
 			new CensusColumnOccupation($this, 'Occupation', 'Rank, profession or occupation'),

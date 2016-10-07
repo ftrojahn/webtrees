@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,7 +37,7 @@ $controller
 	->restrictAccess(Auth::isEditor($WT_TREE))
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();')
-	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('J', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
+	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('j', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
 
 switch ($action) {
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,16 +48,16 @@ case 'editraw':
 	check_record_access($record);
 
 	$controller
-		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit raw GEDCOM'))
+		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit the raw GEDCOM'))
 		->pageHeader()
 		->addInlineJavascript('jQuery("#raw-gedcom-list").sortable({opacity: 0.7, cursor: "move", axis: "y"});');
 
 	?>
 	<div id="edit_interface-page">
-		<h4>
+		<h2>
 			<?php echo $controller->getPageTitle(); ?>
 			<?php echo FunctionsPrint::helpLink('edit_edit_raw'); ?>
-		</h4>
+		</h2>
 		<pre>     <?php echo '0 @' . $record->getXref() . '@ ' . $record::RECORD_TYPE; ?></pre>
 		<form method="post" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
@@ -109,7 +109,7 @@ case 'updateraw':
 	check_record_access($record);
 
 	$controller
-		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit raw GEDCOM'))
+		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit the raw GEDCOM'))
 		->pageHeader();
 
 	$gedcom = '0 @' . $record->getXref() . '@ ' . $record::RECORD_TYPE;
@@ -159,16 +159,16 @@ case 'editrawfact':
 	}
 
 	$controller
-		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit raw GEDCOM'))
+		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit the raw GEDCOM'))
 		->pageHeader();
 
 	?>
 	<div id="edit_interface-page">
-		<h4>
+		<h2>
 			<?php echo $controller->getPageTitle(); ?>
 			<?php echo FunctionsPrint::helpLink('edit_edit_raw'); ?>
 			<?php FunctionsPrint::printSpecialCharacterLink('gedcom'); ?>
-		</h4>
+		</h2>
 		<form method="post" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="updaterawfact">
@@ -221,7 +221,7 @@ case 'updaterawfact':
 	}
 
 	$controller
-		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit raw GEDCOM'))
+		->setPageTitle($record->getFullName() . ' - ' . I18N::translate('Edit the raw GEDCOM'))
 		->pageHeader();
 
 	// Cleanup the client’s bad editing?
@@ -262,7 +262,7 @@ case 'edit':
 		->pageHeader();
 
 	echo '<div id="edit_interface-page">';
-	echo '<h4>', $controller->getPageTitle(), '</h4>';
+	echo '<h2>', $controller->getPageTitle(), '</h2>';
 	FunctionsPrint::initializeCalendarPopup();
 	echo '<form name="editform" method="post" action="edit_interface.php" enctype="multipart/form-data">';
 	echo '<input type="hidden" name="ged" value="', $WT_TREE->getNameHtml(), '">';
@@ -272,7 +272,7 @@ case 'edit':
 	echo '<input type="hidden" name="prev_action" value="edit">';
 	echo Filter::getCsrf();
 	echo '<table class="facts_table">';
-	FunctionsEdit::createEditForm($record, $edit_fact);
+	FunctionsEdit::createEditForm($edit_fact);
 	echo keep_chan($record);
 	echo '</table>';
 
@@ -287,7 +287,7 @@ case 'edit':
 		break;
 	case 'FAM':
 	case 'INDI':
-		// FAM and INDI records have real facts.  They can take NOTE/SOUR/OBJE/etc.
+		// FAM and INDI records have real facts. They can take NOTE/SOUR/OBJE/etc.
 		if ($level1type !== 'SEX' && $level1type !== 'NOTE' && $level1type !== 'ALIA') {
 			if ($level1type !== 'SOUR') {
 				FunctionsEdit::printAddLayer('SOUR');
@@ -316,7 +316,7 @@ case 'edit':
 	if (Auth::isAdmin() || $WT_TREE->getPreference('SHOW_GEDCOM_RECORD')) {
 		echo
 			'<br><br><a href="edit_interface.php?action=editrawfact&amp;xref=', $xref, '&amp;fact_id=', $fact_id, '&amp;ged=', $WT_TREE->getNameUrl(), '">',
-			I18N::translate('Edit raw GEDCOM'),
+			I18N::translate('Edit the raw GEDCOM'),
 			'</a>';
 	}
 	?>
@@ -344,7 +344,7 @@ case 'add':
 	$level0type = $record::RECORD_TYPE;
 
 	echo '<div id="edit_interface-page">';
-	echo '<h4>', $controller->getPageTitle(), '</h4>';
+	echo '<h2>', $controller->getPageTitle(), '</h2>';
 
 	FunctionsPrint::initializeCalendarPopup();
 	echo '<form name="addform" method="post" action="edit_interface.php" enctype="multipart/form-data">';
@@ -489,7 +489,7 @@ case 'update':
 	// For the GEDFact_assistant module
 	$pid_array = Filter::post('pid_array');
 	if ($pid_array) {
-		foreach (explode(', ', $pid_array) as $pid) {
+		foreach (explode(',', $pid_array) as $pid) {
 			if ($pid !== $xref) {
 				$indi = Individual::getInstance($pid, $WT_TREE);
 				if ($indi && $indi->canEdit()) {
@@ -503,7 +503,7 @@ case 'update':
 	break;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add a new child to an existing family
+// Add a child to an existing family
 ////////////////////////////////////////////////////////////////////////////////
 case 'add_child_to_family':
 	$xref   = Filter::get('xref', WT_REGEX_XREF);
@@ -513,7 +513,7 @@ case 'add_child_to_family':
 	check_record_access($family);
 
 	$controller
-		->setPageTitle($family->getFullName() . ' - ' . I18N::translate('Add a new child'))
+		->setPageTitle($family->getFullName() . ' - ' . I18N::translate('Add a child'))
 		->pageHeader();
 
 	print_indi_form('add_child_to_family_action', null, $family, null, 'CHIL', $gender);
@@ -583,7 +583,7 @@ case 'add_child_to_family_action':
 	break;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add a new child to an existing individual (creating a one-parent family)
+// Add a child to an existing individual (creating a one-parent family)
 ////////////////////////////////////////////////////////////////////////////////
 case 'add_child_to_individual':
 	$xref = Filter::get('xref', WT_REGEX_XREF);
@@ -669,10 +669,10 @@ case 'add_parent_to_individual':
 	check_record_access($individual);
 
 	if ($gender === 'F') {
-		$controller->setPageTitle(I18N::translate('Add a new mother'));
+		$controller->setPageTitle(I18N::translate('Add a mother'));
 		$famtag = 'WIFE';
 	} else {
-		$controller->setPageTitle(I18N::translate('Add a new father'));
+		$controller->setPageTitle(I18N::translate('Add a father'));
 		$famtag = 'HUSB';
 	}
 	$controller->pageHeader();
@@ -747,7 +747,7 @@ case 'add_parent_to_individual_action':
 case 'add_unlinked_indi':
 	$controller
 		->restrictAccess(Auth::isManager($WT_TREE))
-		->setPageTitle(I18N::translate('Create a new individual'))
+		->setPageTitle(I18N::translate('Create an individual'))
 		->pageHeader();
 
 	print_indi_form('add_unlinked_indi_action', null, null, null, null, null);
@@ -794,7 +794,7 @@ case 'add_unlinked_indi_action':
 	break;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add a new spouse to an existing individual (creating a new family)
+// Add a spouse to an existing individual (creating a new family)
 ////////////////////////////////////////////////////////////////////////////////
 case 'add_spouse_to_individual':
 	$famtag = Filter::get('famtag', 'HUSB|WIFE');
@@ -804,10 +804,10 @@ case 'add_spouse_to_individual':
 	check_record_access($individual);
 
 	if ($famtag === 'WIFE') {
-		$controller->setPageTitle(I18N::translate('Add a new wife'));
+		$controller->setPageTitle(I18N::translate('Add a wife'));
 		$sex = 'F';
 	} else {
-		$controller->setPageTitle(I18N::translate('Add a new husband'));
+		$controller->setPageTitle(I18N::translate('Add a husband'));
 		$sex = 'M';
 	}
 	$controller->pageHeader();
@@ -834,7 +834,7 @@ case 'add_spouse_to_individual_action':
 	check_record_access($person);
 
 	$controller
-		->setPageTitle(I18N::translate('Add a new spouse'))
+		->setPageTitle(I18N::translate('Add a spouse'))
 		->pageHeader();
 
 	FunctionsEdit::splitSource();
@@ -884,7 +884,7 @@ case 'add_spouse_to_individual_action':
 	break;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add a new spouse to an existing family
+// Add a spouse to an existing family
 ////////////////////////////////////////////////////////////////////////////////
 case 'add_spouse_to_family':
 	$xref   = Filter::get('xref', WT_REGEX_XREF);
@@ -894,10 +894,10 @@ case 'add_spouse_to_family':
 	check_record_access($family);
 
 	if ($famtag === 'WIFE') {
-		$controller->setPageTitle(I18N::translate('Add a new wife'));
+		$controller->setPageTitle(I18N::translate('Add a wife'));
 		$sex = 'F';
 	} else {
-		$controller->setPageTitle(I18N::translate('Add a new husband'));
+		$controller->setPageTitle(I18N::translate('Add a husband'));
 		$sex = 'M';
 	}
 	$controller->pageHeader();
@@ -985,7 +985,7 @@ case 'addfamlink':
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form method="post" name="addchildform" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="linkfamaction">
@@ -1008,7 +1008,7 @@ case 'addfamlink':
 					<td class="facts_value">
 						<?php echo FunctionsEdit::editFieldPedigree('PEDI', '', '', $person); ?>
 						<p class="small text-muted">
-							<?php echo I18N::translate('A child may have more than one set of parents.  The relationship between the child and the parents can be biological, legal, or based on local culture and tradition.  If no pedigree is specified, then a biological relationship will be assumed.'); ?>
+							<?php echo I18N::translate('A child may have more than one set of parents. The relationship between the child and the parents can be biological, legal, or based on local culture and tradition. If no pedigree is specified, then a biological relationship will be assumed.'); ?>
 						</p>
 					</td>
 				</tr>
@@ -1093,7 +1093,7 @@ case 'linkspouse':
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form method="post" name="addchildform" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="linkspouseaction">
@@ -1193,7 +1193,7 @@ case 'linkspouseaction':
 ////////////////////////////////////////////////////////////////////////////////
 case 'addnewsource':
 	$controller
-		->setPageTitle(I18N::translate('Create a new source'))
+		->setPageTitle(I18N::translate('Create a source'))
 		->pageHeader();
 
 	?>
@@ -1208,7 +1208,7 @@ case 'addnewsource':
 		}
 	</script>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="addsourceaction">
@@ -1276,7 +1276,7 @@ case 'addnewsource':
 
 case 'addsourceaction':
 	$controller
-		->setPageTitle(I18N::translate('Create a new source'))
+		->setPageTitle(I18N::translate('Create a source'))
 		->pageHeader();
 
 	if (!Filter::checkCsrf()) {
@@ -1315,7 +1315,7 @@ case 'addsourceaction':
 		$newgedrec .= "\n1 REPO @" . $REPO . '@';
 		$CALN = Filter::post('CALN');
 		if ($CALN) {
-			$newgedrec .= "\n1 CALN " . $CALN;
+			$newgedrec .= "\n2 CALN " . $CALN;
 		}
 	}
 	$EVEN = Filter::postArray('EVEN', WT_REGEX_TAG);
@@ -1345,12 +1345,12 @@ case 'addsourceaction':
 ////////////////////////////////////////////////////////////////////////////////
 case 'addnewnote':
 	$controller
-		->setPageTitle(I18N::translate('Create a new shared note'))
+		->setPageTitle(I18N::translate('Create a shared note'))
 		->pageHeader();
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 
 		<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
@@ -1381,7 +1381,7 @@ case 'addnewnote':
 
 case 'addnoteaction':
 	$controller
-		->setPageTitle(I18N::translate('Create a new shared note'))
+		->setPageTitle(I18N::translate('Create a shared note'))
 		->pageHeader();
 
 	if (!Filter::checkCsrf()) {
@@ -1419,7 +1419,7 @@ case 'addmedia_links':
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form method="post" action="edit_interface.php?xref=<?php echo $person->getXref(); ?>" onsubmit="findindi()">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="addmedia_links">
@@ -1441,12 +1441,12 @@ case 'editnote':
 	check_record_access($note);
 
 	$controller
-		->setPageTitle(I18N::translate('Edit shared note'))
+		->setPageTitle(I18N::translate('Edit the shared note'))
 		->pageHeader();
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form method="post" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="editnoteaction">
@@ -1487,7 +1487,7 @@ case 'editnoteaction':
 	check_record_access($record);
 
 	$controller
-		->setPageTitle(I18N::translate('Edit shared note'))
+		->setPageTitle(I18N::translate('Edit the shared note'))
 		->pageHeader();
 
 	// We have user-supplied data in a replacement string - escape it against backreferences
@@ -1509,11 +1509,11 @@ case 'editnoteaction':
 ////////////////////////////////////////////////////////////////////////////////
 case 'addnewrepository':
 	$controller
-		->setPageTitle(I18N::translate('Create a new repository'))
+		->setPageTitle(I18N::translate('Create a repository'))
 		->pageHeader();
 
 	echo '<div id="edit_interface-page">';
-	echo '<h4>', $controller->getPageTitle(), '</h4>';
+	echo '<h2>', $controller->getPageTitle(), '</h2>';
 
 	echo '<script>';
 	?>
@@ -1572,7 +1572,7 @@ case 'addrepoaction':
 	}
 
 	$controller
-		->setPageTitle(I18N::translate('Create a new repository'))
+		->setPageTitle(I18N::translate('Create a repository'))
 		->pageHeader();
 
 	$gedrec    = '0 @XREF@ REPO';
@@ -1637,7 +1637,7 @@ case 'editname':
 	}
 
 	$controller
-		->setPageTitle(I18N::translate('Edit name'))
+		->setPageTitle(I18N::translate('Edit the name'))
 		->pageHeader();
 
 	print_indi_form('update', $person, null, $name_fact, '', $person->getSex());
@@ -1652,7 +1652,7 @@ case 'addname':
 	check_record_access($person);
 
 	$controller
-		->setPageTitle(I18N::translate('Add a new name'))
+		->setPageTitle(I18N::translate('Add a name'))
 		->pageHeader();
 
 	print_indi_form('update', $person, null, null, '', $person->getSex());
@@ -1715,7 +1715,7 @@ case 'reorder_media':
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo I18N::translate('Click a row, then drag-and-drop to re-order media'); ?></h4>
+		<h2><?php echo I18N::translate('Re-order media'); ?></h2>
 		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="reorder_media_update">
@@ -1726,7 +1726,7 @@ case 'reorder_media':
 				<li class="facts_value" style="list-style:none;cursor:move;margin-bottom:2px;" id="li_<?php echo $obje->getXref(); ?>">
 					<table class="pic">
 						<tr>
-							<td width="80" valign="top" align="center">
+							<td>
 								<?php echo $obje->displayImage(); ?>
 							</td>
 							<td>
@@ -1738,9 +1738,6 @@ case 'reorder_media':
 				</li>
 			<?php } ?>
 			</ul>
-			<table class="facts_table">
-				<?php echo keep_chan($record); ?>
-			</table>
 			<p id="save-cancel">
 				<input type="submit" class="save" value="<?php echo I18N::translate('save'); ?>">
 				<input type="button" class="cancel" value="<?php echo I18N::translate('close'); ?>" onclick="window.close();">
@@ -1751,9 +1748,8 @@ case 'reorder_media':
 	break;
 
 case 'reorder_media_update':
-	$xref      = Filter::post('xref', WT_REGEX_XREF);
-	$order1    = Filter::post('order1');
-	$keep_chan = Filter::postBool('keep_chan');
+	$xref   = Filter::post('xref', WT_REGEX_XREF);
+	$order1 = Filter::post('order1');
 
 	if (!Filter::checkCsrf()) {
 		header('Location: ' . WT_BASE_URL . WT_SCRIPT_NAME . '?action=reorder_media_&xref=' . $xref);
@@ -1782,7 +1778,7 @@ case 'reorder_media_update':
 		}
 	}
 
-	$person->updateRecord(implode("\n", $facts), !$keep_chan);
+	$person->updateRecord(implode("\n", $facts), false);
 
 	$controller->addInlineJavascript('closePopupAndReloadParent();');
 	break;
@@ -1805,7 +1801,7 @@ case 'reorder_children':
 
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 			<input type="hidden" name="action" value="reorder_update">
@@ -1844,11 +1840,8 @@ case 'reorder_children':
 					echo '</li>';
 					$i++;
 				}
-			echo '</ul>';
 			?>
-			<table>
-				<?php echo keep_chan($family); ?>
-			</table>
+			</ul>
 			<p id="save-cancel">
 				<input type="submit" class="save" value="<?php echo I18N::translate('save'); ?>">
 				<input type="submit" class="save" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();" value="<?php echo I18N::translate('sort by date of birth'); ?>">
@@ -1860,9 +1853,8 @@ case 'reorder_children':
 	break;
 
 case 'reorder_update':
-	$xref      = Filter::post('xref', WT_REGEX_XREF);
-	$order     = Filter::post('order');
-	$keep_chan = Filter::postBool('keep_chan');
+	$xref  = Filter::post('xref', WT_REGEX_XREF);
+	$order = Filter::post('order');
 
 	if (!Filter::checkCsrf()) {
 		header('Location: ' . WT_BASE_URL . WT_SCRIPT_NAME . '?action=reorder_children&xref=' . $xref);
@@ -1895,7 +1887,7 @@ case 'reorder_update':
 			$gedcom[] = $fact->getGedcom();
 		}
 
-		$family->updateRecord(implode("\n", $gedcom), !$keep_chan);
+		$family->updateRecord(implode("\n", $gedcom), false);
 	}
 
 	$controller->addInlineJavascript('closePopupAndReloadParent();');
@@ -1919,7 +1911,7 @@ case 'changefamily':
 	$children = $family->getChildren();
 	?>
 	<div id="edit_interface-page">
-		<h4><?php echo $controller->getPageTitle(); ?></h4>
+		<h2><?php echo $controller->getPageTitle(); ?></h2>
 		<div id="changefam">
 			<form name="changefamform" method="post" action="edit_interface.php">
 				<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
@@ -2066,12 +2058,8 @@ case 'changefamily_update':
 	}
 
 	$CHIL = array();
-	for ($i = 0;; ++$i) {
-		if (isset($_POST['CHIL' . $i])) {
-			$CHIL[] = Filter::post('CHIL' . $i, WT_REGEX_XREF);
-		} else {
-			break;
-		}
+	for ($i = 0; isset($_POST['CHIL' . $i]); ++$i) {
+		$CHIL[] = Filter::post('CHIL' . $i, WT_REGEX_XREF);
 	}
 
 	$family = Family::getInstance($xref, $WT_TREE);
@@ -2090,10 +2078,8 @@ case 'changefamily_update':
 	$new_father   = Individual::getInstance($HUSB, $WT_TREE);
 	$new_mother   = Individual::getInstance($WIFE, $WT_TREE);
 	$new_children = array();
-	if (is_array($CHIL)) {
-		foreach ($CHIL as $child) {
-			$new_children[] = Individual::getInstance($child, $WT_TREE);
-		}
+	foreach ($CHIL as $child) {
+		$new_children[] = Individual::getInstance($child, $WT_TREE);
 	}
 
 	if ($old_father !== $new_father) {
@@ -2195,7 +2181,7 @@ case 'reorder_fams':
 
 	?>
 	<div id="edit_interface-page">
-	<h4><?php echo $controller->getPageTitle(); ?></h4>
+	<h2><?php echo $controller->getPageTitle(); ?></h2>
 	<form name="reorder_form" method="post" action="edit_interface.php">
 		<input type="hidden" name="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
 		<input type="hidden" name="action" value="reorder_fams_update">
@@ -2222,9 +2208,8 @@ case 'reorder_fams':
 	break;
 
 case 'reorder_fams_update':
-	$xref      = Filter::post('xref', WT_REGEX_XREF);
-	$order     = Filter::post('order');
-	$keep_chan = Filter::postBool('keep_chan');
+	$xref  = Filter::post('xref', WT_REGEX_XREF);
+	$order = Filter::post('order');
 
 	if (!Filter::checkCsrf()) {
 		header('Location: ' . WT_BASE_URL . WT_SCRIPT_NAME . '?action=reorder_fams&xref=' . $xref);
@@ -2257,7 +2242,7 @@ case 'reorder_fams_update':
 			$gedcom[] = $fact->getGedcom();
 		}
 
-		$person->updateRecord(implode("\n", $gedcom), !$keep_chan);
+		$person->updateRecord(implode("\n", $gedcom), false);
 	}
 
 	$controller->addInlineJavascript('closePopupAndReloadParent();');
@@ -2424,7 +2409,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 	$bdm = ''; // used to copy '1 SOUR' to '2 SOUR' for BIRT DEAT MARR
 
 	echo '<div id="edit_interface-page">';
-	echo '<h4>', $controller->getPageTitle(), '</h4>';
+	echo '<h2>', $controller->getPageTitle(), '</h2>';
 	FunctionsPrint::initializeCalendarPopup();
 	echo '<form method="post" name="addchildform" onsubmit="return checkform();">';
 	echo '<input type="hidden" name="ged" value="', $WT_TREE->getNameHtml(), '">';
@@ -2591,16 +2576,16 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 	if ($name_fact && (Auth::isAdmin() || $WT_TREE->getPreference('SHOW_GEDCOM_RECORD'))) {
 		echo
 			'<br><br><a href="edit_interface.php?action=editrawfact&amp;xref=', $xref, '&amp;fact_id=', $name_fact->getFactId(), '&amp;ged=', $WT_TREE->getNameUrl(), '">',
-			I18N::translate('Edit raw GEDCOM'),
+			I18N::translate('Edit the raw GEDCOM'),
 			'</a>';
 	}
 
 	echo '<p id="save-cancel">';
-	echo '<input type="submit" class="save" value="', /* I18N: button label */ I18N::translate('save'), '">';
+	echo '<input type="submit" class="save" value="', /* I18N: A button label. */ I18N::translate('save'), '">';
 	if (preg_match('/^add_(child|spouse|parent|unlinked_indi)/', $nextaction)) {
-		echo '<input type="submit" class="save" value="', /* I18N: button label */ I18N::translate('go to new individual'), '" onclick="document.addchildform.goto.value=\'new\';">';
+		echo '<input type="submit" class="save" value="', /* I18N: A button label. */ I18N::translate('go to new individual'), '" onclick="document.addchildform.goto.value=\'new\';">';
 	}
-	echo '<input type="button" class="cancel" value="', /* I18N: button label */ I18N::translate('close'), '" onclick="window.close();">';
+	echo '<input type="button" class="cancel" value="', /* I18N: A button label. */ I18N::translate('close'), '" onclick="window.close();">';
 	echo '</p>';
 	echo '</form>';
 	$controller->addInlineJavascript('
@@ -2705,7 +2690,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 	var oldName = "";
 
 	// Calls to generate_name() trigger an update - hence need to
-	// set the manual change to true first.  We are probably
+	// set the manual change to true first. We are probably
 	// listening to the wrong events on the input fields...
 	var manualChange = true;
 	manualChange = generate_name() !== jQuery("#NAME").val();

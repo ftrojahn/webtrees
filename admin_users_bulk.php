@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -43,11 +43,11 @@ $controller
 </p>
 <p>
 	<a href="#" onclick="return message('never_logged', 'messaging2', '');">
-		<?php echo I18N::translate('Send a message to users who have never logged in'); ?>
+		<?php echo I18N::translate('Send a message to users who have never signed in'); ?>
 	</a>
 </p>
 <p>
 	<a href="#" onclick="return message('last_6mo', 'messaging2', '');">
-		<?php echo I18N::translate('Send a message to users who have not logged in for 6 months'); ?>
+		<?php echo I18N::translate('Send a message to users who have not signed in for 6 months'); ?>
 	</a>
 </p>

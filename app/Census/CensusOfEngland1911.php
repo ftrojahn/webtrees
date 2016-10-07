@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@ class CensusOfEngland1911 extends CensusOfEngland implements CensusInterface {
 	 * @return string
 	 */
 	public function censusDate() {
-		return '02 MAR 1911';
+		return '02 APR 1911';
 	}
 
 	/**
@@ -39,7 +39,7 @@ class CensusOfEngland1911 extends CensusOfEngland implements CensusInterface {
 			new CensusColumnRelationToHead($this, 'Relation', 'Relation to head of household'),
 			new CensusColumnAgeMale($this, 'AgeM', 'Age (males)'),
 			new CensusColumnAgeFemale($this, 'AgeF', 'Age (females)'),
-			new CensusColumnCondition($this, 'Condition', 'Condition'),
+			new CensusColumnConditionEnglish($this, 'Condition', 'Condition'),
 			new CensusColumnYearsMarried($this, 'YrM', 'Years married'),
 			new CensusColumnChildrenBornAlive($this, 'ChA', 'Children born alive'),
 			new CensusColumnChildrenLiving($this, 'ChL', 'Children who are still alive'),

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -84,7 +84,7 @@ class MediaTabModule extends AbstractModule implements ModuleTabInterface {
 				</td>
 				<td class="facts_value">
 					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=<?php echo $controller->record->getXref(); ?>&amp;ged=<?php echo $controller->record->getTree()->getNameUrl(); ?>', '_blank', edit_window_specs); return false;">
-						<?php echo I18N::translate('Add a new media object'); ?>
+						<?php echo I18N::translate('Add a media object'); ?>
 					</a>
 					<?php echo FunctionsPrint::helpLink('OBJE'); ?>
 					<br>

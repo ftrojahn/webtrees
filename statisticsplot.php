@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,9 +30,9 @@ require './includes/session.php';
 /**
  * Month of birth
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -86,9 +86,9 @@ function month_of_birth($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Month of birth of first child in a relation
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -142,9 +142,9 @@ function month_of_birth_of_first_child($z_axis, array $z_boundaries, Stats $stat
 /**
  * Month of death
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -198,9 +198,9 @@ function month_of_death($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Month of marriage
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -239,9 +239,9 @@ function month_of_marriage($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Month of first marriage
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -292,9 +292,9 @@ function month_of_first_marriage($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Age related to birth year
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -344,9 +344,9 @@ function lifespan_by_birth_year($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Age related to death year
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -396,9 +396,9 @@ function lifespan_by_death_year($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Age in year of marriage
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -450,9 +450,9 @@ function age_at_marriage($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Age in year of first marriage
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -527,9 +527,9 @@ function age_at_first_marriage($z_axis, array $z_boundaries, Stats $stats) {
 /**
  * Number of children
  *
- * @param int       $z_axis
- * @param integer[] $z_boundaries
- * @param Stats     $stats
+ * @param int   $z_axis
+ * @param int[] $z_boundaries
+ * @param Stats $stats
  *
  * @return int
  */
@@ -761,7 +761,7 @@ function calculate_axis($x_axis_boundaries) {
 	if ($x_axis === 21 && $hulpar[0] == 1) {
 		$xdata[0] = 0;
 	} else {
-		$xdata[0] = I18N::translate('less than') . ' ' . $hulpar[0];
+		$xdata[0] = format_range_of_numbers(0, $hulpar[0]);
 	}
 	$x_boundaries[0] = $hulpar[0] - 1;
 	while (isset($hulpar[$i])) {
@@ -770,10 +770,10 @@ function calculate_axis($x_axis_boundaries) {
 			$xdata[$i]        = $hulpar[$i1];
 			$x_boundaries[$i] = $hulpar[$i1];
 		} elseif ($hulpar[$i1] === $hulpar[0]) {
-			$xdata[$i]        = $hulpar[$i1] . '-' . $hulpar[$i];
+			$xdata[$i]        = format_range_of_numbers($hulpar[$i1], $hulpar[$i]);
 			$x_boundaries[$i] = $hulpar[$i];
 		} else {
-			$xdata[$i]        = ($hulpar[$i1] + 1) . '-' . $hulpar[$i];
+			$xdata[$i]        = format_range_of_numbers($hulpar[$i1] + 1, $hulpar[$i]);
 			$x_boundaries[$i] = $hulpar[$i];
 		}
 		$i++;
@@ -785,12 +785,28 @@ function calculate_axis($x_axis_boundaries) {
 	} else {
 		$xmax = $i;
 	}
-	$xdata[$xmax]        = I18N::translate('over') . ' ' . $hulpar[$i - 1];
+	$xdata[$xmax]        = /* I18N: Label on a graph; 40+ means 40 or more */ I18N::translate('%s+', I18N::number($hulpar[$i - 1]));
 	$x_boundaries[$xmax] = 10000;
 	$xmax                = $xmax + 1;
 	if ($xmax > 20) {
 		$xmax = 20;
 	}
+}
+
+/**
+ * A range of integers.
+ *
+ * @param int $x
+ * @param int $y
+ *
+ * @return string
+ */
+function format_range_of_numbers($x, $y) {
+	return /* I18N: A range of numbers */ I18N::translate(
+		'%1$s–%2$s',
+		I18N::number($x),
+		I18N::number($y)
+	);
 }
 
 /**
@@ -833,7 +849,7 @@ $z_axis       = Filter::getInteger('z-as', 300, 302, 302);
 $stats        = new Stats($WT_TREE);
 $z_boundaries = array();
 
-echo '<div class="statistics_chart" title="', I18N::translate('Statistics plot'), '">';
+echo '<div class="statistics_chart" title="', I18N::translate('Statistics chart'), '">';
 
 switch ($x_axis) {
 case '1':

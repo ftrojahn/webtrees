@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,7 @@ define('WT_SCRIPT_NAME', 'fanchart.php');
 require './includes/session.php';
 
 $controller = new FanchartController;
+global $WT_TREE;
 
 if (Filter::getBool('img')) {
 	header('Content-Type: image/png');
@@ -32,6 +33,7 @@ if (Filter::getBool('img')) {
 }
 
 $controller
+	->restrictAccess(Module::isActiveChart($WT_TREE, 'fan_chart'))
 	->pageHeader()
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('
@@ -90,7 +92,7 @@ $controller
 						<?php echo FunctionsEdit::selectEditControl('fan_style', $controller->getFanStyles(), null, $controller->fan_style); ?>
 					</td>
 					<td rowspan="2" class="topbottombar vmiddle">
-						<input type="submit" value="<?php echo I18N::translate('View'); ?>">
+						<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('view'); ?>">
 					</td>
 				</tr>
 				<tr>

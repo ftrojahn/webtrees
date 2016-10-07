@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ class FlashMessages {
 	const FLASH_KEY = 'flash_messages';
 
 	/**
-	 * Add a new message to the session storage.
+	 * Add a message to the session storage.
 	 *
 	 * @param string $text
 	 * @param string $status "success", "info", "warning" or "danger"

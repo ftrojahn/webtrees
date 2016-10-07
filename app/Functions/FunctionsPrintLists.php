@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -124,7 +124,7 @@ class FunctionsPrintLists {
 		$stats = new Stats($WT_TREE);
 
 		// Bad data can cause "longest life" to be huge, blowing memory limits
-		$max_age = min($WT_TREE->getPreference('MAX_ALIVE_AGE'), $stats->LongestLifeAge()) + 1;
+		$max_age = min($WT_TREE->getPreference('MAX_ALIVE_AGE'), $stats->longestLifeAge()) + 1;
 
 		// Inititialise chart data
 		$deat_by_age = array();
@@ -139,7 +139,7 @@ class FunctionsPrintLists {
 		}
 
 		$html = '
-			<div class="loading-image">&nbsp;</div>
+			<div class="loading-image"></div>
 			<div class="indi-list">
 				<table id="' . $table_id . '">
 					<thead>
@@ -183,7 +183,7 @@ class FunctionsPrintLists {
 							<th>' . GedcomTag::getLabel('SURN') . '</th>
 							<th>GIVN</th>
 							<th>SURN</th>
-							<th>' . /* I18N: Abbreviation for “Sosa-Stradonitz number”.  This is an individual’s surname, so may need transliterating into non-latin alphabets. */
+							<th>' . /* I18N: Abbreviation for “Sosa-Stradonitz number”. This is an individual’s surname, so may need transliterating into non-latin alphabets. */
 			I18N::translate('Sosa') . '</th>
 							<th>SOSA</th>
 							<th>' . GedcomTag::getLabel('BIRT') . '</th>
@@ -263,7 +263,7 @@ class FunctionsPrintLists {
 			$html .= '<td>' . Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)) . 'AAAA' . Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)) . '</td>';
 			//-- SOSA
 			if ($option == 'sosa') {
-				$html .= '<td><a href="../../relationship.php?pid1=' . $datalist[1] . '&amp;pid2=' . $person->getXref() . '" title="' . I18N::translate('Relationships') . '">' . I18N::number($key) . '</a></td><td>' . $key . '</td>';
+				$html .= '<td><a href="relationship.php?pid1=' . $datalist[1] . '&amp;pid2=' . $person->getXref() . '" title="' . I18N::translate('Relationships') . '">' . I18N::number($key) . '</a></td><td>' . $key . '</td>';
 			} else {
 				$html .= '<td></td><td>0</td>';
 			}
@@ -356,7 +356,7 @@ class FunctionsPrintLists {
 			$html .= '</td>';
 			//-- Filtering by death date
 			$html .= '<td>';
-			// Died in last 100 years?  Died?  Not dead?
+			// Died in last 100 years? Died? Not dead?
 			if (Date::compare($death_dates[0], $d100y) > 0) {
 				$html .= 'Y100';
 			} elseif ($death_dates[0]->minimumJulianDay() || $person->isDead()) {
@@ -506,7 +506,7 @@ class FunctionsPrintLists {
 		}
 
 		$html = '
-			<div class="loading-image">&nbsp;</div>
+			<div class="loading-image"></div>
 			<div class="fam-list">
 				<table id="' . $table_id . '">
 					<thead>
@@ -528,7 +528,7 @@ class FunctionsPrintLists {
 											data-filter-column="21"
 											data-filter-value="W"
 											class="ui-state-default"
-											title="' . I18N::translate('Show couples where only the female partner is deceased.') . '"
+											title="' . I18N::translate('Show couples where only the female partner is dead.') . '"
 										>
 											' . I18N::translate('Widower') . '
 										</button>
@@ -537,7 +537,7 @@ class FunctionsPrintLists {
 											data-filter-column="21"
 											data-filter-value="H"
 											class="ui-state-default"
-											title="' . I18N::translate('Show couples where only the male partner is deceased.') . '"
+											title="' . I18N::translate('Show couples where only the male partner is dead.') . '"
 										>
 											' . I18N::translate('Widow') . '
 										</button>
@@ -546,7 +546,7 @@ class FunctionsPrintLists {
 											data-filter-column="21"
 											data-filter-value="Y"
 											class="ui-state-default"
-											title="' . I18N::translate('Show individuals who are dead or couples where both partners are deceased.') . '"
+											title="' . I18N::translate('Show individuals who are dead or couples where both partners are dead.') . '"
 										>
 											' . I18N::translate('Both dead') . '
 										</button>
@@ -557,7 +557,7 @@ class FunctionsPrintLists {
 											data-filter-column="22"
 											data-filter-value="R"
 											class="ui-state-default"
-											title="' . I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.') . '"
+											title="' . I18N::translate('Show “roots” couples or individuals. These individuals may also be called “patriarchs”. They are individuals who have no parents recorded in the database.') . '"
 										>
 											' . I18N::translate('Roots') . '
 										</button>
@@ -566,7 +566,7 @@ class FunctionsPrintLists {
 											data-filter-column="22"
 											data-filter-value="L"
 											class="ui-state-default"
-											title="' . I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.') . '"
+											title="' . I18N::translate('Show “leaves” couples or individuals. These are individuals who are alive but have no children recorded in the database.') . '"
 										>
 											' . I18N::translate('Leaves') . '
 										</button>
@@ -823,8 +823,8 @@ class FunctionsPrintLists {
 			$nchi = $family->getNumberOfChildren();
 			$html .= '<td>' . I18N::number($nchi) . '</td><td>' . $nchi . '</td>';
 			//-- Last change
-			$html .= '<td>' . $family->LastChangeTimestamp() . '</td>';
-			$html .= '<td>' . $family->LastChangeTimestamp(true) . '</td>';
+			$html .= '<td>' . $family->lastChangeTimestamp() . '</td>';
+			$html .= '<td>' . $family->lastChangeTimestamp(true) . '</td>';
 			//-- Sorting by marriage date
 			$html .= '<td>';
 			if (!$family->canShow() || !$mdate->isOK()) {
@@ -915,7 +915,7 @@ class FunctionsPrintLists {
 	public static function sourceTable($datalist) {
 		global $WT_TREE, $controller;
 
-		// Count the number of linked records.  These numbers include private records.
+		// Count the number of linked records. These numbers include private records.
 		// It is not good to bypass privacy, but many servers do not have the resources
 		// to process privacy for every record in the tree
 		$count_individuals = Database::prepare(
@@ -968,7 +968,7 @@ class FunctionsPrintLists {
 			');
 
 		//--table wrapper
-		$html .= '<div class="loading-image">&nbsp;</div>';
+		$html .= '<div class="loading-image"></div>';
 		$html .= '<div class="source-list">';
 		//-- table header
 		$html .= '<table id="' . $table_id . '"><thead><tr>';
@@ -1040,19 +1040,19 @@ class FunctionsPrintLists {
 			$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 			//-- Last change
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $source->LastChangeTimestamp() . '</td>';
+				$html .= '<td>' . $source->lastChangeTimestamp() . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Last change hidden sort column
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $source->LastChangeTimestamp(true) . '</td>';
+				$html .= '<td>' . $source->lastChangeTimestamp(true) . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Delete
 			if (Auth::isManager($WT_TREE)) {
-				$html .= '<td><div title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_source(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($source->getFullName()))) . "', '" . $source->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></div></td>';
+				$html .= '<td><a href="#" title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_record(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($source->getFullName()))) . "', '" . $source->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></a></td>';
 			} else {
 				$html .= '<td></td>';
 			}
@@ -1108,7 +1108,7 @@ class FunctionsPrintLists {
 			');
 
 		//--table wrapper
-		$html .= '<div class="loading-image">&nbsp;</div>';
+		$html .= '<div class="loading-image"></div>';
 		$html .= '<div class="note-list">';
 		//-- table header
 		$html .= '<table id="' . $table_id . '"><thead><tr>';
@@ -1145,7 +1145,7 @@ class FunctionsPrintLists {
 			$num = count($note->linkedIndividuals('NOTE'));
 			$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 			//-- Linked FAMs
-			$num = count($note->linkedfamilies('NOTE'));
+			$num = count($note->linkedFamilies('NOTE'));
 			$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 			//-- Linked OBJEcts
 			$num = count($note->linkedMedia('NOTE'));
@@ -1155,19 +1155,19 @@ class FunctionsPrintLists {
 			$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 			//-- Last change
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $note->LastChangeTimestamp() . '</td>';
+				$html .= '<td>' . $note->lastChangeTimestamp() . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Last change hidden sort column
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $note->LastChangeTimestamp(true) . '</td>';
+				$html .= '<td>' . $note->lastChangeTimestamp(true) . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Delete
 			if (Auth::isManager($WT_TREE)) {
-				$html .= '<td><div title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_note(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($note->getFullName()))) . "', '" . $note->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></div></td>';
+				$html .= '<td><a href="#" title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_record(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($note->getFullName()))) . "', '" . $note->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></a></td>';
 			} else {
 				$html .= '<td></td>';
 			}
@@ -1188,7 +1188,7 @@ class FunctionsPrintLists {
 	public static function repositoryTable($repositories) {
 		global $WT_TREE, $controller;
 
-		// Count the number of linked records.  These numbers include private records.
+		// Count the number of linked records. These numbers include private records.
 		// It is not good to bypass privacy, but many servers do not have the resources
 		// to process privacy for every record in the tree
 		$count_sources = Database::prepare(
@@ -1224,7 +1224,7 @@ class FunctionsPrintLists {
 			');
 
 		//--table wrapper
-		$html .= '<div class="loading-image">&nbsp;</div>';
+		$html .= '<div class="loading-image"></div>';
 		$html .= '<div class="repo-list">';
 		//-- table header
 		$html .= '<table id="' . $table_id . '"><thead><tr>';
@@ -1269,19 +1269,19 @@ class FunctionsPrintLists {
 			$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 			//-- Last change
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $repository->LastChangeTimestamp() . '</td>';
+				$html .= '<td>' . $repository->lastChangeTimestamp() . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Last change hidden sort column
 			if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-				$html .= '<td>' . $repository->LastChangeTimestamp(true) . '</td>';
+				$html .= '<td>' . $repository->lastChangeTimestamp(true) . '</td>';
 			} else {
 				$html .= '<td></td>';
 			}
 			//-- Delete
 			if (Auth::isManager($WT_TREE)) {
-				$html .= '<td><div title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_repository(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($repository->getFullName()))) . "', '" . $repository->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></div></td>';
+				$html .= '<td><a href="#" title="' . I18N::translate('Delete') . '" class="deleteicon" onclick="return delete_record(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($repository->getFullName()))) . "', '" . $repository->getXref() . '\');"><span class="link_text">' . I18N::translate('Delete') . '</span></a></td>';
 			} else {
 				$html .= '<td></td>';
 			}
@@ -1335,7 +1335,7 @@ class FunctionsPrintLists {
 			');
 
 		//--table wrapper
-		$html .= '<div class="loading-image">&nbsp;</div>';
+		$html .= '<div class="loading-image"></div>';
 		$html .= '<div class="media-list">';
 		//-- table header
 		$html .= '<table id="' . $table_id . '"><thead><tr>';
@@ -1379,20 +1379,20 @@ class FunctionsPrintLists {
 				$num = count($media_object->linkedIndividuals('OBJE'));
 				$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 				//-- Linked FAMs
-				$num = count($media_object->linkedfamilies('OBJE'));
+				$num = count($media_object->linkedFamilies('OBJE'));
 				$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 				//-- Linked SOURces
 				$num = count($media_object->linkedSources('OBJE'));
 				$html .= '<td>' . I18N::number($num) . '</td><td>' . $num . '</td>';
 				//-- Last change
 				if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-					$html .= '<td>' . $media_object->LastChangeTimestamp() . '</td>';
+					$html .= '<td>' . $media_object->lastChangeTimestamp() . '</td>';
 				} else {
 					$html .= '<td></td>';
 				}
 				//-- Last change hidden sort column
 				if ($WT_TREE->getPreference('SHOW_LAST_CHANGE')) {
-					$html .= '<td>' . $media_object->LastChangeTimestamp(true) . '</td>';
+					$html .= '<td>' . $media_object->lastChangeTimestamp(true) . '</td>';
 				} else {
 					$html .= '<td></td>';
 				}
@@ -1420,17 +1420,20 @@ class FunctionsPrintLists {
 		$controller
 			->addExternalJavascript(WT_JQUERY_DATATABLES_JS_URL)
 			->addInlineJavascript('
+				jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
+				jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 				jQuery.fn.dataTableExt.oSort["num-asc" ]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a<b) ? -1 : (a>b ? 1 : 0);};
 				jQuery.fn.dataTableExt.oSort["num-desc"]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a>b) ? -1 : (a<b ? 1 : 0);};
 				jQuery(".surname-list").dataTable( {
 					dom: \'t\',
 					jQueryUI: true,
 					autoWidth: false,
+					' . I18N::datatablesI18N() . ',
 					paging: false,
-					sorting: [],
+					sorting: [[1, "asc"]],
 					columns: [
 						/*  0 name  */ { dataSort: 1 },
-						/*  1 NAME  */ { visible: false },
+						/*  1 NAME  */ { type: "unicode", visible: false },
 						/*  2 count */ { dataSort: 3, class: "center" },
 						/*  3 COUNT */ { visible: false }
 					],
@@ -1468,7 +1471,7 @@ class FunctionsPrintLists {
 				if ($spfxsurn) {
 					$html .= '<a href="' . $url . '" dir="auto">' . Filter::escapeHtml($spfxsurn) . '</a><br>';
 				} else {
-					// No surname, but a value from "2 SURN"?  A common workaround for toponyms, etc.
+					// No surname, but a value from "2 SURN"? A common workaround for toponyms, etc.
 					$html .= '<a href="' . $url . '" dir="auto">' . Filter::escapeHtml($surn) . '</a><br>';
 				}
 			}
@@ -1583,213 +1586,39 @@ class FunctionsPrintLists {
 
 		}
 		switch ($style) {
-			case 1:
-				return '<ul><li>' . implode('</li><li>', $html) . '</li></ul>';
-			case 2:
-				return implode(I18N::$list_separator, $html);
-			case 3:
-				$i     = 0;
-				$count = count($html);
-				if ($count > 36) {
-					$col = 4;
-				} elseif ($count > 18) {
-					$col = 3;
-				} elseif ($count > 6) {
-					$col = 2;
-				} else {
-					$col = 1;
-				}
-				$newcol = ceil($count / $col);
-				$html2  = '<table class="list_table"><tr>';
-				$html2 .= '<td class="list_value" style="padding: 14px;">';
+		case 1:
+			return '<ul><li>' . implode('</li><li>', $html) . '</li></ul>';
+		case 2:
+			return implode(I18N::$list_separator, $html);
+		case 3:
+			$i     = 0;
+			$count = count($html);
+			if ($count > 36) {
+				$col = 4;
+			} elseif ($count > 18) {
+				$col = 3;
+			} elseif ($count > 6) {
+				$col = 2;
+			} else {
+				$col = 1;
+			}
+			$newcol = ceil($count / $col);
+			$html2  = '<table class="list_table"><tr>';
+			$html2 .= '<td class="list_value" style="padding: 14px;">';
 
-				foreach ($html as $surns) {
-					$html2 .= $surns . '<br>';
-					$i++;
-					if ($i == $newcol && $i < $count) {
-						$html2 .= '</td><td class="list_value" style="padding: 14px;">';
-						$newcol = $i + ceil($count / $col);
-					}
+			foreach ($html as $surns) {
+				$html2 .= $surns . '<br>';
+				$i++;
+				if ($i == $newcol && $i < $count) {
+					$html2 .= '</td><td class="list_value" style="padding: 14px;">';
+					$newcol = $i + ceil($count / $col);
 				}
-				$html2 .= '</td></tr></table>';
+			}
+			$html2 .= '</td></tr></table>';
 
-				return $html2;
+			return $html2;
 		}
 	}
-
-	/**
-	 * Print a table of events
-	 *
-	 * @param string[] $change_ids
-	 * @param string $sort
-	 *
-	 * @return string
-	 */
-	public static function changesList($change_ids, $sort) {
-		global $WT_TREE;
-
-		$n   = 0;
-		$arr = array();
-		foreach ($change_ids as $change_id) {
-			$record = GedcomRecord::getInstance($change_id, $WT_TREE);
-			if (!$record || !$record->canShow()) {
-				continue;
-			}
-			// setup sorting parameters
-			$arr[$n]['record'] = $record;
-			$arr[$n]['jd']     = ($sort == 'name') ? 1 : $n;
-			$arr[$n]['anniv']  = $record->lastChangeTimestamp(true);
-			$arr[$n++]['fact'] = $record->getSortName(); // in case two changes have same timestamp
-		}
-
-		switch ($sort) {
-			case 'name':
-				uasort($arr, '\Fisharebest\Webtrees\Functions\Functions::eventSortName');
-				break;
-			case 'date_asc':
-				uasort($arr, '\Fisharebest\Webtrees\Functions\Functions::eventSort');
-				$arr = array_reverse($arr);
-				break;
-			case 'date_desc':
-				uasort($arr, '\Fisharebest\Webtrees\Functions\Functions::eventSort');
-		}
-		$html = '';
-		foreach ($arr as $value) {
-			$html .= '<a href="' . $value['record']->getHtmlUrl() . '" class="list_item name2">' . $value['record']->getFullName() . '</a>';
-			$html .= '<div class="indent" style="margin-bottom: 5px;">';
-			if ($value['record'] instanceof Individual) {
-				if ($value['record']->getAddName()) {
-					$html .= '<a href="' . $value['record']->getHtmlUrl() . '" class="list_item">' . $value['record']->getAddName() . '</a>';
-				}
-			}
-			$html .= /* I18N: [a record was] Changed on <date/time> by <user> */
-				I18N::translate('Changed on %1$s by %2$s', $value['record']->lastChangeTimestamp(), Filter::escapeHtml($value['record']->lastChangeUser()));
-			$html .= '</div>';
-		}
-
-		return $html;
-	}
-
-	/**
-	 * Print a table of events
-	 *
-	 * @param string[] $change_ids
-	 * @param string $sort
-	 *
-	 * @return string
-	 */
-	public static function changesTable($change_ids, $sort) {
-		global $controller, $WT_TREE;
-
-		$n        = 0;
-		$table_id = 'table-chan-' . Uuid::uuid4(); // lists requires a unique ID in case there are multiple lists per page
-		switch ($sort) {
-			case 'name':        //name
-				$aaSorting = "[5,'asc'], [4,'desc']";
-				break;
-			case 'date_asc':    //date ascending
-				$aaSorting = "[4,'asc'], [5,'asc']";
-				break;
-			case 'date_desc':   //date descending
-				$aaSorting = "[4,'desc'], [5,'asc']";
-				break;
-		}
-		$html = '';
-		$controller
-			->addExternalJavascript(WT_JQUERY_DATATABLES_JS_URL)
-			->addInlineJavascript('
-				jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
-				jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
-				jQuery("#' . $table_id . '").dataTable({
-					dom: \'t\',
-					paging: false,
-					autoWidth:false,
-					lengthChange: false,
-					filter: false,
-					' . I18N::datatablesI18N() . ',
-					jQueryUI: true,
-					sorting: [' . $aaSorting . '],
-					columns: [
-						/* 0-Type */    { sortable: false, class: "center" },
-						/* 1-Record */  { dataSort: 5 },
-						/* 2-Change */  { dataSort: 4 },
-						/* 3-By */      null,
-						/* 4-DATE */    { visible: false },
-						/* 5-SORTNAME */{ type: "unicode", visible: false }
-					]
-				});
-			');
-
-		//-- table header
-		$html .= '<table id="' . $table_id . '" class="width100">';
-		$html .= '<thead><tr>';
-		$html .= '<th></th>';
-		$html .= '<th>' . I18N::translate('Record') . '</th>';
-		$html .= '<th>' . GedcomTag::getLabel('CHAN') . '</th>';
-		$html .= '<th>' . GedcomTag::getLabel('_WT_USER') . '</th>';
-		$html .= '<th>DATE</th>'; //hidden by datatables code
-		$html .= '<th>SORTNAME</th>'; //hidden by datatables code
-		$html .= '</tr></thead><tbody>';
-
-		//-- table body
-		foreach ($change_ids as $change_id) {
-			$record = GedcomRecord::getInstance($change_id, $WT_TREE);
-			if (!$record || !$record->canShow()) {
-				continue;
-			}
-			$html .= '<tr><td>';
-			switch ($record::RECORD_TYPE) {
-				case 'INDI':
-					$icon = $record->getSexImage('small');
-					break;
-				case 'FAM':
-					$icon = '<i class="icon-button_family"></i>';
-					break;
-				case 'OBJE':
-					$icon = '<i class="icon-button_media"></i>';
-					break;
-				case 'NOTE':
-					$icon = '<i class="icon-button_note"></i>';
-					break;
-				case 'SOUR':
-					$icon = '<i class="icon-button_source"></i>';
-					break;
-				case 'REPO':
-					$icon = '<i class="icon-button_repository"></i>';
-					break;
-				default:
-					$icon = '&nbsp;';
-					break;
-			}
-			$html .= '<a href="' . $record->getHtmlUrl() . '">' . $icon . '</a>';
-			$html .= '</td>';
-			++$n;
-			//-- Record name(s)
-			$name = $record->getFullName();
-			$html .= '<td class="wrap">';
-			$html .= '<a href="' . $record->getHtmlUrl() . '">' . $name . '</a>';
-			if ($record instanceof Individual) {
-				$addname = $record->getAddName();
-				if ($addname) {
-					$html .= '<div class="indent"><a href="' . $record->getHtmlUrl() . '">' . $addname . '</a></div>';
-				}
-			}
-			$html .= "</td>";
-			//-- Last change date/time
-			$html .= '<td class="wrap">' . $record->lastChangeTimestamp() . '</td>';
-			//-- Last change user
-			$html .= '<td class="wrap">' . Filter::escapeHtml($record->lastChangeUser()) . '</td>';
-			//-- change date (sortable) hidden by datatables code
-			$html .= '<td>' . $record->lastChangeTimestamp(true) . '</td>';
-			//-- names (sortable) hidden by datatables code
-			$html .= '<td>' . $record->getSortName() . '</td></tr>';
-		}
-
-		$html .= '</tbody></table>';
-
-		return $html;
-	}
-
 	/**
 	 * Print a table of events
 	 *
@@ -1831,7 +1660,7 @@ class FunctionsPrintLists {
 				});
 			');
 
-		// Did we have any output?  Did we skip anything?
+		// Did we have any output? Did we skip anything?
 		$output          = 0;
 		$filter          = 0;
 		$filtered_events = array();
@@ -1918,8 +1747,7 @@ class FunctionsPrintLists {
 					if ($endjd == $startjd) {
 						$summary = I18N::translate('No events exist for tomorrow.');
 					} else {
-						// I18N: translation for %s==1 is unused; it is translated separately as “tomorrow”
-						$summary = I18N::plural('No events exist for the next %s day.', 'No events exist for the next %s days.', $endjd - $startjd + 1, I18N::number($endjd - $startjd + 1));
+						$summary = /* I18N: translation for %s==1 is unused; it is translated separately as “tomorrow” */ I18N::plural('No events exist for the next %s day.', 'No events exist for the next %s days.', $endjd - $startjd + 1, I18N::number($endjd - $startjd + 1));
 					}
 				} else {
 					if ($endjd == $startjd) {
@@ -1954,7 +1782,7 @@ class FunctionsPrintLists {
 	public static function eventsList($startjd, $endjd, $events = 'BIRT MARR DEAT', $only_living = false, $sort_by = 'anniv') {
 		global $WT_TREE;
 
-		// Did we have any output?  Did we skip anything?
+		// Did we have any output? Did we skip anything?
 		$output          = 0;
 		$filter          = 0;
 		$filtered_events = array();
@@ -1988,14 +1816,14 @@ class FunctionsPrintLists {
 
 		// Now we've filtered the list, we can sort by event, if required
 		switch ($sort_by) {
-			case 'anniv':
-				// Data is already sorted by anniversary date
-				break;
-			case 'alpha':
-				uasort($filtered_events, function (Fact $x, Fact $y) {
-					return GedcomRecord::compare($x->getParent(), $y->getParent());
-				});
-				break;
+		case 'anniv':
+			// Data is already sorted by anniversary date
+			break;
+		case 'alpha':
+			uasort($filtered_events, function (Fact $x, Fact $y) {
+				return GedcomRecord::compare($x->getParent(), $y->getParent());
+			});
+			break;
 		}
 
 		foreach ($filtered_events as $fact) {
@@ -2056,7 +1884,7 @@ class FunctionsPrintLists {
 	/**
 	 * Print a chart by age using Google chart API
 	 *
-	 * @param integer[] $data
+	 * @param int[] $data
 	 * @param string $title
 	 *
 	 * @return string
@@ -2127,7 +1955,7 @@ class FunctionsPrintLists {
 	/**
 	 * Print a chart by decade using Google chart API
 	 *
-	 * @param integer[] $data
+	 * @param int[] $data
 	 * @param string $title
 	 *
 	 * @return string

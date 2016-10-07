@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -59,9 +59,8 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface 
 
 		$num             = $this->getBlockSetting($block_id, 'num', '10');
 		$count_placement = $this->getBlockSetting($block_id, 'count_placement', 'before');
-		$block           = $this->getBlockSetting($block_id, 'block', '0');
 
-		foreach (array('count_placement', 'num', 'block') as $name) {
+		foreach (array('count_placement', 'num') as $name) {
 			if (array_key_exists($name, $cfg)) {
 				$$name = $cfg[$name];
 			}
@@ -70,13 +69,13 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface 
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
 		$title .= $this->getTitle();
 
-		$content = "";
+		$content = '';
 		// load the lines from the file
 		$top10 = Database::prepare(
 			"SELECT page_parameter, page_count" .
@@ -86,23 +85,19 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface 
 		)->execute(array(
 			'tree_id' => $WT_TREE->getTreeId(),
 			'limit'   => (int) $num,
-		))->FetchAssoc();
+		))->fetchAssoc();
 
-		if ($block) {
-			$content .= "<table width=\"90%\">";
-		} else {
-			$content .= "<table>";
-		}
+		$content .= '<table>';
 		foreach ($top10 as $id => $count) {
 			$record = GedcomRecord::getInstance($id, $WT_TREE);
 			if ($record && $record->canShow()) {
-				$content .= '<tr valign="top">';
+				$content .= '<tr>';
 				if ($count_placement == 'before') {
-					$content .= '<td dir="ltr" align="right">[' . $count . ']</td>';
+					$content .= '<td dir="ltr" style="text-align:right">[' . $count . ']</td>';
 				}
 				$content .= '<td class="name2" ><a href="' . $record->getHtmlUrl() . '">' . $record->getFullName() . '</a></td>';
 				if ($count_placement == 'after') {
-					$content .= '<td dir="ltr" align="right">[' . $count . ']</td>';
+					$content .= '<td dir="ltr" style="text-align:right">[' . $count . ']</td>';
 				}
 				$content .= '</tr>';
 			}
@@ -110,10 +105,6 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface 
 		$content .= "</table>";
 
 		if ($template) {
-			if ($block) {
-				$class .= ' small_inner_block';
-			}
-
 			return Theme::theme()->formatBlock($id, $title, $class, $content);
 		} else {
 			return $content;
@@ -159,29 +150,21 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface 
 		if (Filter::postBool('save') && Filter::checkCsrf()) {
 			$this->setBlockSetting($block_id, 'num', Filter::postInteger('num', 1, 10000, 10));
 			$this->setBlockSetting($block_id, 'count_placement', Filter::post('count_placement', 'before|after', 'before'));
-			$this->setBlockSetting($block_id, 'block', Filter::postBool('block'));
 		}
 
 		$num             = $this->getBlockSetting($block_id, 'num', '10');
 		$count_placement = $this->getBlockSetting($block_id, 'count_placement', 'before');
-		$block           = $this->getBlockSetting($block_id, 'block', '0');
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Number of items to show');
+		echo /* I18N: ... to show in a list */ I18N::translate('Number of pages');
 		echo '</td><td class="optionbox">';
 		echo '<input type="text" name="num" size="2" value="', $num, '">';
 		echo '</td></tr>';
 
 		echo "<tr><td class=\"descriptionbox wrap width33\">";
-		echo I18N::translate('Place counts before or after name?');
+		echo /* I18N: Label for a configuration option */ I18N::translate('Show counts before or after name');
 		echo "</td><td class=\"optionbox\">";
 		echo FunctionsEdit::selectEditControl('count_placement', array('before' => I18N::translate('before'), 'after' => I18N::translate('after')), null, $count_placement, '');
-		echo '</td></tr>';
-
-		echo '<tr><td class="descriptionbox wrap width33">';
-		echo /* I18N: label for a yes/no option */ I18N::translate('Add a scrollbar when block contents grow');
-		echo '</td><td class="optionbox">';
-		echo FunctionsEdit::editFieldYesNo('block', $block);
 		echo '</td></tr>';
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@ use Fisharebest\Webtrees\Controller\PageController;
 define('WT_SCRIPT_NAME', 'admin_trees_places.php');
 require './includes/session.php';
 
-$search  = Filter::post('search');
+$search  = Filter::post('search', null, Filter::get('search'));
 $replace = Filter::post('replace');
 $confirm = Filter::post('confirm');
 
@@ -40,7 +40,7 @@ if ($search && $replace) {
 		" LEFT JOIN `##change` ON (i_id = xref AND i_file=gedcom_id AND status='pending')" .
 		" WHERE i_file = ?" .
 		" AND COALESCE(new_gedcom, i_gedcom) REGEXP CONCAT('\n2 PLAC ([^\n]*, )*', ?, '(\n|$)')"
-	)->execute(array($WT_TREE->getTreeId(), $search))->fetchAll();
+	)->execute(array($WT_TREE->getTreeId(), preg_quote($search)))->fetchAll();
 	foreach ($rows as $row) {
 		$record = Individual::getInstance($row->xref, $WT_TREE, $row->gedcom);
 		foreach ($record->getFacts() as $fact) {
@@ -61,7 +61,7 @@ if ($search && $replace) {
 		" LEFT JOIN `##change` ON (f_id = xref AND f_file=gedcom_id AND status='pending')" .
 		" WHERE f_file = ?" .
 		" AND COALESCE(new_gedcom, f_gedcom) REGEXP CONCAT('\n2 PLAC ([^\n]*, )*', ?, '(\n|$)')"
-	)->execute(array($WT_TREE->getTreeId(), $search))->fetchAll();
+	)->execute(array($WT_TREE->getTreeId(), preg_quote($search)))->fetchAll();
 	foreach ($rows as $row) {
 		$record = Family::getInstance($row->xref, $WT_TREE, $row->gedcom);
 		foreach ($record->getFacts() as $fact) {
@@ -82,6 +82,7 @@ $controller = new PageController;
 $controller
 	->restrictAccess(Auth::isManager($WT_TREE))
 	->setPageTitle(I18N::translate('Update all the place names in a family tree') . ' — ' . $WT_TREE->getTitleHtml())
+	->addInlineJavascript('autocomplete();')
 	->pageHeader();
 ?>
 
@@ -94,18 +95,18 @@ $controller
 <h1><?php echo $controller->getPageTitle(); ?></h1>
 
 <p>
-	<?php echo I18N::translate('This will update the highest-level part or parts of the place name.  For example, “Mexico” will match “Quintana Roo, Mexico”, but not “Santa Fe, New Mexico”.'); ?>
+	<?php echo I18N::translate('This will update the highest-level part or parts of the place name. For example, “Mexico” will match “Quintana Roo, Mexico”, but not “Santa Fe, New Mexico”.'); ?>
 </p>
 
 <form method="post">
 	<dl>
 		<dt><label for="search"><?php echo I18N::translate('Search for'); ?></label></dt>
-		<dd><input name="search" id="search" type="text" size="30" value="<?php echo Filter::escapeHtml($search); ?>" required autofocus></dd>
+		<dd><input name="search" id="search" type="text" size="60" value="<?php echo Filter::escapeHtml($search); ?>" data-autocomplete-type="PLAC" required autofocus></dd>
 		<dt><label for="replace"><?php echo I18N::translate('Replace with'); ?></label></dt>
-		<dd><input name="replace" id="replace" type="text" size="30" value="<?php echo Filter::escapeHtml($replace); ?>" required></dd>
+		<dd><input name="replace" id="replace" type="text" size="60" value="<?php echo Filter::escapeHtml($replace); ?>" data-autocomplete-type="PLAC" required></dd>
 	</dl>
-	<button type="submit" value="preview"><?php echo /* I18N: button label */ I18N::translate('preview'); ?></button>
-	<button type="submit" value="update" name="confirm"><?php echo /* I18N: button label */ I18N::translate('update'); ?></button>
+	<button type="submit" value="preview"><?php echo /* I18N: A button label. */ I18N::translate('preview'); ?></button>
+	<button type="submit" value="update" name="confirm"><?php echo /* I18N: A button label. */ I18N::translate('update'); ?></button>
 </form>
 
 <?php if ($search && $replace) { ?>

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -60,7 +60,41 @@ class User {
 	}
 
 	/**
-	 * Find the user with a specified user_id.
+	 * Find the user with a specified user_name.
+	 *
+	 * @param string $user_name
+	 *
+	 * @return User|null
+	 */
+	public static function findByUserName($user_name) {
+		$user_id = Database::prepare(
+			"SELECT SQL_CACHE user_id FROM `##user` WHERE user_name = :user_name"
+		)->execute(array(
+			'user_name' => $user_name,
+		))->fetchOne();
+
+		return self::find($user_id);
+	}
+
+	/**
+	 * Find the user with a specified email address.
+	 *
+	 * @param string $email
+	 *
+	 * @return User|null
+	 */
+	public static function findByEmail($email) {
+		$user_id = Database::prepare(
+			"SELECT SQL_CACHE user_id FROM `##user` WHERE email = :email"
+		)->execute(array(
+			'email' => $email,
+		))->fetchOne();
+
+		return self::find($user_id);
+	}
+
+	/**
+	 * Find the user with a specified user_name or email address.
 	 *
 	 * @param string $identifier
 	 *
@@ -130,7 +164,7 @@ class User {
 			'user_name' => $user_name,
 			'real_name' => $real_name,
 			'email'     => $email,
-			'password'  => password_hash($password, PASSWORD_DEFAULT),
+			'password'  => self::passwordHash($password),
 		));
 
 		// Set default blocks for this user
@@ -274,7 +308,7 @@ class User {
 		Database::prepare("DELETE `##block_setting` FROM `##block_setting` JOIN `##block` USING (block_id) WHERE user_id=?")->execute(array($this->user_id));
 		Database::prepare("DELETE FROM `##block` WHERE user_id=?")->execute(array($this->user_id));
 		Database::prepare("DELETE FROM `##user_gedcom_setting` WHERE user_id=?")->execute(array($this->user_id));
-		Database::prepare("DELETE FROM `##gedcom_setting` WHERE setting_value=? AND setting_name in ('CONTACT_USER_ID', 'WEBMASTER_USER_ID')")->execute(array($this->user_id));
+		Database::prepare("DELETE FROM `##gedcom_setting` WHERE setting_value=? AND setting_name IN ('CONTACT_USER_ID', 'WEBMASTER_USER_ID')")->execute(array($this->user_id));
 		Database::prepare("DELETE FROM `##user_setting` WHERE user_id=?")->execute(array($this->user_id));
 		Database::prepare("DELETE FROM `##message` WHERE user_id=?")->execute(array($this->user_id));
 		Database::prepare("DELETE FROM `##user` WHERE user_id=?")->execute(array($this->user_id));
@@ -290,8 +324,8 @@ class User {
 			"SELECT password FROM `##user` WHERE user_id = ?"
 		)->execute(array($this->user_id))->fetchOne();
 
-		if (password_verify($password, $password_hash)) {
-			if (password_needs_rehash($password_hash, PASSWORD_DEFAULT)) {
+		if ($this->passwordVerify($password, $password_hash)) {
+			if ($this->passwordNeedsRehash($password_hash)) {
 				$this->setPassword($password);
 			}
 
@@ -410,7 +444,7 @@ class User {
 	public function setPassword($password) {
 		Database::prepare(
 			"UPDATE `##user` SET password = ? WHERE user_id = ?"
-		)->execute(array(password_hash($password, PASSWORD_DEFAULT), $this->user_id));
+		)->execute(array($this->passwordHash($password), $this->user_id));
 
 		return $this;
 	}
@@ -433,7 +467,7 @@ class User {
 					"SELECT SQL_CACHE setting_name, setting_value FROM `##user_setting` WHERE user_id = ?"
 				)->execute(array($this->user_id))->fetchAssoc();
 			} else {
-				// Not logged in?  We have no preferences.
+				// Not logged in? We have no preferences.
 				$this->preferences = array();
 			}
 		}
@@ -478,5 +512,55 @@ class User {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * The ircmaxell/password_compat implementation of the password_hash() function
+	 * relies on an encryption library which is not secure in PHP < 5.3.7
+	 *
+	 * @return bool
+	 */
+	private static function isPhpCryptBroken() {
+		return PHP_VERSION_ID < 50307 && password_hash('foo', PASSWORD_DEFAULT) === false;
+	}
+
+	/**
+	 * @param string $password
+	 *
+	 * @return string
+	 */
+	private static function passwordHash($password) {
+		if (self::isPhpCryptBroken()) {
+			return crypt($password);
+		} else {
+			return password_hash($password, PASSWORD_DEFAULT);
+		}
+	}
+
+	/**
+	 * @param string $hash
+	 *
+	 * @return bool
+	 */
+	private static function passwordNeedsRehash($hash) {
+		if (self::isPhpCryptBroken()) {
+			return false;
+		} else {
+			return password_needs_rehash($hash, PASSWORD_DEFAULT);
+		}
+	}
+
+	/**
+	 * @param string $password
+	 * @param string $hash
+	 *
+	 * @return bool
+	 */
+	private static function passwordVerify($password, $hash) {
+		if (self::isPhpCryptBroken()) {
+			return crypt($password, $hash) === $hash;
+		} else {
+			return password_verify($password, $hash);
+		}
 	}
 }

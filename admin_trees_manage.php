@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,7 @@ namespace Fisharebest\Webtrees;
 global $WT_TREE;
 
 use Fisharebest\Webtrees\Controller\PageController;
+use Fisharebest\Webtrees\Functions\Functions;
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
@@ -37,7 +38,7 @@ $controller
 $multiple_tree_threshold = Site::getPreference('MULTIPLE_TREE_THRESHOLD') ?: 500;
 
 // Note that glob() returns false instead of an empty array when open_basedir_restriction
-// is in force and no files are found.  See PHP bug #47358.
+// is in force and no files are found. See PHP bug #47358.
 if (defined('GLOB_BRACE')) {
 	$gedcom_files = glob(WT_DATA_DIR . '*.{ged,Ged,GED}', GLOB_NOSORT | GLOB_BRACE) ?: array();
 } else {
@@ -79,7 +80,7 @@ case 'new_tree':
 			FlashMessages::addMessage(/* I18N: %s is the name of a family tree */ I18N::translate('The family tree “%s” has been created.', Filter::escapeHtml($basename)), 'success');
 		}
 	}
-	header('Location: ' . WT_BASE_URL . WT_SCRIPT_NAME . '?ged=' . $basename);
+	header('Location: ' . WT_BASE_URL . WT_SCRIPT_NAME . '?ged=' . Filter::escapeUrl($basename));
 
 	return;
 case 'replace_upload':
@@ -96,6 +97,8 @@ case 'replace_upload':
 		if (isset($_FILES['tree_name'])) {
 			if ($_FILES['tree_name']['error'] == 0 && is_readable($_FILES['tree_name']['tmp_name'])) {
 				$tree->importGedcomFile($_FILES['tree_name']['tmp_name'], $_FILES['tree_name']['name']);
+			} else {
+				FlashMessages::addMessage(Functions::fileUploadErrorText($_FILES['tree_name']['error']), 'danger');
 			}
 		} else {
 			FlashMessages::addMessage(I18N::translate('No GEDCOM file was received.'), 'danger');
@@ -195,7 +198,7 @@ case 'importform':
 	<p>
 		<?php echo /* I18N: %s is the name of a family tree */ I18N::translate('This will delete all the genealogy data from “%s” and replace it with data from a GEDCOM file.', $tree->getTitleHtml()); ?>
 	</p>
-	<form class="form form-horizontal" name="gedcomimportform" method="post" enctype="multipart/form-data" onsubmit="return checkGedcomImportForm('<?php echo Filter::escapeHtml(I18N::translate('You have selected a GEDCOM file with a different name.  Is this correct?')); ?>');">
+	<form class="form form-horizontal" name="gedcomimportform" method="post" enctype="multipart/form-data" onsubmit="return checkGedcomImportForm('<?php echo Filter::escapeHtml(I18N::translate('You have selected a GEDCOM file with a different name. Is this correct?')); ?>');">
 		<input type="hidden" name="gedcom_id" value="<?php echo $tree->getTreeId(); ?>">
 		<input type="hidden" id="gedcom_filename" value="<?php echo Filter::escapeHtml($gedcom_filename); ?>">
 		<?php echo Filter::getCsrf(); ?>
@@ -264,7 +267,7 @@ case 'importform':
 
 		<fieldset class="form-group">
 			<legend class="control-label col-sm-3">
-				<?php echo I18N::translate('Import options'); ?>
+				<?php echo I18N::translate('Import preferences'); ?>
 			</legend>
 			<div class="col-sm-9">
 				<label>
@@ -294,7 +297,7 @@ case 'importform':
 					value="<?php echo Filter::escapeHtml($WT_TREE->getPreference('GEDCOM_MEDIA_PATH')); ?>"
 					>
 				<p class="small text-muted">
-					<?php echo /* I18N: Help text for the “GEDCOM media path” configuration setting. A “path” is something like “C:\Documents\Genealogy\Photos\John_Smith.jpeg” */ I18N::translate('Some genealogy software creates GEDCOM files that contain media filenames with full paths.  These paths will not exist on the web-server.  To allow webtrees to find the file, the first part of the path must be removed.'); ?>
+					<?php echo /* I18N: Help text for the “GEDCOM media path” configuration setting. A “path” is something like “C:\Documents\Genealogy\Photos\John_Smith.jpeg” */ I18N::translate('Some genealogy software creates GEDCOM files that contain media filenames with full paths. These paths will not exist on the web-server. To allow webtrees to find the file, the first part of the path must be removed.'); ?>
 					<?php echo /* I18N: Help text for the “GEDCOM media path” configuration setting. %s are all folder names */ I18N::translate('For example, if the GEDCOM file contains %1$s and webtrees expects to find %2$s in the media folder, then you would need to remove %3$s.', '<code>C:\\Documents\\family\\photo.jpeg</code>', '<code>family\\photo.jpeg</code>', '<code>C:\\Documents\\</code>'); ?>
 				</p>
 			</div>
@@ -303,7 +306,7 @@ case 'importform':
 		<div class="form-group">
 			<div class="col-sm-offset-3 col-sm-9">
 				<button type="submit" class="btn btn-primary">
-					<?php echo /* I18N: A button label */ I18N::translate('continue'); ?>
+					<?php echo /* I18N: A button label. */ I18N::translate('continue'); ?>
 				</button>
 			</div>
 		</div>
@@ -617,12 +620,12 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 		<div class="panel-heading">
 			<h2 class="panel-title">
 				<i class="fa fa-fw fa-plus"></i>
-				<a data-toggle="collapse" data-parent="#accordion" href="#create-a-new-family-tree">
-					<?php echo I18N::translate('Create a new family tree'); ?>
+				<a data-toggle="collapse" data-parent="#accordion" href="#create-a-family-tree">
+					<?php echo I18N::translate('Create a family tree'); ?>
 				</a>
 			</h2>
 		</div>
-		<div id="create-a-new-family-tree" class="panel-collapse collapse<?php echo Tree::getAll() ? '' : ' in'; ?>">
+		<div id="create-a-family-tree" class="panel-collapse collapse<?php echo Tree::getAll() ? '' : ' in'; ?>">
 			<div class="panel-body">
 				<form role="form" class="form-horizontal" method="post">
 					<?php echo Filter::getCsrf(); ?>
@@ -657,14 +660,14 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 									id="tree_name"
 									maxlength="31"
 									name="tree_name"
-									pattern="[^&lt;&gt;&amp;&quot;#^$.*?{}()\[\]/\\]*"
+									pattern="[^&lt;&gt;&amp;&quot;#^$*?{}()\[\]/\\]*"
 									required
 									type="text"
 									value="<?php echo $default_tree_name; ?>"
 									>
 							</div>
 							<p class="small text-muted">
-								<?php echo I18N::translate('Avoid spaces and punctuation.  A family name might be a good choice.'); ?>
+								<?php echo I18N::translate('Avoid spaces and punctuation. A family name might be a good choice.'); ?>
 							</p>
 						</div>
 					</div>
@@ -672,7 +675,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-primary">
 								<i class="fa fa-check"></i>
-								<?php echo /* I18N: Button label */ I18N::translate('create'); ?>
+								<?php echo /* I18N: A button label. */ I18N::translate('create'); ?>
 							</button>
 							<p class="small text-muted">
 								<?php echo I18N::translate('After creating the family tree, you will be able to import data from a GEDCOM file.'); ?>
@@ -685,7 +688,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 	</div>
 	<?php endif; ?>
 	<!-- display link to PhpGedView-WT transfer wizard on first visit to this page, before any GEDCOM is loaded -->
-	<?php if (count(Tree::GetAll()) === 0 && count(User::all()) === 1): ?>
+	<?php if (count(Tree::getAll()) === 0 && count(User::all()) === 1): ?>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h2 class="panel-title">
@@ -698,7 +701,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 		<div id="pgv-import-wizard" class="panel-collapse collapse">
 			<div class="panel-body">
 				<p>
-					<?php echo I18N::translate('The PhpGedView to webtrees wizard is an automated process to assist administrators make the move from a PhpGedView installation to a new webtrees one.  It will transfer all PhpGedView GEDCOM and other database information directly to your new webtrees database.  The following requirements are necessary:'); ?>
+					<?php echo I18N::translate('The PhpGedView to webtrees wizard is an automated process to assist administrators make the move from a PhpGedView installation to a new webtrees one. It will transfer all PhpGedView GEDCOM and other database information directly to your new webtrees database. The following requirements are necessary:'); ?>
 				</p>
 				<ul>
 					<li>
@@ -715,11 +718,11 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 					</li>
 				</ul>
 				<p>
-					<?php echo I18N::translate('<b>Important note:</b> The transfer wizard is not able to assist with moving media items.  You will need to set up and move or copy your media configuration and objects separately after the transfer wizard is finished.'); ?>
+					<?php echo I18N::translate('<b>Important note:</b> The transfer wizard is not able to assist with moving media items. You will need to set up and move or copy your media configuration and objects separately after the transfer wizard is finished.'); ?>
 				</p>
 				<p>
 					<a href="admin_pgv_to_wt.php">
-						<?php echo I18N::translate('Click here for PhpGedView to webtrees transfer wizard'); ?>
+						<?php echo I18N::translate('PhpGedView to webtrees transfer wizard'); ?>
 					</a>
 				</p>
 			</div>
@@ -748,10 +751,10 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 					<input type="hidden" name="action" value="synchronize">
 					<button type="submit" class="btn btn-danger">
 						<i class="fa fa-refresh"></i>
-						<?php echo /* I18N: Button label */ I18N::translate('continue'); ?>
+						<?php echo /* I18N: A button label. */ I18N::translate('continue'); ?>
 					</button>
 					<p class="small text-muted">
-						<?php echo I18N::translate('Caution!  This may take a long time.  Be patient.'); ?>
+						<?php echo I18N::translate('Caution! This may take a long time. Be patient.'); ?>
 					</p>
 				</form>
 			</div>

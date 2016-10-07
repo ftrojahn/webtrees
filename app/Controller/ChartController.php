@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -48,11 +48,11 @@ class ChartController extends PageController {
 		$rootid     = Filter::get('rootid', WT_REGEX_XREF);
 		$this->root = Individual::getInstance($rootid, $WT_TREE);
 		if (!$this->root) {
-			// Missing root individual?  Show the chart for someone.
+			// Missing root individual? Show the chart for someone.
 			$this->root = $this->getSignificantIndividual();
 		}
 
-		if (!$this->root || !$this->root->canShowName()) {
+		if (!$this->root) {
 			http_response_code(404);
 			$this->error_message = I18N::translate('This individual does not exist or you do not have permission to view it.');
 		}
@@ -89,7 +89,7 @@ class ChartController extends PageController {
 	}
 
 	/**
-	 * Find the direct-line ancestors of an individual.  Array indexes are SOSA numbers.
+	 * Find the direct-line ancestors of an individual. Array indexes are SOSA numbers.
 	 *
 	 * @param int $generations
 	 *

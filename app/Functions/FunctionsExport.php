@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -153,7 +153,7 @@ class FunctionsExport {
 			$old_file_name = $match[1];
 			// Don’t modify external links
 			if (!preg_match('~^(https?|ftp):~', $old_file_name)) {
-				// Adding a windows path?  Convert the slashes.
+				// Adding a windows path? Convert the slashes.
 				if (strpos($path, '\\') !== false) {
 					$new_file_name = preg_replace('~/+~', '\\', $old_file_name);
 				} else {
@@ -176,25 +176,25 @@ class FunctionsExport {
 	 * @param Tree $tree Which tree to export
 	 * @param resource $gedout Handle to a writable stream
 	 * @param string[] $exportOptions Export options are as follows:
-	 *                                'privatize':    which Privacy rules apply?  (none, visitor, user, manager)
-	 *                                'toANSI':       should the output be produced in ISO-8859-1 instead of UTF-8?  (yes, no)
-	 *                                'path':         what constant should prefix all media file paths?  (eg: media/  or c:\my pictures\my family
-	 *                                'slashes':      what folder separators apply to media file paths?  (forward, backward)
+	 *                                'privatize':    which Privacy rules apply? (none, visitor, user, manager)
+	 *                                'toANSI':       should the output be produced in ISO-8859-1 instead of UTF-8? (yes, no)
+	 *                                'path':         what constant should prefix all media file paths? (eg: media/  or c:\my pictures\my family
+	 *                                'slashes':      what folder separators apply to media file paths? (forward, backward)
 	 */
 	public static function exportGedcom(Tree $tree, $gedout, $exportOptions) {
 		switch ($exportOptions['privatize']) {
-			case 'gedadmin':
-				$access_level = Auth::PRIV_NONE;
-				break;
-			case 'user':
-				$access_level = Auth::PRIV_USER;
-				break;
-			case 'visitor':
-				$access_level = Auth::PRIV_PRIVATE;
-				break;
-			case 'none':
-				$access_level = Auth::PRIV_HIDE;
-				break;
+		case 'gedadmin':
+			$access_level = Auth::PRIV_NONE;
+			break;
+		case 'user':
+			$access_level = Auth::PRIV_USER;
+			break;
+		case 'visitor':
+			$access_level = Auth::PRIV_PRIVATE;
+			break;
+		case 'none':
+			$access_level = Auth::PRIV_HIDE;
+			break;
 		}
 
 		$head = self::gedcomHeader($tree);
@@ -205,7 +205,7 @@ class FunctionsExport {
 		$head = self::reformatRecord($head);
 		fwrite($gedout, $head);
 
-		// Buffer the output.  Lots of small fwrite() calls can be very slow when writing large gedcoms.
+		// Buffer the output. Lots of small fwrite() calls can be very slow when writing large gedcoms.
 		$buffer = '';
 
 		// Generate the OBJE/SOUR/REPO/NOTE records first, as their privacy calcualations involve
@@ -251,15 +251,15 @@ class FunctionsExport {
 
 		foreach ($rows as $row) {
 			switch ($row->type) {
-				case 'NOTE':
-					$record = Note::getInstance($row->xref, $tree, $row->gedcom);
-					break;
-				case 'REPO':
-					$record = Repository::getInstance($row->xref, $tree, $row->gedcom);
-					break;
-				default:
-					$record = GedcomRecord::getInstance($row->xref, $tree, $row->gedcom);
-					break;
+			case 'NOTE':
+				$record = Note::getInstance($row->xref, $tree, $row->gedcom);
+				break;
+			case 'REPO':
+				$record = Repository::getInstance($row->xref, $tree, $row->gedcom);
+				break;
+			default:
+				$record = GedcomRecord::getInstance($row->xref, $tree, $row->gedcom);
+				break;
 			}
 
 			$rec = $record->privatizeGedcom($access_level);

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,7 +28,7 @@ class WebtreesTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string A relative path, such as "themes/foo/"
 	 */
 	public function assetUrl() {
-		return 'themes/webtrees/css-1.7.0/';
+		return 'themes/webtrees/css-1.7.8/';
 	}
 
 	/**
@@ -39,8 +39,13 @@ class WebtreesTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string
 	 */
 	protected function flashMessageContainer(\stdClass $message) {
-		// This theme uses jQuery markup.
-		return '<p class="ui-state-highlight">' . $message->text . '</p>';
+		// This theme uses jQueryUI markup.
+		switch ($message->status) {
+		case 'danger':
+			return '<p class="ui-state-error">' . $message->text . '</p>';
+		default:
+			return '<p class="ui-state-highlight">' . $message->text . '</p>';
+		}
 	}
 
 	/**

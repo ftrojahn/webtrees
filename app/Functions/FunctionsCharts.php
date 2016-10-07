@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -99,78 +99,78 @@ class FunctionsCharts {
 		/**
 		 * husband side
 		 */
-		echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\">";
-		echo "<table border='0'><tr>";
+		echo '<table cellspacing="0" cellpadding="0" border="0"><tr><td rowspan="2">';
+		echo '<table border="0"><tr>';
 
 		if ($parid) {
 			if ($husb->getXref() == $parid) {
 				self::printSosaNumber($label);
 			} else {
-				self::printSosaNumber($label, "", "blank");
+				self::printSosaNumber($label, '', 'blank');
 			}
 		} elseif ($sosa) {
 			self::printSosaNumber($sosa * 2);
 		}
 		if ($husb->isPendingAddtion()) {
-			echo '<td valign="top" class="facts_value new">';
+			echo '<td class="facts_value new">';
 		} elseif ($husb->isPendingDeletion()) {
-			echo '<td valign="top" class="facts_value old">';
+			echo '<td class="facts_value old">';
 		} else {
-			echo '<td valign="top">';
+			echo '<td>';
 		}
 		FunctionsPrint::printPedigreePerson($husb, $show_full);
-		echo "</td></tr></table>";
-		echo "</td>";
+		echo '</td></tr></table>';
+		echo '</td>';
 		// husband’s parents
 		$hfam = $husb->getPrimaryChildFamily();
 		if ($hfam) {
 			// remove the|| test for $sosa
-			echo "<td rowspan=\"2\"><img src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td rowspan=\"2\"><img src=\"" . Theme::theme()->parameter('image-vline') . "\" width=\"3\" height=\"" . ($pbheight + 9) . "\" alt=\"\"></td>";
-			echo "<td><img class=\"line5\" src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td>";
+			echo '<td rowspan="2"><img src="' . Theme::theme()->parameter('image-hline') . '"></td><td rowspan="2"><img src="' . Theme::theme()->parameter('image-vline') . '" width="3" height="' . ($pbheight + 9) . '"></td>';
+			echo '<td><img class="line5" src="' . Theme::theme()->parameter('image-hline') . '"></td><td>';
 			// husband’s father
 			if ($hfam && $hfam->getHusband()) {
-				echo "<table border='0'><tr>";
+				echo '<table border="0"><tr>';
 				if ($sosa > 0) {
-					self::printSosaNumber($sosa * 4, $hfam->getHusband()->getXref(), "down");
+					self::printSosaNumber($sosa * 4, $hfam->getHusband()->getXref(), 'down');
 				}
 				if (!empty($gparid) && $hfam->getHusband()->getXref() == $gparid) {
-					self::printSosaNumber(trim(substr($label, 0, -3), ".") . ".");
+					self::printSosaNumber(trim(substr($label, 0, -3), '.') . '.');
 				}
-				echo "<td valign=\"top\">";
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getHusband(), $show_full);
-				echo "</td></tr></table>";
+				echo '</td></tr></table>';
 			} elseif ($hfam && !$hfam->getHusband()) {
 				// Empty box for grandfather
-				echo "<table border='0'><tr>";
-				echo '<td valign="top">';
+				echo '<table border="0"><tr>';
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getHusband(), $show_full);
 				echo '</td></tr></table>';
 			}
-			echo "</td>";
+			echo '</td>';
 		}
 		if ($hfam && ($sosa != -1)) {
-			echo '<td valign="middle" rowspan="2">';
+			echo '<td rowspan="2">';
 			self::printUrlArrow(($sosa == 0 ? '?famid=' . $hfam->getXref() . '&amp;ged=' . $hfam->getTree()->getNameUrl() : '#' . $hfam->getXref()), $hfam->getXref(), 1);
 			echo '</td>';
 		}
 		if ($hfam) {
 			// husband’s mother
-			echo "</tr><tr><td><img src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td>";
+			echo '</tr><tr><td><img src="' . Theme::theme()->parameter('image-hline') . '"></td><td>';
 			if ($hfam && $hfam->getWife()) {
-				echo "<table border='0'><tr>";
+				echo '<table border=\'0\'><tr>';
 				if ($sosa > 0) {
-					self::printSosaNumber($sosa * 4 + 1, $hfam->getWife()->getXref(), "down");
+					self::printSosaNumber($sosa * 4 + 1, $hfam->getWife()->getXref(), 'down');
 				}
 				if (!empty($gparid) && $hfam->getWife()->getXref() == $gparid) {
-					self::printSosaNumber(trim(substr($label, 0, -3), ".") . ".");
+					self::printSosaNumber(trim(substr($label, 0, -3), '.') . '.');
 				}
-				echo '<td valign="top">';
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getWife(), $show_full);
 				echo '</td></tr></table>';
 			} elseif ($hfam && !$hfam->getWife()) {
 				// Empty box for grandmother
-				echo "<table border='0'><tr>";
-				echo '<td valign="top">';
+				echo '<table border="0"><tr>';
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getWife(), $show_full);
 				echo '</td></tr></table>';
 			}
@@ -191,83 +191,83 @@ class FunctionsCharts {
 		/**
 		 * wife side
 		 */
-		echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\">";
-		echo "<table><tr>";
+		echo '<table cellspacing="0" cellpadding="0" border="0"><tr><td rowspan="2">';
+		echo '<table><tr>';
 		if ($parid) {
 			if ($wife->getXref() == $parid) {
 				self::printSosaNumber($label);
 			} else {
-				self::printSosaNumber($label, "", "blank");
+				self::printSosaNumber($label, '', 'blank');
 			}
 		} elseif ($sosa) {
 			self::printSosaNumber($sosa * 2 + 1);
 		}
 		if ($wife->isPendingAddtion()) {
-			echo '<td valign="top" class="facts_value new">';
+			echo '<td class="facts_value new">';
 		} elseif ($wife->isPendingDeletion()) {
-			echo '<td valign="top" class="facts_value old">';
+			echo '<td class="facts_value old">';
 		} else {
-			echo '<td valign="top">';
+			echo '<td>';
 		}
 		FunctionsPrint::printPedigreePerson($wife, $show_full);
-		echo "</td></tr></table>";
-		echo "</td>";
+		echo '</td></tr></table>';
+		echo '</td>';
 		// wife’s parents
 		$hfam = $wife->getPrimaryChildFamily();
 
 		if ($hfam) {
-			echo "<td rowspan=\"2\"><img src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td rowspan=\"2\"><img src=\"" . Theme::theme()->parameter('image-vline') . "\" width=\"3\" height=\"" . ($pbheight + 9) . "\" alt=\"\"></td>";
-			echo "<td><img class=\"line5\" src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td>";
+			echo '<td rowspan="2"><img src="' . Theme::theme()->parameter('image-hline') . '"></td><td rowspan="2"><img src="' . Theme::theme()->parameter('image-vline') . '" width="3" height="' . ($pbheight + 9) . '"></td>';
+			echo '<td><img class="line5" src="' . Theme::theme()->parameter('image-hline') . '"></td><td>';
 			// wife’s father
 			if ($hfam && $hfam->getHusband()) {
-				echo "<table><tr>";
+				echo '<table><tr>';
 				if ($sosa > 0) {
-					self::printSosaNumber($sosa * 4 + 2, $hfam->getHusband()->getXref(), "down");
+					self::printSosaNumber($sosa * 4 + 2, $hfam->getHusband()->getXref(), 'down');
 				}
 				if (!empty($gparid) && $hfam->getHusband()->getXref() == $gparid) {
-					self::printSosaNumber(trim(substr($label, 0, -3), ".") . ".");
+					self::printSosaNumber(trim(substr($label, 0, -3), '.') . '.');
 				}
-				echo "<td valign=\"top\">";
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getHusband(), $show_full);
-				echo "</td></tr></table>";
+				echo '</td></tr></table>';
 			} elseif ($hfam && !$hfam->getHusband()) {
 				// Empty box for grandfather
-				echo "<table border='0'><tr>";
-				echo '<td valign="top">';
+				echo '<table border="0"><tr>';
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getHusband(), $show_full);
 				echo '</td></tr></table>';
 			}
-			echo "</td>";
+			echo '</td>';
 		}
 		if ($hfam && ($sosa != -1)) {
-			echo '<td valign="middle" rowspan="2">';
+			echo '<td rowspan="2">';
 			self::printUrlArrow(($sosa == 0 ? '?famid=' . $hfam->getXref() . '&amp;ged=' . $hfam->getTree()->getNameUrl() : '#' . $hfam->getXref()), $hfam->getXref(), 1);
 			echo '</td>';
 		}
 		if ($hfam) {
 			// wife’s mother
-			echo "</tr><tr><td><img src=\"" . Theme::theme()->parameter('image-hline') . "\" alt=\"\"></td><td>";
+			echo '</tr><tr><td><img src="' . Theme::theme()->parameter('image-hline') . '"></td><td>';
 			if ($hfam && $hfam->getWife()) {
-				echo "<table><tr>";
+				echo '<table><tr>';
 				if ($sosa > 0) {
-					self::printSosaNumber($sosa * 4 + 3, $hfam->getWife()->getXref(), "down");
+					self::printSosaNumber($sosa * 4 + 3, $hfam->getWife()->getXref(), 'down');
 				}
 				if (!empty($gparid) && $hfam->getWife()->getXref() == $gparid) {
-					self::printSosaNumber(trim(substr($label, 0, -3), ".") . ".");
+					self::printSosaNumber(trim(substr($label, 0, -3), '.') . '.');
 				}
-				echo "<td valign=\"top\">";
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getWife(), $show_full);
-				echo "</td></tr></table>";
+				echo '</td></tr></table>';
 			} elseif ($hfam && !$hfam->getWife()) {
 				// Empty box for grandmother
-				echo "<table border='0'><tr>";
-				echo '<td valign="top">';
+				echo '<table border="0"><tr>';
+				echo '<td>';
 				FunctionsPrint::printPedigreePerson($hfam->getWife(), $show_full);
 				echo '</td></tr></table>';
 			}
 			echo '</td>';
 		}
-		echo "</tr></table>";
+		echo '</tr></table>';
 	}
 
 	/**
@@ -332,14 +332,14 @@ class FunctionsCharts {
 					}
 				}
 				if ($child->isPendingAddtion()) {
-					echo '<td valign="middle" class="new">';
+					echo '<td class="new">';
 				} elseif ($child->isPendingDeletion()) {
-					echo '<td valign="middle" class="old">';
+					echo '<td class="old">';
 				} else {
-					echo '<td valign="middle">';
+					echo '<td>';
 				}
 				FunctionsPrint::printPedigreePerson($child, $show_full);
-				echo "</td>";
+				echo '</td>';
 				if ($sosa != 0) {
 					// loop for all families where current child is a spouse
 					$famids = $child->getSpouseFamilies();
@@ -350,12 +350,7 @@ class FunctionsCharts {
 						// multiple marriages
 						if ($f > 0) {
 							echo '</tr><tr><td></td>';
-							echo '<td valign="top"';
-							if (I18N::direction() === 'rtl') {
-								echo ' align="left">';
-							} else {
-								echo ' align="right">';
-							}
+							echo '<td style="text-align:end; vertical-align: top;">';
 
 							//find out how many cousins there are to establish vertical line on second families
 							$fchildren = $famids[$f]->getChildren();
@@ -369,14 +364,14 @@ class FunctionsCharts {
 							}
 
 							if ($f == $maxfam) {
-								echo "<img height=\"" . ((($bheight / 2)) + $PBadj) . "px\"";
+								echo '<img height="' . ((($bheight / 2)) + $PBadj) . 'px"';
 							} else {
-								echo "<img height=\"" . $pbheight . "px\"";
+								echo '<img height="' . $pbheight . 'px"';
 							}
-							echo " width=\"3\" src=\"" . Theme::theme()->parameter('image-vline') . "\" alt=\"\">";
-							echo "</td>";
+							echo ' width="3" src="' . Theme::theme()->parameter('image-vline') . '">';
+							echo '</td>';
 						}
-						echo "<td class=\"details1\" valign=\"middle\" align=\"center\">";
+						echo '<td class="details1" style="text-align:center;">';
 						$spouse = $famids[$f]->getSpouse($child);
 
 						$marr = $famids[$f]->getFirstFact('MARR');
@@ -440,7 +435,7 @@ class FunctionsCharts {
 		}
 		self::printFamilyParents(Family::getInstance($famid, $WT_TREE), $sosa, $label, $parid, $gparid, $show_full);
 		echo '<br>';
-		echo '<table><tr><td valign="top">';
+		echo '<table><tr><td>';
 		self::printFamilyChildren(Family::getInstance($famid, $WT_TREE), $childid, $sosa, $label, $show_cousins, $show_full);
 		echo '</td></tr></table>';
 		echo '<br>';
@@ -517,17 +512,17 @@ class FunctionsCharts {
 
 		$kids = count($fchildren);
 
-		echo '<td valign="middle" height="100%">';
+		echo '<td>';
 		if ($kids) {
-			echo '<table cellspacing="0" cellpadding="0" border="0" ><tr valign="middle">';
+			echo '<table cellspacing="0" cellpadding="0" border="0" ><tr>';
 			if ($kids > 1) {
-				echo '<td rowspan="', $kids, '" valign="middle" align="right"><img width="3px" height="', (($bheight + 9) * ($kids - 1)), 'px" src="', Theme::theme()->parameter('image-vline'), '" alt=""></td>';
+				echo '<td rowspan="', $kids, '"><img width="3px" height="', (($bheight + 9) * ($kids - 1)), 'px" src="', Theme::theme()->parameter('image-vline'), '"></td>';
 			}
 			$ctkids = count($fchildren);
 			$i      = 1;
 			foreach ($fchildren as $fchil) {
 				if ($i == 1) {
-					echo '<td><img width="10px" height="3px" align="top"';
+					echo '<td><img width="10px" height="3px" style="vertical-align:top"';
 				} else {
 					echo '<td><img width="10px" height="3px"';
 				}
@@ -536,7 +531,7 @@ class FunctionsCharts {
 				} else {
 					echo ' style="padding-left: 2px;"';
 				}
-				echo ' src="', Theme::theme()->parameter('image-hline'), '" alt=""></td><td>';
+				echo ' src="', Theme::theme()->parameter('image-hline'), '"></td><td>';
 				FunctionsPrint::printPedigreePerson($fchil, $show_full);
 				echo '</td></tr>';
 				if ($i < $ctkids) {

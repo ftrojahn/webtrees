@@ -9,22 +9,23 @@
 		}
 	},
 	"require": {
-		"bombayworks/zendframework1": "1.*",
 		"ezyang/htmlpurifier": "4.*",
 		"fisharebest/algorithm": "1.*",
 		"fisharebest/ext-calendar": "2.*",
 		"fisharebest/localization": "1.*",
-		"ircmaxell/password-compat": "1.*",
+		"fisharebest/php-polyfill": "1.*",
 		"michelf/php-markdown": "1.*",
-		"patchwork/utf8": "1.*",
 		"pclzip/pclzip": "2.*",
-		"ramsey/uuid": "2.*",
-		"tecnick.com/tcpdf": "6.*"
+		"rhumsaa/uuid": "2.*",
+		"swiftmailer/swiftmailer": "~5.0",
+		"tecnickcom/tcpdf": "6.*"
 	},
 	"require-dev": {
+		"fabpot/php-cs-fixer": "*",
 		"mockery/mockery": "*",
+		"phpdocumentor/phpdocumentor": "*",
 		"phpunit/phpunit": "*",
-		"satooshi/php-coveralls": "dev-master"
+		"satooshi/php-coveralls": "~1.0"
 	},
 	"extra": {
 		"branch-alias": {

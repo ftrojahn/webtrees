@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,10 @@
  */
 namespace Fisharebest\Webtrees;
 
+use Fisharebest\Webtrees\Controller\HourglassController;
+use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\Functions\FunctionsPrint;
+
 /**
  * Defined in session.php
  *
@@ -22,15 +26,12 @@ namespace Fisharebest\Webtrees;
  */
 global $WT_TREE;
 
-use Fisharebest\Webtrees\Controller\HourglassController;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
-use Fisharebest\Webtrees\Functions\FunctionsPrint;
-
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
 
 $controller = new HourglassController;
 $controller
+	->restrictAccess(Module::isActiveChart($WT_TREE, 'hourglass_chart'))
 	->pageHeader()
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();')
@@ -58,7 +59,7 @@ $controller
 						<?php echo FunctionsEdit::twoStateCheckbox('show_full', $controller->showFull()); ?>
 					</td>
 					<td rowspan="3" class="topbottombar vmiddle">
-						<input type="submit" value="<?php echo I18N::translate('View'); ?>">
+						<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('view'); ?>">
 					</td>
 				</tr>
 				<tr>

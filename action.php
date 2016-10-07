@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,7 +42,13 @@ case 'accept-changes':
 	// Accept all the pending changes for a record
 	$record = GedcomRecord::getInstance(Filter::post('xref', WT_REGEX_XREF), $WT_TREE);
 	if ($record && Auth::isModerator($record->getTree()) && $record->canShow() && $record->canEdit()) {
-		FlashMessages::addMessage(/* I18N: %s is the name of an individual, source or other record */ I18N::translate('The changes to “%s” have been accepted.', $record->getFullName()));
+		if ($record->isPendingDeletion()) {
+			FlashMessages::addMessage(/* I18N: %s is the name of a genealogy record */
+				I18N::translate('“%s” has been deleted.', $record->getFullName()));
+		} else {
+			FlashMessages::addMessage(/* I18N: %s is the name of a genealogy record */
+				I18N::translate('The changes to “%s” have been accepted.', $record->getFullName()));
+		}
 		FunctionsImport::acceptAllChanges($record->getXref(), $record->getTree()->getTreeId());
 	} else {
 		http_response_code(406);
@@ -58,7 +64,7 @@ case 'copy-fact':
 
 	if ($record && $record->canEdit()) {
 		foreach ($record->getFacts() as $fact) {
-			if ($fact->getfactId() == $fact_id) {
+			if ($fact->getFactId() == $fact_id) {
 				switch ($fact->getTag()) {
 				case 'NOTE':
 				case 'SOUR':
@@ -109,7 +115,7 @@ case 'delete-fact':
 	$record = GedcomRecord::getInstance($xref, $WT_TREE);
 	if ($record && $record->canShow() && $record->canEdit()) {
 		foreach ($record->getFacts() as $fact) {
-			if ($fact->getfactId() == $fact_id && $fact->canShow() && $fact->canEdit()) {
+			if ($fact->getFactId() == $fact_id && $fact->canShow() && $fact->canEdit()) {
 				$record->deleteFact($fact_id, true);
 				break 2;
 			}
@@ -120,12 +126,7 @@ case 'delete-fact':
 	http_response_code(406);
 	break;
 
-case 'delete-family':
-case 'delete-individual':
-case 'delete-media':
-case 'delete-note':
-case 'delete-repository':
-case 'delete-source':
+case 'delete-record':
 	$record = GedcomRecord::getInstance(Filter::post('xref', WT_REGEX_XREF), $WT_TREE);
 	if ($record && Auth::isEditor($record->getTree()) && $record->canShow() && $record->canEdit()) {
 		// Delete links to this record
@@ -133,7 +134,7 @@ case 'delete-source':
 			$linker     = GedcomRecord::getInstance($xref, $WT_TREE);
 			$old_gedcom = $linker->getGedcom();
 			$new_gedcom = FunctionsEdit::removeLinks($old_gedcom, $record->getXref());
-			// FunctionsDb::fetch_all_links() does not take account of pending changes.  The links (or even the
+			// FunctionsDb::fetch_all_links() does not take account of pending changes. The links (or even the
 			// record itself) may have already been deleted.
 			if ($old_gedcom !== $new_gedcom) {
 				// If we have removed a link from a family to an individual, and it has only one member

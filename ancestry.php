@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,6 +35,7 @@ $MAX_PEDIGREE_GENERATIONS = $WT_TREE->getPreference('MAX_PEDIGREE_GENERATIONS');
 
 $controller = new AncestryController;
 $controller
+	->restrictAccess(Module::isActiveChart($WT_TREE, 'ancestors_chart'))
 	->pageHeader()
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();');
@@ -88,7 +89,7 @@ $controller
 						</div>
 					</td>
 					<td rowspan="3" class="facts_label03">
-					<input type="submit" value="<?php echo I18N::translate('View'); ?>">
+					<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('view'); ?>">
 					</td>
 				</tr>
 				<tr>

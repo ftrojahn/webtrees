@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -85,7 +85,7 @@ class Session {
 	 * @return bool
 	 */
 	public static function has($name) {
-		return array_key_exists($name, $_SESSION);
+		return isset($_SESSION[$name]);
 	}
 
 	/**
@@ -108,7 +108,7 @@ class Session {
 	}
 
 	/**
-	 * Set an explicit session ID.  Typically used for search robots.
+	 * Set an explicit session ID. Typically used for search robots.
 	 *
 	 * @param string $id
 	 */

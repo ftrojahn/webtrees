@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,15 +15,18 @@
  */
 namespace Fisharebest\Webtrees;
 
-use Fisharebest\Webtrees\Controller\PageController;
-
 /**
  * Defined in edit_interface.php
  *
- * @global PageController $controller
- * @global Individual     $person
+ * @global Individual $person
  */
-global $person, $controller;
+global $person;
+/**
+ * Defined in edit_interface.php
+ *
+ * @global Controller\PageController $controller
+ */
+global $controller;
 
 ?>
 <style>
@@ -58,15 +61,15 @@ global $person, $controller;
 <div id="media-links">
 	<table class="facts_table center">
 		<tr>
-			<td class="topbottombar" colspan="1">
+			<td class="topbottombar">
 				<b><?php echo $controller->getPageTitle(); ?></b>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top">
+			<td>
 				<table class="outer_nav">
 					<tr>
-						<th class="descriptionbox"><?php echo I18N::translate('Search for individuals to add to add Links list.'); ?></th>
+						<th class="descriptionbox"><?php echo I18N::translate('Find an individual'); ?></th>
 					</tr>
 					<tr>
 						<td id="srch" class="optionbox center">
@@ -77,7 +80,7 @@ global $person, $controller;
 									if (txt === "") {
 										alert("<?php echo I18N::translate('You must enter a name'); ?>");
 									} else {
-										window.open("module.php?mod=GEDFact_assistant&mod_action=media_find&callback=paste_id&action=filter&type=indi&multiple=&filter=" + txt, "win02", "resizable=1, menubar=0, scrollbars=1, top=180, left=600, HEIGHT=600, WIDTH=450 ").focus();
+										window.open("module.php?mod=GEDFact_assistant&mod_action=media_find&callback=paste_id&action=filter&type=indi&multiple=&filter=" + txt, "win02", "resizable=1, menubar=0, scrollbars=1, top=180, left=600, height=600, width=450 ").focus();
 									}
 								}
 							</script>
@@ -88,13 +91,12 @@ global $person, $controller;
 						</td>
 					</tr>
 					<tr>
-						<td align="center">
+						<td>
 							<table width="100%" class="fact_table" cellspacing="0" border="0">
 								<tr>
-									<td align="center" colspan=3 class="descriptionbox wrap">
-										<?php echo I18N::translate('Click %s to choose individual as head of family.', '<i class="headimg vmiddle icon-button_head"></i>'); ?>
-										<br><br>
-										<?php echo I18N::translate('Click name to add individual to add links list.'); ?>
+									<td colspan=3 class="descriptionbox wrap">
+										<i class="headimg vmiddle icon-button_head"></i>
+										<?php echo I18N::translate('View this family'); ?>
 									</td>
 								</tr>
 								<?php
@@ -133,17 +135,19 @@ function print_navigator_family(Family $family, Individual $individual) {
 	foreach ($family->getSpouses() as $spouse) {
 		?>
 		<tr class="fact_value">
-			<td class="facts_value">
-				<a href="edit_interface.php?action=addmedia_links&amp;noteid=newnote&amp;pid=<?php echo $spouse->getXref(); ?>&amp;gedcom=<?php echo $spouse->getTree()->getNameUrl(); ?>">
-					<i class="headimg vmiddle icon-button_head"></i>
-				</a>
-			</td>
 			<td class="facts_value" >
-				<a href="#" onclick="opener.insertRowToTable('<?php echo $spouse->getXref(); ?>', '<?php echo Filter::escapeJs($spouse->getFullName()); ?>', '', '', '', '', '', '', '', '');">
+				<a href="#" onclick="opener.insertRowToTable('<?php echo $spouse->getXref(); ?>', '<?php echo Filter::escapeJs($spouse->getFullName()); ?>', '', '', '', '', '', '', '', ''); return false;">
 					<?php echo $spouse === $individual ? '<b>' : ''; ?>
 					<?php echo $spouse->getFullName(); ?> <?php echo $spouse->getLifeSpan(); ?>
 					<?php echo $spouse === $individual ? '</b>' : ''; ?>
 				</a>
+			</td>
+			<td class="facts_value">
+				<?php if ($individual !== $spouse): ?>
+					<a href="edit_interface.php?action=addmedia_links&amp;noteid=newnote&amp;pid=<?php echo $spouse->getXref(); ?>&amp;gedcom=<?php echo $spouse->getTree()->getNameUrl(); ?>">
+						<i class="headimg vmiddle icon-button_head"></i>
+					</a>
+				<?php endif; ?>
 			</td>
 		<tr>
 	<?php
@@ -152,17 +156,19 @@ function print_navigator_family(Family $family, Individual $individual) {
 	foreach ($family->getChildren() as $child) {
 		?>
 		<tr>
-			<td class="facts_value" >
-				<a href="edit_interface.php?action=addmedia_links&amp;noteid=newnote&amp;pid=<?php echo $child->getXref(); ?>&amp;gedcom=<?php echo $child->getTree()->getNameUrl(); ?>">
-					<i class="headimg vmiddle icon-button_head"></i>
-				</a>
-			</td>
 			<td class="facts_value">
-				<a href="#" onclick="opener.insertRowToTable('<?php echo $child->getXref(); ?>', '<?php echo Filter::escapeJs($child->getFullName()); ?>', '', '', '', '', '', '', '', '');">
+				<a href="#" onclick="opener.insertRowToTable('<?php echo $child->getXref(); ?>', '<?php echo Filter::escapeJs($child->getFullName()); ?>', '', '', '', '', '', '', '', ''); return false;">
 					<?php echo $child === $individual ? '<b>' : ''; ?>
 					<?php echo $child->getFullName(); ?> <?php echo $child->getLifeSpan(); ?>
 				<?php echo $child === $individual ? '</b>' : ''; ?>
 				</a>
+			</td>
+			<td class="facts_value" >
+			<?php if ($individual !== $child): ?>
+					<a href="edit_interface.php?action=addmedia_links&amp;noteid=newnote&amp;pid=<?php echo $child->getXref(); ?>&amp;gedcom=<?php echo $child->getTree()->getNameUrl(); ?>">
+						<i class="headimg vmiddle icon-button_head"></i>
+					</a>
+				<?php endif; ?>
 			</td>
 		</tr>
 	<?php

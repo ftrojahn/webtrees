@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -417,6 +417,53 @@ $old_files = array(
 	WT_ROOT . 'packages/jquery-1.11.2',
 	WT_ROOT . 'packages/jquery-2.1.3',
 	WT_ROOT . 'packages/moment-2.10.3',
+	// Removed in 1.7.3
+	WT_ROOT . 'includes/php_53_compatibility.php',
+	WT_ROOT . 'modules_v3/GEDFact_assistant/census/date.js',
+	WT_ROOT . 'modules_v3/GEDFact_assistant/census/dynamicoptionlist.js',
+	WT_ROOT . 'packages/jquery-cookie-1.4.1/jquery.cookie.js',
+	// Removed in 1.7.4
+	WT_ROOT . 'assets/js-1.7.2',
+	WT_ROOT . 'themes/_administration/css-1.7.0',
+	WT_ROOT . 'themes/clouds/css-1.7.0',
+	WT_ROOT . 'themes/colors/css-1.7.0',
+	WT_ROOT . 'themes/fab/css-1.7.0',
+	WT_ROOT . 'themes/minimal/css-1.7.0',
+	WT_ROOT . 'themes/webtrees/css-1.7.0',
+	WT_ROOT . 'themes/xenea/css-1.7.0',
+	WT_ROOT . 'packages/bootstrap-3.3.5',
+	WT_ROOT . 'packages/bootstrap-datetimepicker-4.15.35',
+	WT_ROOT . 'packages/jquery-1.11.3',
+	WT_ROOT . 'packages/jquery-2.1.4',
+	WT_ROOT . 'packages/moment-2.10.6',
+	// Removed in 1.7.5
+	WT_ROOT . 'themes/_administration/css-1.7.4',
+	WT_ROOT . 'themes/clouds/css-1.7.4',
+	WT_ROOT . 'themes/colors/css-1.7.4',
+	WT_ROOT . 'themes/fab/css-1.7.4',
+	WT_ROOT . 'themes/minimal/css-1.7.4',
+	WT_ROOT . 'themes/webtrees/css-1.7.4',
+	WT_ROOT . 'themes/xenea/css-1.7.4',
+	// Removed in 1.7.7
+	WT_ROOT . 'assets/js-1.7.4',
+	WT_ROOT . 'modules_v3/googlemap/images/css_sprite_facts.png',
+	WT_ROOT . 'modules_v3/googlemap/images/flag_shadow.png',
+	WT_ROOT . 'modules_v3/googlemap/images/shadow-left-large.png',
+	WT_ROOT . 'modules_v3/googlemap/images/shadow-left-small.png',
+	WT_ROOT . 'modules_v3/googlemap/images/shadow-right-large.png',
+	WT_ROOT . 'modules_v3/googlemap/images/shadow-right-small.png',
+	WT_ROOT . 'modules_v3/googlemap/images/shadow50.png',
+	WT_ROOT . 'modules_v3/googlemap/images/transparent-left-large.png',
+	WT_ROOT . 'modules_v3/googlemap/images/transparent-left-small.png',
+	WT_ROOT . 'modules_v3/googlemap/images/transparent-right-large.png',
+	WT_ROOT . 'modules_v3/googlemap/images/transparent-right-small.png',
+	// Removed in 1.7.8
+	WT_ROOT . 'themes/clouds/css-1.7.5',
+	WT_ROOT . 'themes/colors/css-1.7.5',
+	WT_ROOT . 'themes/fab/css-1.7.5',
+	WT_ROOT . 'themes/minimal/css-1.7.5',
+	WT_ROOT . 'themes/webtrees/css-1.7.5',
+	WT_ROOT . 'themes/xenea/css-1.7.5',
 );
 
 // Delete old files (if we can).
@@ -511,27 +558,32 @@ $changes = Database::prepare(
 )->fetchAssoc();
 
 // Server warnings
+// Note that security support for 5.6 ends after security support for 7.0
 $server_warnings = array();
 if (
-	version_compare(PHP_VERSION, '5.4', '<') ||
-	version_compare(PHP_VERSION, '5.5', '<') && date('Y-m-d') >= '2015-09-14' ||
-	version_compare(PHP_VERSION, '5.6', '<') && date('Y-m-d') >= '2016-07-10' ||
-	version_compare(PHP_VERSION, '7.0', '<') && date('Y-m-d') >= '2017-08-28'
+	PHP_VERSION_ID < 50500 ||
+	PHP_VERSION_ID < 50600 && date('Y-m-d') >= '2016-07-10' ||
+	PHP_VERSION_ID < 70000 && date('Y-m-d') >= '2018-12-31' ||
+	PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70100 && date('Y-m-d') >= '2018-12-03'
 ) {
-	$server_warnings[] = I18N::translate('Your web server is using PHP version %s, which is no longer receiving security updates.  You should upgrade to a later version as soon as possible.', PHP_VERSION);
+	$server_warnings[] =
+		I18N::translate('Your web server is using PHP version %s, which is no longer receiving security updates. You should upgrade to a later version as soon as possible.', PHP_VERSION) .
+		'<br><a href="https://php.net/supported-versions.php">https://php.net/supported-versions.php</a>';
 } elseif (
-	version_compare(PHP_VERSION, '5.5', '<') && date('Y-m-d') >= '2014-09-14' ||
-	version_compare(PHP_VERSION, '5.6', '<') && date('Y-m-d') >= '2015-07-10' ||
-	version_compare(PHP_VERSION, '7.0', '<') && date('Y-m-d') >= '2016-08-28'
+	PHP_VERSION_ID < 50600 ||
+	PHP_VERSION_ID < 70000 && date('Y-m-d') >= '2016-12-31' ||
+	PHP_VERSION_ID < 70100 && date('Y-m-d') >= '2017-12-03'
 ) {
-	$server_warnings[] = I18N::translate('Your web server is using PHP version %s, which is no longer maintained.  You should upgrade to a later version.', PHP_VERSION);
-} else
+	$server_warnings[] =
+		I18N::translate('Your web server is using PHP version %s, which is no longer maintained. You should upgrade to a later version.', PHP_VERSION) .
+		 '<br><a href="https://php.net/supported-versions.php">https://php.net/supported-versions.php</a>';
+}
 
 ?>
 <h1><?php echo $controller->getPageTitle(); ?></h1>
 
 <p>
-	<?php echo I18N::translate('These pages provide access to all the configuration settings and management tools for this webtrees site.'); ?>
+	<?php echo I18N::translate('These pages provide access to all the preferences and management tools for this webtrees site.'); ?>
 </p>
 
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -570,7 +622,7 @@ if (
 		<div id="webtrees-version-panel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="webtrees-version-heading">
 			<div class="panel-body">
 				<p>
-					<?php echo /* I18N: %s is a URL/link to the project website */ I18N::translate('Support and documentation can be found at %s.', '<a href="http://webtrees.net/">webtrees.net</a>'); ?>
+					<?php echo /* I18N: %s is a URL/link to the project website */ I18N::translate('Support and documentation can be found at %s.', '<a href="https://webtrees.net/">webtrees.net</a>'); ?>
 				</p>
 				<?php if (Auth::isAdmin()): ?>
 				<p>
@@ -582,7 +634,7 @@ if (
 						<?php echo /* I18N: %s is a version number */ I18N::translate('Upgrade to webtrees %s.', Filter::escapeHtml($latest_version)); ?>
 					</a>
 					<?php else: ?>
-						<?php echo I18N::translate('This is the latest version of webtrees.  No upgrade is available.'); ?>
+						<?php echo I18N::translate('This is the latest version of webtrees. No upgrade is available.'); ?>
 					<?php endif; ?>
 				</p>
 				<?php endif; ?>
@@ -684,7 +736,7 @@ if (
 						</tr>
 						<tr>
 							<th>
-								<?php echo I18N::translate('Users logged in'); ?>
+								<?php echo I18N::translate('Users who are signed in'); ?>
 							</th>
 							<td>
 								<?php foreach ($logged_in as $n => $user): ?>
@@ -846,7 +898,7 @@ if (
 		<div id="old-files-panel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="old-files-heading">
 			<div class="panel-body">
 				<p>
-					<?php echo I18N::translate('Files have been found from a previous version of webtrees.  Old files can sometimes be a security risk.  You should delete them.'); ?>
+					<?php echo I18N::translate('Files have been found from a previous version of webtrees. Old files can sometimes be a security risk. You should delete them.'); ?>
 				</p>
 				<ul class="list-unstyled">
 					<?php foreach ($files_to_delete as $file_to_delete): ?>

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ $controller
 					<td class="optionbox">
 						<input data-autocomplete-type="SURN" type="text" name="surname" id="SURN" value="<?php echo Filter::escapeHtml($controller->getSurname()); ?>" dir="auto">
 						<input type="hidden" name="ged" id="ged" value="<?php echo $WT_TREE->getNameHtml(); ?>">
-						<input type="submit" value="<?php echo I18N::translate('View'); ?>">
+						<input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('view'); ?>">
 						<p>
 							<?php echo I18N::translate('Phonetic search'); ?>
 						</p>

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,7 +29,20 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
 use Fisharebest\Webtrees\Module;
+use Fisharebest\Webtrees\Module\AncestorsChartModule;
+use Fisharebest\Webtrees\Module\CompactTreeChartModule;
+use Fisharebest\Webtrees\Module\DescendancyChartModule;
+use Fisharebest\Webtrees\Module\FamilyBookChartModule;
 use Fisharebest\Webtrees\Module\FamilyTreeFavoritesModule;
+use Fisharebest\Webtrees\Module\FanChartModule;
+use Fisharebest\Webtrees\Module\GoogleMapsModule;
+use Fisharebest\Webtrees\Module\HourglassChartModule;
+use Fisharebest\Webtrees\Module\InteractiveTreeModule;
+use Fisharebest\Webtrees\Module\LifespansChartModule;
+use Fisharebest\Webtrees\Module\PedigreeChartModule;
+use Fisharebest\Webtrees\Module\RelationshipsChartModule;
+use Fisharebest\Webtrees\Module\StatisticsChartModule;
+use Fisharebest\Webtrees\Module\TimelineChartModule;
 use Fisharebest\Webtrees\Module\UserFavoritesModule;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Theme;
@@ -172,10 +185,13 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function analytics() {
-		if ($this->themeId() === '_administration') {
+		if ($this->themeId() === '_administration' || !empty($_SERVER['HTTP_DNT'])) {
 			return '';
 		} else {
 			return
+				$this->analyticsBingWebmaster(
+					Site::getPreference('BING_WEBMASTER_ID')
+				) .
 				$this->analyticsGoogleWebmaster(
 					Site::getPreference('GOOGLE_WEBMASTER_ID')
 				) .
@@ -236,12 +252,18 @@ abstract class AbstractTheme {
 	 */
 	protected function analyticsGoogleTracker($analytics_id) {
 		if ($analytics_id) {
+			// Add extra dimensions (i.e. filtering categories)
+			$dimensions = (object) array(
+				'dimension1' => $this->tree ? $this->tree->getName() : '-',
+				'dimension2' => $this->tree ? Auth::accessLevel($this->tree) : '-',
+			);
+
 			return
 				'<script async src="https://www.google-analytics.com/analytics.js"></script>' .
 				'<script>' .
 				'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;' .
 				'ga("create","' . $analytics_id . '","auto");' .
-				'ga("send", "pageview");' .
+				'ga("send", "pageview", ' . json_encode($dimensions) . ');' .
 				'</script>';
 		} else {
 			return '';
@@ -309,7 +331,7 @@ abstract class AbstractTheme {
 			$this->headerContent() .
 			$this->primaryMenuContainer($this->primaryMenu()) .
 			'</header>' .
-			'<main id="content" role="main">' .
+			'<main id="content">' .
 			$this->flashMessagesContainer(FlashMessages::getMessages());
 	}
 
@@ -321,7 +343,7 @@ abstract class AbstractTheme {
 	public function bodyHeaderPopupWindow() {
 		return
 			'<body class="container container-popup">' .
-			'<main id="content" role="main">' .
+			'<main id="content">' .
 			$this->flashMessagesContainer(FlashMessages::getMessages());
 	}
 
@@ -353,7 +375,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkEverything(User $user) {
-		return I18N::translate('For technical support or genealogy questions, please contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For technical support or genealogy questions contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -364,7 +386,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkGenealogy(User $user) {
-		return I18N::translate('For help with genealogy questions contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For help with genealogy questions contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -375,7 +397,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkTechnical(User $user) {
-		return I18N::translate('For technical support and information contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For technical support and information contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -401,6 +423,28 @@ abstract class AbstractTheme {
 	}
 
 	/**
+	 * Create a cookie warning.
+	 *
+	 * @return string
+	 */
+	public function cookieWarning() {
+		if (
+			empty($_SERVER['HTTP_DNT']) &&
+			empty($_COOKIE['cookie']) &&
+			(Site::getPreference('GOOGLE_ANALYTICS_ID') || Site::getPreference('PIWIK_SITE_ID') || Site::getPreference('STATCOUNTER_PROJECT_ID'))
+		) {
+			return
+				'<div class="cookie-warning">' .
+				I18N::translate('Cookies') . ' - ' .
+				I18N::translate('This website uses cookies to learn about visitor behaviour.') . ' ' .
+				'<button onclick="document.cookie=\'cookie=1\'; this.parentNode.classList.add(\'hidden\');">' . I18N::translate('continue') . '</button>' .
+				'</div>';
+		} else {
+			return '';
+		}
+	}
+
+	/**
 	 * Create the <DOCTYPE> tag.
 	 *
 	 * @return string
@@ -417,8 +461,8 @@ abstract class AbstractTheme {
 	protected function favicon() {
 		return
 			'<link rel="icon" href="' . $this->assetUrl() . 'favicon.png" type="image/png">' .
-			'<link rel="icon" type="image/png" href="' . $this->assetUrl() .'favicon192.png" sizes="192x192">' .
-			'<link rel="apple-touch-icon" sizes="180x180" href="' . $this->assetUrl() .'favicon180.png">';
+			'<link rel="icon" type="image/png" href="' . $this->assetUrl() . 'favicon192.png" sizes="192x192">' .
+			'<link rel="apple-touch-icon" sizes="180x180" href="' . $this->assetUrl() . 'favicon180.png">';
 	}
 
 	/**
@@ -434,7 +478,7 @@ abstract class AbstractTheme {
 
 	/**
 	 * Create a container for messages that are "flashed" to the session
-	 * on one request, and displayed on another.  If there are many messages,
+	 * on one request, and displayed on another. If there are many messages,
 	 * the container may need a max-height and scroll-bar.
 	 *
 	 * @param \stdClass[] $messages
@@ -482,7 +526,8 @@ abstract class AbstractTheme {
 		return
 			$this->formatContactLinks() .
 			$this->logoPoweredBy() .
-			$this->formatPageViews($this->page_views);
+			$this->formatPageViews($this->page_views) .
+			$this->cookieWarning();
 	}
 
 	/**
@@ -528,7 +573,7 @@ abstract class AbstractTheme {
 			return
 				'<div class="page-views">' .
 				I18N::plural('This page has been viewed %s time.', 'This page has been viewed %s times.', $count,
-				'<span class="odometer">' . I18N::digits($count) . '</span>') .
+					'<span class="odometer">' . I18N::digits($count) . '</span>') .
 				'</div>';
 		} else {
 			return '';
@@ -621,7 +666,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	public function head(PageController $controller) {
-		// Record this now.  By the time we render the footer, $controller no longer exists.
+		// Record this now. By the time we render the footer, $controller no longer exists.
 		$this->page_views = $this->pageViews($controller);
 
 		return
@@ -645,7 +690,7 @@ abstract class AbstractTheme {
 
 		// If an extra (site) title is specified, append it.
 		if ($this->tree && $this->tree->getPreference('META_TITLE')) {
-			$title .= ' - ' . Filter::escapeHtml($this->tree->getPreference('META_TITLE'));
+			$title .= ' – ' . $this->tree->getPreference('META_TITLE');
 		}
 
 		$html =
@@ -793,21 +838,28 @@ abstract class AbstractTheme {
 			$thumbnail = '';
 		}
 
+		$content = '<span class="namedef name1">' . $individual->getFullName() . '</span>';
+		$icons   = '';
+		if ($individual->canShow()) {
+			$content =
+				'<a href="' . $individual->getHtmlUrl() . '">' . $content . '</a>' .
+				'<div class="namedef name1">' . $individual->getAddName() . '</div>';
+			$icons   =
+				'<div class="noprint icons">' .
+				'<span class="iconz icon-zoomin" title="' . I18N::translate('Zoom in/out on this box.') . '"></span>' .
+				'<div class="itr"><i class="icon-pedigree"></i><div class="popup">' .
+				'<ul class="' . $personBoxClass . '">' . implode('', $this->individualBoxMenu($individual)) . '</ul>' .
+				'</div>' .
+				'</div>' .
+				'</div>';
+		}
+
 		return
 			'<div data-pid="' . $individual->getXref() . '" class="person_box_template ' . $personBoxClass . ' box-style1" style="width: ' . $this->parameter('chart-box-x') . 'px; min-height: ' . $this->parameter('chart-box-y') . 'px">' .
-			'<div class="noprint icons">' .
-			'<span class="iconz icon-zoomin" title="' . I18N::translate('Zoom in/out on this box.') . '"></span>' .
-			'<div class="itr"><i class="icon-pedigree"></i><div class="popup">' .
-			'<ul class="' . $personBoxClass . '">' . implode('', $this->individualBoxMenu($individual)) . '</ul>' .
-			'</div>' .
-			'</div>' .
-			'</div>' .
+			$icons .
 			'<div class="chart_textbox" style="max-height:' . $this->parameter('chart-box-y') . 'px;">' .
 			$thumbnail .
-			'<a href="' . $individual->getHtmlUrl() . '">' .
-			'<span class="namedef name1">' . $individual->getFullName() . '</span>' .
-			'</a>' .
-			'<div class="namedef name1">' . $individual->getAddName() . '</div>' .
+			$content .
 			'<div class="inout2 details1">' . $this->individualBoxFacts($individual) . '</div>' .
 			'</div>' .
 			'<div class="inout"></div>' .
@@ -838,21 +890,28 @@ abstract class AbstractTheme {
 			$thumbnail = '';
 		}
 
+		$content = '<span class="namedef name1">' . $individual->getFullName() . '</span>';
+		$icons   = '';
+		if ($individual->canShow()) {
+			$content =
+				'<a href="' . $individual->getHtmlUrl() . '">' . $content . '</a>' .
+				'<div class="namedef name2">' . $individual->getAddName() . '</div>';
+			$icons   =
+				'<div class="noprint icons">' .
+				'<span class="iconz icon-zoomin" title="' . I18N::translate('Zoom in/out on this box.') . '"></span>' .
+				'<div class="itr"><i class="icon-pedigree"></i><div class="popup">' .
+				'<ul class="' . $personBoxClass . '">' . implode('', $this->individualBoxMenu($individual)) . '</ul>' .
+				'</div>' .
+				'</div>' .
+				'</div>';
+		}
+
 		return
 			'<div data-pid="' . $individual->getXref() . '" class="person_box_template ' . $personBoxClass . ' box-style2">' .
-			'<div class="noprint icons">' .
-			'<span class="iconz icon-zoomin" title="' . I18N::translate('Zoom in/out on this box.') . '"></span>' .
-			'<div class="itr"><i class="icon-pedigree"></i><div class="popup">' .
-			'<ul class="' . $personBoxClass . '">' . implode('', $this->individualBoxMenu($individual)) . '</ul>' .
-			'</div>' .
-			'</div>' .
-			'</div>' .
+			$icons .
 			'<div class="chart_textbox" style="max-height:' . $this->parameter('chart-box-y') . 'px;">' .
 			$thumbnail .
-			'<a href="' . $individual->getHtmlUrl() . '">' .
-			'<span class="namedef name2">' . $individual->getFullName() . '</span>' .
-			'</a>' .
-			'<div class="namedef name2">' . $individual->getAddName() . '</div>' .
+			$content .
 			'<div class="inout2 details2">' . $this->individualBoxFacts($individual) . '</div>' .
 			'</div>' .
 			'<div class="inout"></div>' .
@@ -982,7 +1041,7 @@ abstract class AbstractTheme {
 	 *
 	 * @return Menu[]
 	 */
-	protected function individualBoxMenu(Individual $individual) {
+	public function individualBoxMenu(Individual $individual) {
 		$menus = array_merge(
 			$this->individualBoxMenuCharts($individual),
 			$this->individualBoxMenuFamilyLinks($individual)
@@ -999,18 +1058,13 @@ abstract class AbstractTheme {
 	 * @return Menu[]
 	 */
 	protected function individualBoxMenuCharts(Individual $individual) {
-		$menus = array_filter(array(
-			$this->menuChartAncestors($individual),
-			$this->menuChartCompact($individual),
-			$this->menuChartDescendants($individual),
-			$this->menuChartFanChart($individual),
-			$this->menuChartHourglass($individual),
-			$this->menuChartInteractiveTree($individual),
-			$this->menuChartPedigree($individual),
-			$this->menuChartPedigreeMap($individual),
-			$this->menuChartRelationship($individual),
-			$this->menuChartTimeline($individual),
-		));
+		$menus = array();
+		foreach (Module::getActiveCharts($this->tree) as $chart) {
+			$menu = $chart->getBoxChartMenu($individual);
+			if ($menu) {
+				$menus[] = $menu;
+			}
+		}
 
 		usort($menus, function (Menu $x, Menu $y) {
 			return I18N::strcasecmp($x->getLabel(), $y->getLabel());
@@ -1061,7 +1115,7 @@ abstract class AbstractTheme {
 	}
 
 	/**
-	 * Initialise the theme.  We cannot pass these in a constructor, as the construction
+	 * Initialise the theme. We cannot pass these in a constructor, as the construction
 	 * happens in a theme file, and we need to be able to change it.
 	 *
 	 * @param Tree|null $tree The current tree (if there is one).
@@ -1097,7 +1151,7 @@ abstract class AbstractTheme {
 	 * @return Menu
 	 */
 	protected function menuCalendar() {
-		return new Menu(I18N::translate('Calendar'), 'calendar.php?' . $this->tree_url . '&amp;view=day', 'menu-calendar', array('rel' => 'nofollow'), array(
+		return new Menu(I18N::translate('Calendar'), '#', 'menu-calendar', array('rel' => 'nofollow'), array(
 			// Day view
 			new Menu(I18N::translate('Day'), 'calendar.php?' . $this->tree_url . '&amp;view=day', 'menu-calendar-day', array('rel' => 'nofollow')),
 			// Month view
@@ -1127,202 +1181,225 @@ abstract class AbstractTheme {
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
 	 */
 	protected function menuChart(Individual $individual) {
-		// The top level menu is the pedigree chart
-		$menu = $this->menuChartPedigree($individual);
-		$menu->setLabel(I18N::translate('Charts'));
-		$menu->setClass('menu-chart');
+		$submenus = array();
+		foreach (Module::getActiveCharts($this->tree) as $chart) {
+			$menu = $chart->getChartMenu($individual);
+			if ($menu) {
+				$submenus[] = $menu;
+			}
+		}
 
-		$submenus = array_filter(array(
-			$this->menuChartAncestors($individual),
-			$this->menuChartCompact($individual),
-			$this->menuChartDescendants($individual),
-			$this->menuChartFamilyBook($individual),
-			$this->menuChartFanChart($individual),
-			$this->menuChartHourglass($individual),
-			$this->menuChartInteractiveTree($individual),
-			$this->menuChartLifespan($individual),
-			$this->menuChartPedigree($individual),
-			$this->menuChartPedigreeMap($individual),
-			$this->menuChartRelationship($individual),
-			$this->menuChartStatistics(),
-			$this->menuChartTimeline($individual),
-		));
+		if ($submenus) {
+			usort($submenus, function (Menu $x, Menu $y) {
+				return I18N::strcasecmp($x->getLabel(), $y->getLabel());
+			});
 
-		usort($submenus, function (Menu $x, Menu $y) {
-			return I18N::strcasecmp($x->getLabel(), $y->getLabel());
-		});
-
-		$menu->setSubmenus($submenus);
-
-		return $menu;
+			return new Menu(I18N::translate('Charts'), '#', 'menu-chart', array('rel' => 'nofollow'), $submenus);
+		} else {
+			return null;
+		}
 	}
 
 	/**
-	 * Generate a menu item for the ancestors chart (ancestry.php).
+	 * Generate a menu item for the ancestors chart.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartAncestors(Individual $individual) {
-		return new Menu(I18N::translate('Ancestors'), 'ancestry.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-ancestry', array('rel' => 'nofollow'));
+		$chart = new AncestorsChartModule(WT_ROOT . WT_MODULES_DIR . 'ancestors_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the compact tree (compact.php).
+	 * Generate a menu item for the compact tree.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartCompact(Individual $individual) {
-		return new Menu(I18N::translate('Compact tree'), 'compact.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-compact', array('rel' => 'nofollow'));
+		$chart = new CompactTreeChartModule(WT_ROOT . WT_MODULES_DIR . 'compact_tree_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the descendants chart (descendancy.php).
+	 * Generate a menu item for the descendants chart.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartDescendants(Individual $individual) {
-		return new Menu(I18N::translate('Descendants'), 'descendancy.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-descendants', array('rel' => 'nofollow'));
+		$chart = new DescendancyChartModule(WT_ROOT . WT_MODULES_DIR . 'descendancy_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the family-book chart (familybook.php).
+	 * Generate a menu item for the family-book chart.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartFamilyBook(Individual $individual) {
-		return new Menu(I18N::translate('Family book'), 'familybook.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-familybook', array('rel' => 'nofollow'));
+		$chart = new FamilyBookChartModule(WT_ROOT . WT_MODULES_DIR . 'family_book_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the fan chart (fanchart.php).
+	 * Generate a menu item for the fan chart.
 	 *
 	 * We can only do this if the GD2 library is installed with TrueType support.
 	 *
 	 * @param Individual $individual
 	 *
 	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartFanChart(Individual $individual) {
-		if (function_exists('imagettftext')) {
-			return new Menu(I18N::translate('Fan chart'), 'fanchart.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-fanchart', array('rel' => 'nofollow'));
-		} else {
-			return null;
-		}
+		$chart = new FanChartModule(WT_ROOT . WT_MODULES_DIR . 'fan_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the interactive tree (tree module).
+	 * Generate a menu item for the interactive tree.
 	 *
 	 * @param Individual $individual
 	 *
 	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartInteractiveTree(Individual $individual) {
-		if (Module::getModuleByName('tree')) {
-			return new Menu(I18N::translate('Interactive tree'), 'module.php?mod=tree&amp;mod_action=treeview&amp;' . $this->tree_url . '&amp;rootid=' . $individual->getXref(), 'menu-chart-tree', array('rel' => 'nofollow'));
-		} else {
-			return null;
-		}
+		$chart = new InteractiveTreeModule(WT_ROOT . WT_MODULES_DIR . 'tree');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the hourglass chart (hourglass.php).
-	 *
-	 * @param Individual $individual
-	 *
-	 * @return Menu
-	 */
-	protected function menuChartHourglass(Individual $individual) {
-		return new Menu(I18N::translate('Hourglass chart'), 'hourglass.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-hourglass', array('rel' => 'nofollow'));
-	}
-
-	/**
-	 * Generate a menu item for the lifepsan chart (lifespan.php).
-	 *
-	 * @param Individual $individual
-	 *
-	 * @return Menu
-	 */
-	protected function menuChartLifespan(Individual $individual) {
-		return new Menu(I18N::translate('Lifespans'), 'lifespan.php', 'menu-chart-lifespan', array('rel' => 'nofollow'));
-	}
-
-	/**
-	 * Generate a menu item for the pedigree chart (pedigree.php).
-	 *
-	 * @param Individual $individual
-	 *
-	 * @return Menu
-	 */
-	protected function menuChartPedigree(Individual $individual) {
-		return new Menu(I18N::translate('Pedigree'), 'pedigree.php?rootid=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-pedigree', array('rel' => 'nofollow'));
-	}
-
-	/**
-	 * Generate a menu item for the pedigree map (googlemap module).
+	 * Generate a menu item for the hourglass chart.
 	 *
 	 * @param Individual $individual
 	 *
 	 * @return Menu|null
+	 *
+	 * @deprecated
+	 */
+	protected function menuChartHourglass(Individual $individual) {
+		$chart = new HourglassChartModule(WT_ROOT . WT_MODULES_DIR . 'hourglass_chart');
+
+		return $chart->getChartMenu($individual);
+	}
+
+	/**
+	 * Generate a menu item for the lifepsan chart.
+	 *
+	 * @param Individual $individual
+	 *
+	 * @return Menu|null
+	 *
+	 * @deprecated
+	 */
+	protected function menuChartLifespan(Individual $individual) {
+		$chart = new LifespansChartModule(WT_ROOT . WT_MODULES_DIR . 'lifespans_chart');
+
+		return $chart->getChartMenu($individual);
+	}
+
+	/**
+	 * Generate a menu item for the pedigree chart.
+	 *
+	 * @param Individual $individual
+	 *
+	 * @return Menu|null
+	 *
+	 * @deprecated
+	 */
+	protected function menuChartPedigree(Individual $individual) {
+		$chart = new PedigreeChartModule(WT_ROOT . WT_MODULES_DIR . 'pedigree_chart');
+
+		return $chart->getChartMenu($individual);
+	}
+
+	/**
+	 * Generate a menu item for the pedigree map.
+	 *
+	 * @param Individual $individual
+	 *
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartPedigreeMap(Individual $individual) {
-		if (Module::getModuleByName('googlemap')) {
-			return new Menu(I18N::translate('Pedigree map'), 'module.php?' . $this->tree_url . '&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid=' . $individual->getXref(), 'menu-chart-pedigree_map', array('rel' => 'nofollow'));
-		} else {
-			return null;
-		}
+		$chart = new GoogleMapsModule(WT_ROOT . WT_MODULES_DIR . 'googlemap');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the relationship chart (relationship.php).
+	 * Generate a menu item for the relationship chart.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartRelationship(Individual $individual) {
-		$gedcomid = $this->tree->getUserPreference(Auth::user(), 'gedcomid');
+		$chart = new RelationshipsChartModule(WT_ROOT . WT_MODULES_DIR . 'relationships_chart');
 
-		if ($gedcomid && $individual->getXref()) {
-			return new Menu(I18N::translate('Relationship to me'), 'relationship.php?pid1=' . $gedcomid . '&amp;pid2=' . $individual->getXref() . '&amp;ged=' . $this->tree_url, 'menu-chart-relationship', array('rel' => 'nofollow'));
-		} else {
-			return new Menu(I18N::translate('Relationships'), 'relationship.php?pid1=' . $individual->getXref() . '&amp;ged=' . $this->tree_url, 'menu-chart-relationship', array('rel' => 'nofollow'));
-		}
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the statistics charts (statistics.php).
+	 * Generate a menu item for the statistics charts.
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartStatistics() {
-		return new Menu(I18N::translate('Statistics'), 'statistics.php?' . $this->tree_url, 'menu-chart-statistics', array('rel' => 'nofollow'));
+		$chart = new StatisticsChartModule(WT_ROOT . WT_MODULES_DIR . 'statistics_chart');
+
+		return $chart->getChartMenu(null);
 	}
 
 	/**
-	 * Generate a menu item for the timeline chart (timeline.php).
+	 * Generate a menu item for the timeline chart.
 	 *
 	 * @param Individual $individual
 	 *
-	 * @return Menu
+	 * @return Menu|null
+	 *
+	 * @deprecated
 	 */
 	protected function menuChartTimeline(Individual $individual) {
-		return new Menu(I18N::translate('Timeline'), 'timeline.php?pids%5B%5D=' . $individual->getXref() . '&amp;' . $this->tree_url, 'menu-chart-timeline', array('rel' => 'nofollow'));
+		$chart = new TimelineChartModule(WT_ROOT . WT_MODULES_DIR . 'timeline_chart');
+
+		return $chart->getChartMenu($individual);
 	}
 
 	/**
-	 * Generate a menu item for the control panel (admin.php).
+	 * Generate a menu item for the control panel.
 	 *
 	 * @return Menu|null
 	 */
@@ -1355,37 +1432,41 @@ abstract class AbstractTheme {
 		} elseif ($show_tree_favorites) {
 			$favorites = FamilyTreeFavoritesModule::getFavorites($this->tree->getTreeId());
 		} else {
-			return null;
+			$favorites = array();
 		}
 
-		$menu = new Menu(I18N::translate('Favorites'), '#', 'menu-favorites');
-
+		$submenus = array();
+		$records  = array();
 		foreach ($favorites as $favorite) {
 			switch ($favorite['type']) {
 			case 'URL':
-				$submenu = new Menu($favorite['title'], $favorite['url']);
-				$menu->addSubmenu($submenu);
+				$submenus[] = new Menu($favorite['title'], $favorite['url']);
 				break;
 			case 'INDI':
 			case 'FAM':
 			case 'SOUR':
 			case 'OBJE':
 			case 'NOTE':
-				$obj = GedcomRecord::getInstance($favorite['gid'], $this->tree);
-				if ($obj && $obj->canShowName()) {
-					$menu->addSubmenu(new Menu($obj->getFullName(), $obj->getHtmlUrl()));
+				$record = GedcomRecord::getInstance($favorite['gid'], $this->tree);
+				if ($record && $record->canShowName()) {
+					$submenus[] = new Menu($record->getFullName(), $record->getHtmlUrl());
+					$records[]  = $record;
 				}
 				break;
 			}
 		}
 
-		if ($show_user_favorites && isset($controller->record) && $controller->record instanceof GedcomRecord) {
-			$menu->addSubmenu(new Menu(I18N::translate('Add to favorites'), '#', '', array(
+		if ($show_user_favorites && isset($controller->record) && $controller->record instanceof GedcomRecord && !in_array($controller->record, $records)) {
+			$submenus[] = new Menu(I18N::translate('Add to favorites'), '#', '', array(
 				'onclick' => 'jQuery.post("module.php?mod=user_favorites&mod_action=menu-add-favorite", {xref:"' . $controller->record->getXref() . '"},function(){location.reload();})',
-			)));
+			));
 		}
 
-		return $menu;
+		if (empty($submenus)) {
+			return null;
+		} else {
+			return new Menu(I18N::translate('Favorites'), '#', 'menu-favorites', array(), $submenus);
+		}
 	}
 
 	/**
@@ -1467,15 +1548,13 @@ abstract class AbstractTheme {
 	 * @return Menu
 	 */
 	protected function menuLists($surname) {
-		$menu = new Menu(I18N::translate('Lists'), 'indilist.php?' . $this->tree_url, 'menu-list');
-
 		// Do not show empty lists
 		$row = Database::prepare(
 			"SELECT SQL_CACHE" .
-			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file = ?                  ) AS sour," .
-			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file = ? AND o_type='REPO') AS repo," .
-			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file = ? AND o_type='NOTE') AS note," .
-			" EXISTS(SELECT 1 FROM `##media`   WHERE m_file = ?                  ) AS obje"
+			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file = ?) AS sour," .
+			" EXISTS(SELECT 1 FROM `##other` WHERE o_file = ? AND o_type='REPO') AS repo," .
+			" EXISTS(SELECT 1 FROM `##other` WHERE o_file = ? AND o_type='NOTE') AS note," .
+			" EXISTS(SELECT 1 FROM `##media` WHERE m_file = ?) AS obje"
 		)->execute(array(
 			$this->tree->getTreeId(),
 			$this->tree->getTreeId(),
@@ -1483,32 +1562,30 @@ abstract class AbstractTheme {
 			$this->tree->getTreeId(),
 		))->fetchOneRow();
 
-		$menulist = array(
+		$submenus = array(
 			$this->menuListsIndividuals($surname),
 			$this->menuListsFamilies($surname),
 			$this->menuListsBranches($surname),
 			$this->menuListsPlaces(),
 		);
 		if ($row->obje) {
-			$menulist[] = $this->menuListsMedia();
+			$submenus[] = $this->menuListsMedia();
 		}
 		if ($row->repo) {
-			$menulist[] = $this->menuListsRepositories();
+			$submenus[] = $this->menuListsRepositories();
 		}
 		if ($row->sour) {
-			$menulist[] = $this->menuListsSources();
+			$submenus[] = $this->menuListsSources();
 		}
 		if ($row->note) {
-			$menulist[] = $this->menuListsNotes();
+			$submenus[] = $this->menuListsNotes();
 		}
 
-		uasort($menulist, function (Menu $x, Menu $y) {
+		uasort($submenus, function (Menu $x, Menu $y) {
 			return I18N::strcasecmp($x->getLabel(), $y->getLabel());
 		});
 
-		$menu->setSubmenus($menulist);
-
-		return $menu;
+		return new Menu(I18N::translate('Lists'), '#', 'menu-list', array(), $submenus);
 	}
 
 	/**
@@ -1598,7 +1675,7 @@ abstract class AbstractTheme {
 		if (Auth::check() || WT_SCRIPT_NAME === 'login.php') {
 			return null;
 		} else {
-			return new Menu(I18N::translate('Login'), WT_LOGIN_URL . '?url=' . rawurlencode(Functions::getQueryUrl()), 'menu-login', array('rel' => 'nofollow'));
+			return new Menu(I18N::translate('Sign in'), WT_LOGIN_URL . '?url=' . rawurlencode(Functions::getQueryUrl()), 'menu-login', array('rel' => 'nofollow'));
 		}
 	}
 
@@ -1609,7 +1686,7 @@ abstract class AbstractTheme {
 	 */
 	protected function menuLogout() {
 		if (Auth::check()) {
-			return new Menu(I18N::translate('Logout'), 'logout.php', 'menu-logout');
+			return new Menu(I18N::translate('Sign out'), 'logout.php', 'menu-logout');
 		} else {
 			return null;
 		}
@@ -1678,8 +1755,8 @@ abstract class AbstractTheme {
 				$this->menuMyIndividualRecord(),
 				$this->menuMyPedigree(),
 				$this->menuMyAccount(),
-				$this->menuChangeBlocks(),
 				$this->menuControlPanel(),
+				$this->menuChangeBlocks(),
 			)));
 		} else {
 			return null;
@@ -1687,14 +1764,14 @@ abstract class AbstractTheme {
 	}
 
 	/**
-	 * A link to the user's individual record (pedigree.php).
+	 * A link to the user's individual record.
 	 *
 	 * @return Menu|null
 	 */
 	protected function menuMyPedigree() {
 		$gedcomid = $this->tree->getUserPreference(Auth::user(), 'gedcomid');
 
-		if ($gedcomid) {
+		if ($gedcomid && Module::isActiveChart($this->tree, 'pedigree_chart')) {
 			$showFull   = $this->tree->getPreference('PEDIGREE_FULL_DETAILS') ? 1 : 0;
 			$showLayout = $this->tree->getPreference('PEDIGREE_LAYOUT') ? 1 : 0;
 
@@ -1735,33 +1812,64 @@ abstract class AbstractTheme {
 		}
 
 		if ($submenus) {
-			return new Menu(I18N::translate('Reports'), 'reportengine.php?' . $this->tree_url, 'menu-report', array('rel' => 'nofollow'), $submenus);
+			return new Menu(I18N::translate('Reports'), '#', 'menu-report', array('rel' => 'nofollow'), $submenus);
 		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * Create the search menu
+	 * Create the search menu.
 	 *
 	 * @return Menu
 	 */
 	protected function menuSearch() {
-		//-- main search menu item
-		$menu = new Menu(I18N::translate('Search'), 'search.php?' . $this->tree_url, 'menu-search', array('rel' => 'nofollow'));
-		//-- search_general sub menu
-		$menu->addSubmenu(new Menu(I18N::translate('General search'), 'search.php?' . $this->tree_url, 'menu-search-general', array('rel' => 'nofollow')));
-		//-- search_soundex sub menu
-		$menu->addSubmenu(new Menu(/* I18N: search using “sounds like”, rather than exact spelling */
-			I18N::translate('Phonetic search'), 'search.php?' . $this->tree_url . '&amp;action=soundex', 'menu-search-soundex', array('rel' => 'nofollow')));
-		//-- advanced search
-		$menu->addSubmenu(new Menu(I18N::translate('Advanced search'), 'search_advanced.php?' . $this->tree_url, 'menu-search-advanced', array('rel' => 'nofollow')));
-		//-- search_replace sub menu
-		if (Auth::isEditor($this->tree)) {
-			$menu->addSubmenu(new Menu(I18N::translate('Search and replace'), 'search.php?' . $this->tree_url . '&amp;action=replace', 'menu-search-replace'));
-		}
+		return new Menu(I18N::translate('Search'), '#', 'menu-search', array('rel' => 'nofollow'), array_filter(array(
+			$this->menuSearchGeneral(),
+			$this->menuSearchPhonetic(),
+			$this->menuSearchAdvanced(),
+			$this->menuSearchAndReplace(),
+		)));
+	}
 
-		return $menu;
+	/**
+	 * Create the general search sub-menu.
+	 *
+	 * @return Menu
+	 */
+	protected function menuSearchGeneral() {
+		return new Menu(I18N::translate('General search'), 'search.php?' . $this->tree_url, 'menu-search-general', array('rel' => 'nofollow'));
+	}
+
+	/**
+	 * Create the phonetic search sub-menu.
+	 *
+	 * @return Menu
+	 */
+	protected function menuSearchPhonetic() {
+		return new Menu(/* I18N: search using “sounds like”, rather than exact spelling */ I18N::translate('Phonetic search'), 'search.php?' . $this->tree_url . '&amp;action=soundex', 'menu-search-soundex', array('rel' => 'nofollow'));
+	}
+
+	/**
+	 * Create the advanced search sub-menu.
+	 *
+	 * @return Menu
+	 */
+	protected function menuSearchAdvanced() {
+		return new Menu(I18N::translate('Advanced search'), 'search_advanced.php?' . $this->tree_url, 'menu-search-advanced', array('rel' => 'nofollow'));
+	}
+
+	/**
+	 * Create the advanced search sub-menu.
+	 *
+	 * @return Menu
+	 */
+	protected function menuSearchAndReplace() {
+		if (Auth::isEditor($this->tree)) {
+			return new Menu(I18N::translate('Search and replace'), 'search.php?' . $this->tree_url . '&amp;action=replace', 'menu-search-replace');
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -1946,11 +2054,11 @@ abstract class AbstractTheme {
 	 * @return bool
 	 */
 	protected function pendingChangesExist() {
-		return $this->tree && $this->tree->hasPendingEdit() && Auth::isManager($this->tree);
+		return $this->tree && $this->tree->hasPendingEdit() && Auth::isModerator($this->tree);
 	}
 
 	/**
-	 * Create a pending changes link.  Some themes prefer an alert/banner to a menu.
+	 * Create a pending changes link. Some themes prefer an alert/banner to a menu.
 	 *
 	 * @return string
 	 */
@@ -1990,7 +2098,7 @@ abstract class AbstractTheme {
 				$this->menuSearch(),
 			), $this->menuModules()));
 		} else {
-			// No public trees?  No genealogy menu!
+			// No public trees? No genealogy menu!
 			return array();
 		}
 	}
@@ -2014,7 +2122,9 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function primaryMenuContent(array $menus) {
-		return implode('', array_map(function (Menu $menu) { return $menu->getMenuAsList(); }, $menus));
+		return implode('', array_map(function (Menu $menu) {
+			return $menu->getMenuAsList();
+		}, $menus));
 	}
 
 	/**
@@ -2053,7 +2163,9 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function secondaryMenuContent(array $menus) {
-		return implode('', array_map(function (Menu $menu) { return $menu->getMenuAsList(); }, $menus));
+		return implode('', array_map(function (Menu $menu) {
+			return $menu->getMenuAsList();
+		}, $menus));
 	}
 
 	/**
