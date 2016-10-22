@@ -105,13 +105,13 @@ $expireHeader = gmdate('D, d M Y H:i:s', WT_TIMESTAMP + $expireOffset) . ' GMT';
 
 // parse IF_MODIFIED_SINCE header from client
 $if_modified_since = 'x';
-if (@$_SERVER['HTTP_IF_MODIFIED_SINCE']) {
+if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
 	$if_modified_since = preg_replace('/;.*$/', '', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 }
 
 // parse IF_NONE_MATCH header from client
 $if_none_match = 'x';
-if (@$_SERVER['HTTP_IF_NONE_MATCH']) {
+if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$if_none_match = str_replace('"', '', $_SERVER['HTTP_IF_NONE_MATCH']);
 }
 
