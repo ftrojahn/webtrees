@@ -117,7 +117,11 @@ $controller->pageHeader();
 							}
 
 							$userclass = User::find($user->user_id);
-							echo '<td><a href="admin_users.php?action=edit&user_id=' . $userclass->getUserId() . '">' . $userclass->getRealNameHtml() . '</a></td>';
+							echo '<td><a href="admin_users.php?action=edit&user_id=' . $userclass->getUserId() . '">' . $userclass->getRealNameHtml() . '</a>';
+							if ($userclass->getPreference('comment') !== '') {
+								echo '<sup title="' . Filter::escapeHtml($userclass->getPreference('comment')) . '">(*)</sup>';
+							}
+							echo '</td>';
 							echo '<td><a href="admin_users.php?action=edit&user_id=' . $userclass->getUserId() . '"><span dir="auto">'.$userclass->getUserName().'</span></a></td>';
 							echo '<td>'.$ALL_EDIT_OPTIONS[$user->setting_value].'</td>';
 							echo '<td><a href="#" onclick="return message(\'' . Filter::escapeHtml($userclass->getUserName()) . '\', \'\', \'\');">' . Filter::escapeHtml($userclass->getEmail()) . '</a></td>';
