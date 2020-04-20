@@ -14,3 +14,10 @@ apcclear.php
 awstats-icon
 awstatsicons
 modules_v3/openstreetmap
+modules_v3/custom_js/
+
+.well-known
+stats/**
+.htaccess
+robots.txt
+data/aliases.csv
