@@ -55,12 +55,16 @@ class Mail {
 	 */
 	public static function send(Tree $tree, $to_email, $to_name, $replyto_email, $replyto_name, $subject, $message) {
 		try {
+			$umlaute = array("/ä/","/ö/","/ü/","/Ä/","/Ö/","/Ü/","/ß/");
+			$replace = array("ae","oe","ue","Ae","Oe","Ue","ss");
+			$from_new = preg_replace($umlaute, $replace,  $tree->getPreference('title')); 
+			$subject_new = preg_replace($umlaute, $replace, $subject); 
 			$mail = new Zend_Mail('UTF-8');
 			$mail
-				->setSubject($subject)
+				->setSubject($subject_new)
 				->setBodyHtml($message)
 				->setBodyText(Filter::unescapeHtml($message))
-				->setFrom(Site::getPreference('SMTP_FROM_NAME'), $tree->getPreference('title'))
+				->setFrom(Site::getPreference('SMTP_FROM_NAME'), $from_new )
 				->addTo($to_email, $to_name)
 				->setReplyTo($replyto_email, $replyto_name)
 				->send(self::transport());
