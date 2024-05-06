@@ -21,3 +21,7 @@ stats/**
 .htaccess
 robots.txt
 data/aliases.csv
+
+devbox*
+.devbox/**
+.envrc
