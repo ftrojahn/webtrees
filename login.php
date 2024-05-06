@@ -284,6 +284,54 @@ case 'register':
 				I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1])
 			);
 			Log::addAuthenticationLog('Possible spam registration from "' . $user_name . '"/"' . $user_email . '" comments="' . $user_comments . '"');
+		} elseif (Functions::countSpaces(trim($user_realname)) == 0) {
+			FlashMessages::addMessage('Der Name ist nicht vollständig. This is no full realname.');
+		} elseif ((Functions::countSpaces(trim($user_realname)) == 0 && Functions::countCapitals($user_realname) > 2) || (Functions::countSpaces(trim($user_realname)) == 1 && Functions::countCapitals($user_realname) > 3) || (Functions::countSpaces(trim($user_realname)) > 1 && Functions::countCapitals($user_realname) > 4) || (Functions::countSpaces(trim($user_name)) > 1 && Functions::countCapitals($user_name) > 4)  || (Functions::countSpaces(trim($user_name)) == 1 && Functions::countCapitals($user_name) > 3)  || (Functions::countSpaces(trim($user_name)) == 0 && Functions::countCapitals($user_name) > 2)) {
+			// Generate an email in the admin’s language - catched a spammer
+			$webmaster = User::find($WT_TREE->getPreference('WEBMASTER_USER_ID'));
+			I18N::init($webmaster->getPreference('language'));
+
+			$mail1_body =
+				I18N::translate('Hello administrator…') . Mail::EOL . Mail::EOL .
+				/* I18N: %s is a server name/URL */
+				'Username' . ' ' . Filter::escapeHtml($user_name) . Mail::EOL .
+				'Real name' . ' ' . Filter::escapeHtml($user_realname) . Mail::EOL .
+				'Email address' . ' ' . Filter::escapeHtml($user_email) . Mail::EOL .
+				'Comments' . ' ' . Filter::escapeHtml($user_comments) . Mail::EOL . Mail::EOL .
+				'This SPAMMER has NOT been sent an e-mail.' . Mail::EOL . Mail::EOL .
+				Mail::auditFooter();
+
+			$mail1_subject = /* I18N: %s is a server name/URL */ 'New SPAMMER for AbuseIPDB at '. WT_BASE_URL . ' ' . $WT_TREE->getTitle();
+			I18N::init(WT_LOCALE);
+
+			echo '<div id="login-register-page">';
+
+			// Send admin message by email and/or internal messaging
+			Mail::send(
+				// “From:” header
+				$WT_TREE,
+				// “To:” header
+				$webmaster->getEmail(),
+				$webmaster->getRealName(),
+				// “Reply-To:” header
+				$webmaster->getEmail(),
+				$webmaster->getRealName(),
+				// Message body
+				$mail1_subject,
+				$mail1_body
+			);
+			$mail1_method = $webmaster->getPreference('contact_method');
+			if ($mail1_method != 'messaging3' && $mail1_method != 'mailto' && $mail1_method != 'none') {
+				Database::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
+					->execute(array(Filter::escapeHtml($user_email), WT_CLIENT_IP, $webmaster->getUserId(), $mail1_subject, Filter::unescapeHtml($mail1_body)));
+			}
+
+			echo '<div class="confirm"><p>', I18N::translate('Hello %s…<br>Thank you for your registration.', Filter::escapeHtml($user_realname)), '</p>';
+			echo '<p>', 'We will not send a confirmation email to your address <b>'.Filter::escapeHtml($user_email).'</b>.  You cannot verify your account request by following instructions in the confirmation email. You will have to apply again.<br><br>Since you try to fill our inbox with unsolicited content, we will register your ip address with AbuseIPDB.<br><br>If you think this is not correct, please contact us through our contact form.</p>';
+			echo '</div>';
+			echo '</div>';
+
+			return;
 		} else {
 			// Everything looks good - create the user
 			$controller->pageHeader();

@@ -2235,4 +2235,27 @@ class Functions {
 	public static function isFileExternal($file) {
 		return strpos($file, '://') !== false;
 	}
+
+	/**
+	 * Determines how many capital letters are in string
+	 *
+	 * @param string $str
+	 *
+	 * @return int
+	 */
+	public static function countCapitals($s) {
+	  return mb_strlen(preg_replace('/[^\p{Lu}]/u', '', $s));
+	}
+
+	/**
+	 * Determines how many spaces are in string
+	 *
+	 * @param string $str
+	 *
+	 * @return bool
+	 */
+	public static function countSpaces($s) {
+	  return mb_strlen(preg_replace('/[^\s]/', '', $s));
+	}
+
 }
