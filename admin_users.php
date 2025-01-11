@@ -698,7 +698,7 @@ case 'cleanup':
 	<?php
 	// Check for idle users
 	$month = Filter::getInteger('month', 1, 12, 6);
-	echo '<tr><th colspan="2">', I18N::translate('Number of months since the last login for a user’s account to be considered inactive: '), '</th>';
+	echo '<tr><th colspan="3">', I18N::translate('Number of months since the last login for a user’s account to be considered inactive: '), '</th>';
 	echo '<td><select onchange="document.location=options[selectedIndex].value;">';
 	for ($i = 1; $i <= 12; $i++) {
 		echo '<option value="admin_users.php?action=cleanup&amp;month=' . $i . '" ';
@@ -728,7 +728,12 @@ case 'cleanup':
 						<?php echo $user->getRealNameHtml(); ?>
 					</a>
 				</td>
-				<td>
+                <td>
+                    <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
+						<?php echo $user->getEmail(); ?>
+                    </a>
+                </td>
+                <td>
 					<?php echo I18N::translate('User’s account has been inactive too long: ') . FunctionsDate::timestampToGedcomDate($datelogin)->display(); ?>
 				</td>
 				<td>
@@ -752,7 +757,12 @@ case 'cleanup':
 						<?php echo $user->getRealNameHtml(); ?>
 					</a>
 				</td>
-				<td>
+                <td>
+                    <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
+						<?php echo $user->getEmail(); ?>
+                    </a>
+                </td>
+                <td>
 					<?php echo I18N::translate('User didn’t verify within 7 days.'); ?>
 				</td>
 				<td>
@@ -776,7 +786,12 @@ case 'cleanup':
 						<?php echo $user->getRealNameHtml(); ?>
 					</a>
 				</td>
-				<td>
+                <td>
+                    <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
+						<?php echo $user->getEmail(); ?>
+                    </a>
+                </td>
+                <td>
 					<?php echo I18N::translate('User not verified by administrator.'); ?>
 				</td>
 				<td>
