@@ -697,10 +697,10 @@ case 'cleanup':
 	<table class="table table-bordered">
 	<?php
 	// Check for idle users
-	$month = Filter::getInteger('month', 1, 96, 6);
+	$month = Filter::getInteger('month', 1, 120, 12);
 	echo '<tr><th colspan="3">', I18N::translate('Number of months since the last login for a user’s account to be considered inactive: '), '</th>';
 	echo '<td><select onchange="document.location=options[selectedIndex].value;">';
-	for ($i = 1; $i <= 96; $i+6) {
+	for ($i = 1; $i <= 120; $i=($i==1?12:$i+12)) {
 		echo '<option value="admin_users.php?action=cleanup&amp;month=' . $i . '" ';
 		if ($i === $month) {
 			echo 'selected';
