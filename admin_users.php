@@ -726,7 +726,9 @@ case 'cleanup':
 						<?php echo Filter::escapeHtml($user->getUserName()); ?>
 						—
 						<?php echo $user->getRealNameHtml(); ?>
-					</a>
+                        —
+						<?php echo $user->getUserId(); ?>
+                    </a>
 				</td>
                 <td>
                     <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
@@ -755,7 +757,9 @@ case 'cleanup':
 						<?php echo Filter::escapeHtml($user->getUserName()); ?>
 						—
 						<?php echo $user->getRealNameHtml(); ?>
-					</a>
+                        —
+						<?php echo $user->getUserId(); ?>
+                    </a>
 				</td>
                 <td>
                     <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
@@ -784,7 +788,9 @@ case 'cleanup':
 						<?php echo Filter::escapeHtml($user->getUserName()); ?>
 						—
 						<?php echo $user->getRealNameHtml(); ?>
-					</a>
+                        —
+						<?php echo $user->getUserId(); ?>
+                    </a>
 				</td>
                 <td>
                     <a href="?action=edit&amp;user_id=<?php echo $user->getUserId(); ?>">
