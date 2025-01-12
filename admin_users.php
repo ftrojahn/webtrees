@@ -779,7 +779,7 @@ case 'cleanup':
 
 	// Check users not verified by admin
 	foreach (User::all() as $user) {
-		if ($user->getUserId() !== Auth::id() && !$user->getPreference('approved') && $user->getPreference('verified')) {
+		if ($user->getUserId() !== Auth::id() && !$user->getPreference('verified_by_admin') && $user->getPreference('verified')) {
 			$ucnt++;
 			?>
 			<tr>
