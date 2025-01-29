@@ -38,6 +38,7 @@
                     pkgs.ddev
                     pkgs.php83Packages.php-codesniffer
                     pkgs.php83Packages.phpstan
+                    pkgs.php83Extensions.pcov
                   ];
 
                   enterShell = ''
