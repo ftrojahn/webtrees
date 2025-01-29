@@ -13,6 +13,12 @@
 /resources/lang/*/messages.php
 !/resources/lang/en-US/messages.php
 
+.devenv
+.direnv
+.envrc
+
+.idea/
+
 /robots.txt
 
 /tests/clover.xml
