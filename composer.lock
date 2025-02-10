@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "37d4f4010692b4878f8fde7e408948db",
+    "content-hash": "1bb4b2f6cbb17a1b0ba226d9c699783e",
     "packages": [
         {
             "name": "aura/router",
@@ -2190,6 +2190,129 @@
                 }
             ],
             "time": "2024-09-21T08:32:55+00:00"
+        },
+        {
+            "name": "magicsunday/webtrees-module-base",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/magicsunday/webtrees-module-base.git",
+                "reference": "3c83ba56e989803a46cfaad7206088424cb6dac8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/magicsunday/webtrees-module-base/zipball/3c83ba56e989803a46cfaad7206088424cb6dac8",
+                "reference": "3c83ba56e989803a46cfaad7206088424cb6dac8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "fisharebest/webtrees": "~2.2.0 || dev-main"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "3.63.2",
+                "overtrue/phplint": "^3.4 || ^9.0",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-deprecation-rules": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.3",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "phpunit/phpunit": "^9.0 || ^10.0 || ^11.0",
+                "rector/rector": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MagicSunday\\Webtrees\\ModuleBase\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Rico Sonntag",
+                    "email": "mail@ricosonntag.de",
+                    "homepage": "https://ricosonntag.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This modules provides base functionality for all magicsunday/webtrees modules.",
+            "keywords": [
+                "module",
+                "webtrees"
+            ],
+            "support": {
+                "issues": "https://github.com/magicsunday/webtrees-module-base/issues",
+                "source": "https://github.com/magicsunday/webtrees-module-base/tree/1.0.4"
+            },
+            "funding": [
+                {
+                    "url": "https://paypal.me/magicsunday",
+                    "type": "custom"
+                }
+            ],
+            "time": "2024-10-17T12:06:55+00:00"
+        },
+        {
+            "name": "magicsunday/webtrees-module-installer-plugin",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/magicsunday/webtrees-module-installer-plugin.git",
+                "reference": "0ba38c7a0975b4448fe3426c3d076609f4690165"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/magicsunday/webtrees-module-installer-plugin/zipball/0ba38c7a0975b4448fe3426c3d076609f4690165",
+                "reference": "0ba38c7a0975b4448fe3426c3d076609f4690165",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.3",
+                "php": ">=8.2.0 <8.4.0"
+            },
+            "require-dev": {
+                "composer/composer": "^2.5",
+                "friendsofphp/php-cs-fixer": "^3.50",
+                "overtrue/phplint": "^3.4 || ^9.0",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-deprecation-rules": "^1.1",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "rector/rector": "^1.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "MagicSunday\\Webtrees\\Composer\\ModuleInstallerPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "MagicSunday\\Webtrees\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Rico Sonntag",
+                    "email": "mail@ricosonntag.de",
+                    "homepage": "https://ricosonntag.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A composer plugin installer to install webtrees modules directly to the modules_v4 directory.",
+            "keywords": [
+                "installer",
+                "modules",
+                "webtrees"
+            ],
+            "support": {
+                "issues": "https://github.com/magicsunday/webtrees-module-installer-plugin/issues",
+                "source": "https://github.com/magicsunday/webtrees-module-installer-plugin/tree/1.5.0"
+            },
+            "time": "2024-03-21T06:34:23+00:00"
         },
         {
             "name": "middlewares/client-ip",
