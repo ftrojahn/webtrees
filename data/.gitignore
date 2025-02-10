@@ -1,4 +1,10 @@
-*
-!.gitignore
-!.htaccess
-!index.php
+*.ged
+*.GED
+aliases.csv
+cache/
+config.ini.php
+histo.*.php
+html_purifier_cache/
+images/
+language/
+media/

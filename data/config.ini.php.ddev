@@ -1,0 +1,7 @@
+; <?php exit; ?> DO NOT DELETE THIS LINE
+dbhost="db"
+dbport="3306"
+dbuser="db"
+dbpass="db"
+dbname="db"
+tblpfx="wt_"

@@ -13,6 +13,8 @@
 /resources/lang/*/messages.php
 !/resources/lang/en-US/messages.php
 
+/sql/
+
 .devenv
 .direnv
 .envrc
