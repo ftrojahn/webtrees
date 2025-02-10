@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bb4b2f6cbb17a1b0ba226d9c699783e",
+    "content-hash": "38b854220f4fe525b32a67433affa442",
     "packages": [
         {
             "name": "aura/router",
@@ -2313,6 +2313,104 @@
                 "source": "https://github.com/magicsunday/webtrees-module-installer-plugin/tree/1.5.0"
             },
             "time": "2024-03-21T06:34:23+00:00"
+        },
+        {
+            "name": "magicsunday/webtrees-statistic",
+            "version": "dev-remove-depends",
+            "source": {
+                "type": "git",
+                "url": "git@git.trojahn.de:soFT/webtrees-statistics.git",
+                "reference": "cb804380d62a89440293abef8062caf7e4e1e828"
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-json": "*",
+                "magicsunday/webtrees-module-installer-plugin": "^1.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.50",
+                "overtrue/phplint": "^3.4 || ^9.0",
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-deprecation-rules": "^1.1",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "rector/rector": "^1.0"
+            },
+            "type": "webtrees-module",
+            "autoload": {
+                "psr-4": {
+                    "MagicSunday\\Webtrees\\Statistic\\": "src/"
+                }
+            },
+            "scripts": {
+                "module:build": [
+                    "### Remove any left over files",
+                    "rm -Rf webtrees-statistics/",
+                    "### Checkout latest version of repository",
+                    "git archive --prefix=webtrees-statistics/ HEAD --format=tar | tar -x",
+                    "### Remove all not required files from archive",
+                    "rm -rf webtrees-statistics/.github",
+                    "rm -rf webtrees-statistics/resources/js/modules",
+                    "rm -rf webtrees-statistics/test",
+                    "rm -f webtrees-statistics/.gitattributes",
+                    "rm -f webtrees-statistics/.gitignore",
+                    "rm -f webtrees-statistics/composer.json",
+                    "rm -f webtrees-statistics/package.json",
+                    "rm -f webtrees-statistics/rollup.config.js",
+                    "rm -f webtrees-statistics/phpstan.neon",
+                    "rm -f webtrees-statistics/phpstan-baseline.neon",
+                    "rm -f webtrees-statistics/.php-cs-fixer.dist.php",
+                    "rm -f webtrees-statistics/.phplint.yml",
+                    "rm -f webtrees-statistics/rector.php",
+                    "### Create archive",
+                    "zip --quiet --recurse-paths --move -9 webtrees-statistics.zip webtrees-statistics"
+                ],
+                "ci:test:php:lint": [
+                    "phplint"
+                ],
+                "ci:test:php:phpstan": [
+                    "phpstan analyze"
+                ],
+                "ci:test:php:phpstan:baseline": [
+                    "phpstan analyze --generate-baseline phpstan-baseline.neon --allow-empty-baseline"
+                ],
+                "ci:test:php:rector": [
+                    "rector process --config rector.php --dry-run"
+                ],
+                "ci:test:php:unit": [
+                    "phpunit"
+                ],
+                "ci:cgl": [
+                    "php-cs-fixer fix --diff --verbose"
+                ],
+                "ci:test": [
+                    "@ci:test:php:lint",
+                    "@ci:test:php:phpstan",
+                    "@ci:test:php:rector",
+                    "@ci:test:php:unit"
+                ],
+                "module:check": [
+                    "@ci:test"
+                ]
+            },
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Rico Sonntag",
+                    "email": "mail@ricosonntag.de",
+                    "homepage": "https://ricosonntag.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This modules provides SVG based statistics for the [webtrees](https://www.webtrees.net) genealogy application.",
+            "keywords": [
+                "chart",
+                "module",
+                "statistic",
+                "webtrees"
+            ],
+            "time": "2025-02-10T17:26:34+00:00"
         },
         {
             "name": "middlewares/client-ip",
@@ -7764,7 +7862,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "magicsunday/webtrees-statistic": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

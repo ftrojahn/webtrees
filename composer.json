@@ -31,6 +31,12 @@
             "magicsunday/webtrees-module-installer-plugin": true
         }
     },
+    "repositories": {
+		"webtrees-statistic": {
+			"type": "vcs",
+			"url": "git@git.trojahn.de:soFT/webtrees-statistics.git"
+		}
+    },
     "require": {
         "php": "8.3 - 8.4",
         "ext-ctype": "*",
@@ -60,6 +66,7 @@
         "league/flysystem-ziparchive": "3.29.0",
         "magicsunday/webtrees-module-base": "^1.0",
         "magicsunday/webtrees-module-installer-plugin": "^1.5",
+        "magicsunday/webtrees-statistic": "dev-remove-depends",
         "middlewares/client-ip": "2.0.1",
         "mlocati/ip-lib": "1.20.0",
         "nesbot/carbon": "3.8.4",
@@ -121,20 +128,20 @@
         ],
         "webtrees:phpcs": [
             "@composer global require squizlabs/php_codesniffer=* --quiet",
-            "~/.composer/vendor/bin/phpcs --colors --extensions=php   --standard=PSR12 --exclude=Generic.Files.LineLength index.php app tests",
+            "phpcs --colors --extensions=php   --standard=PSR12 --exclude=Generic.Files.LineLength index.php app tests",
             "#~/.composer/vendor/bin/phpcs --colors --extensions=phtml --standard=PSR12 --exclude=Generic.Files.LineLength resources/views",
-            "~/.composer/vendor/bin/phpcs --colors --extensions=css resources/css"
+            "phpcs --colors --extensions=css resources/css"
         ],
         "webtrees:phpstan": [
             "@composer global require --quiet phpstan/phpstan=* phpstan/extension-installer=* phpstan/phpstan-deprecation-rules=* phpstan/phpstan-strict-rules=* phpstan/phpstan-phpunit=*",
             "@composer install --quiet",
-            "~/.composer/vendor/bin/phpstan analyze -v --memory-limit=-1",
+            "phpstan analyze -v --memory-limit=-1",
             "@composer install --no-dev --quiet"
         ],
         "webtrees:phpstan-baseline": [
             "@composer global require --quiet phpstan/phpstan=* phpstan/extension-installer=* phpstan/phpstan-deprecation-rules=* phpstan/phpstan-strict-rules=* phpstan/phpstan-phpunit=*",
             "@composer install --quiet",
-            "~/.composer/vendor/bin/phpstan analyze --memory-limit=-1 --generate-baseline=phpstan-baseline.neon",
+            "phpstan analyze --memory-limit=-1 --generate-baseline=phpstan-baseline.neon",
             "@composer install --no-dev --quiet"
         ],
         "webtrees:psalm": [
