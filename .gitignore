@@ -18,8 +18,11 @@
 .devenv
 .direnv
 .envrc
+.gotmp/
 
 .idea/
+.phpunit.cache/
+.user.ini
 
 /robots.txt
 
