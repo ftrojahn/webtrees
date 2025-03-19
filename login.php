@@ -286,7 +286,7 @@ case 'register':
 			Log::addAuthenticationLog('Possible spam registration from "' . $user_name . '"/"' . $user_email . '" comments="' . $user_comments . '"');
 		} elseif (Functions::countSpaces(trim($user_realname)) == 0) {
 			FlashMessages::addMessage('Der Name ist nicht vollständig. This is no full realname.');
-		} elseif ((Functions::countSpaces(trim($user_realname)) == 0 && Functions::countCapitals($user_realname) > 2) || (Functions::countSpaces(trim($user_realname)) == 1 && Functions::countCapitals($user_realname) > 3) || (Functions::countSpaces(trim($user_realname)) > 1 && Functions::countCapitals($user_realname) > 4) || (Functions::countSpaces(trim($user_name)) > 1 && Functions::countCapitals($user_name) > 4)  || (Functions::countSpaces(trim($user_name)) == 1 && Functions::countCapitals($user_name) > 3)  || (Functions::countSpaces(trim($user_name)) == 0 && Functions::countCapitals($user_name) > 2)) {
+		} elseif ((Functions::countSpaces(trim($user_realname)) == 0 && Functions::countCapitals($user_realname) > 2) || (Functions::countSpaces(trim($user_realname)) == 1 && Functions::countCapitals($user_realname) > 3) || (Functions::countSpaces(trim($user_realname)) > 1 && Functions::countCapitals($user_realname) > 4) || (Functions::countSpaces(trim($user_name)) > 1 && Functions::countCapitals($user_name) > 4)  || (Functions::countSpaces(trim($user_name)) == 1 && Functions::countCapitals($user_name) > 3)  || (Functions::countSpaces(trim($user_name)) == 0 && Functions::countCapitals($user_name) > 3)) {
 			// Generate an email in the admin’s language - catched a spammer
 			$webmaster = User::find($WT_TREE->getPreference('WEBMASTER_USER_ID'));
 			I18N::init($webmaster->getPreference('language'));
