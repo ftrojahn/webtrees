@@ -697,10 +697,10 @@ case 'cleanup':
 	<table class="table table-bordered">
 	<?php
 	// Check for idle users
-	$month = Filter::getInteger('month', 1, 120, 12);
+	$month = Filter::getInteger('month', 1, 240, 12);
 	echo '<tr><th colspan="3">', I18N::translate('Number of months since the last login for a user’s account to be considered inactive: '), '</th>';
 	echo '<td><select onchange="document.location=options[selectedIndex].value;">';
-	for ($i = 1; $i <= 120; $i=($i==1?12:$i+12)) {
+	for ($i = 1; $i <= 240; $i=($i==1?12:$i+12)) {
 		echo '<option value="admin_users.php?action=cleanup&amp;month=' . $i . '" ';
 		if ($i === $month) {
 			echo 'selected';
@@ -739,7 +739,7 @@ case 'cleanup':
 					<?php echo I18N::translate('User’s account has been inactive too long: ') . FunctionsDate::timestampToGedcomDate($datelogin)->display(); ?>
 				</td>
 				<td>
-					<input type="checkbox" name="del_<?php echo $user->getUserId(); ?>" value="1">
+					<input type="checkbox" checked name="del_<?php echo $user->getUserId(); ?>" value="1">
 				</td>
 			</tr>
 		<?php
@@ -770,7 +770,7 @@ case 'cleanup':
 					<?php echo I18N::translate('User didn’t verify within 7 days.'); ?>
 				</td>
 				<td>
-					<input type="checkbox" checked name="del_<?php echo $user->getUserId(); ?>" value="1">
+					<input type="checkbox" <?php if ($month === 240) echo 'checked'; ?> name="del_<?php echo $user->getUserId(); ?>" value="1">
 				</td>
 			</tr>
 			<?php
