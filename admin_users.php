@@ -818,7 +818,7 @@ case 'cleanup':
 		</table>
 		<p>
 		<?php if ($ucnt): ?>
-			<input type="submit" value="<?php echo I18N::translate('delete'); ?>">
+			<input type="submit" value="<?php echo "$ucnt "; echo I18N::translate('delete'); ?>">
 			<?php else: ?>
 			<?php echo I18N::translate('Nothing found to cleanup'); ?>
 			<?php endif; ?>
