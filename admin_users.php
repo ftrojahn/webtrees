@@ -719,6 +719,12 @@ case 'cleanup':
 		}
 		if (mktime(0, 0, 0, (int) date('m') - $month, (int) date('d'), (int) date('Y')) > $datelogin && $user->getPreference('verified') && $user->getPreference('verified_by_admin') && $user->getPreference('undeliverable')) {
 			$ucnt++;
+			$istKeinVerwalter=false;
+			$gedcoms = Database::prepare("SELECT gedcom_id, setting_value FROM `##user_gedcom_setting` WHERE user_id = ? AND setting_name = 'canedit' AND setting_value IN ('admin','accept','edit')")->execute(array($user->getUserId()))->fetchAll();
+			if (sizeof($gedcoms) == 0) {
+				  $istKeinVerwalter = true;
+			} 
+
 			?>
 			<tr>
 				<td>
@@ -737,9 +743,10 @@ case 'cleanup':
                 </td>
                 <td>
 					<?php echo I18N::translate('User’s account has been inactive too long: ') . FunctionsDate::timestampToGedcomDate($datelogin)->display(); ?>
+					<?php if (!$istKeinVerwalter) { echo '<br>Nicht gesetzt weil: <strong>IST AL-Verwalter.</strong>'; } ?>
 				</td>
 				<td>
-					<input type="checkbox" checked name="del_<?php echo $user->getUserId(); ?>" value="1">
+					<input type="checkbox" <?php if ($user->getPreference('undeliverable') && $istKeinVerwalter ) { echo 'checked'; } ?> name="del_<?php echo $user->getUserId(); ?>" value="1">
 				</td>
 			</tr>
 		<?php
